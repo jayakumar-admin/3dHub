@@ -1,0 +1,91 @@
+
+<div class="bg-blue-50 dark:bg-gray-900 min-h-screen py-12 px-4">
+  <div class="container mx-auto max-w-4xl">
+    <h1 class="text-4xl font-bold text-center text-primary-light dark:text-blue-400 mb-8">Shopping Cart</h1>
+
+    <!-- Progress Steps -->
+    <div class="flex justify-center items-center mb-12 space-x-2 sm:space-x-4">
+        <div class="flex items-center text-primary-light dark:text-blue-400">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-primary-light text-white font-bold text-lg">1</div>
+            <span class="ml-2 font-semibold">Items</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex items-center text-gray-500">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-gray-300 dark:bg-gray-600 font-bold text-lg">2</div>
+            <span class="ml-2 font-semibold">Shipping</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex items-center text-gray-500">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-gray-300 dark:bg-gray-600 font-bold text-lg">3</div>
+            <span class="ml-2 font-semibold">Payment</span>
+        </div>
+    </div>
+
+    @if(cartService.cartItems().length > 0) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2 bg-white dark:bg-dark-card rounded-2xl shadow-lg p-6">
+          <h2 class="text-2xl font-bold mb-6 text-light-text dark:text-dark-text">Your Items ({{ cartService.cartCount() }})</h2>
+          <div class="space-y-6">
+            @for(item of cartService.cartItems(); track item.productId) {
+              <div class="flex items-center space-x-4">
+                <img [src]="item.image" [alt]="item.productName" class="w-24 h-24 rounded-lg object-cover">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-lg text-light-text dark:text-dark-text">{{ item.productName }}</h3>
+                  <div class="flex items-center mt-2">
+                    <label class="text-sm mr-2">Qty:</label>
+                    <input type="number" [value]="item.quantity" (change)="updateQuantity(item, +$event.target.value)" min="1" class="w-16 rounded-md border border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 focus:border-blue-500 focus:ring-blue-500">
+                  </div>
+                  <button (click)="removeItem(item)" class="text-sm text-red-500 hover:underline mt-1">Remove</button>
+                </div>
+                <div class="text-right">
+                  <p class="text-lg font-bold text-primary-light dark:text-blue-400">₹{{ item.price * item.quantity }}</p>
+                  @if(item.oldPrice) {
+                    <p class="text-sm text-gray-500 line-through">₹{{ item.oldPrice * item.quantity }}</p>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-6 h-fit">
+          <h2 class="text-2xl font-bold mb-6 text-light-text dark:text-dark-text">Summary</h2>
+          <div class="space-y-3 text-gray-700 dark:text-gray-300">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span>₹{{ cartService.subtotal() }}</span>
+            </div>
+            @if(cartService.totalSavings() > 0) {
+              <div class="flex justify-between text-green-600 font-semibold">
+                <span>Discount</span>
+                <span>- ₹{{ cartService.totalSavings() }}</span>
+              </div>
+            }
+            <div class="flex justify-between">
+              <span>Shipping</span>
+              <span>₹{{ cartService.shipping() }}</span>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+            <div class="flex justify-between font-bold text-lg text-light-text dark:text-dark-text">
+              <span>Total</span>
+              <span>₹{{ cartService.total() }}</span>
+            </div>
+          </div>
+          <a routerLink="/shipping" class="block text-center w-full mt-6 bg-primary-light text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity">
+            Proceed to Shipping
+          </a>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center bg-white dark:bg-dark-card rounded-2xl shadow-lg p-12">
+        <h2 class="text-2xl font-bold text-light-text dark:text-dark-text">Your cart is empty</h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Looks like you haven't added anything to your cart yet.</p>
+        <a routerLink="/products" class="mt-6 inline-block bg-primary-light text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+          Start Shopping
+        </a>
+      </div>
+    }
+  </div>
+</div>

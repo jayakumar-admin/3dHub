@@ -1,0 +1,180 @@
+
+<div>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ pageTitle() }}</h1>
+    <a routerLink="/admin/products" class="text-primary-light dark:text-primary-dark hover:underline">&larr; Back to Products</a>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="space-y-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Primary Info -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Primary Info</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-4">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label>
+              <input type="text" id="name" formControlName="name" class="admin-input">
+              <div class="h-5">
+                @if (name?.invalid && (name?.touched || name?.dirty)) {
+                  <p class="text-red-500 text-xs mt-1">
+                    @if (name?.hasError('required')) {
+                      Product name is required.
+                    }
+                  </p>
+                }
+              </div>
+            </div>
+            <div>
+              <label for="sku" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SKU</label>
+              <input type="text" id="sku" formControlName="sku" class="admin-input">
+              <div class="h-5">
+                @if (sku?.invalid && (sku?.touched || sku?.dirty)) {
+                  <p class="text-red-500 text-xs mt-1">
+                    @if (sku?.hasError('required')) {
+                      SKU is required.
+                    }
+                  </p>
+                }
+              </div>
+            </div>
+            <div class="md:col-span-2">
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                <select id="category" formControlName="category" class="admin-input">
+                  <option value="" disabled>Select a category</option>
+                  @for(cat of categories(); track cat.id) {
+                    <option [value]="cat.id">{{ cat.name }}</option>
+                  }
+                </select>
+                <div class="h-5">
+                  @if (category?.invalid && (category?.touched || category?.dirty)) {
+                    <p class="text-red-500 text-xs mt-1">
+                      @if (category?.hasError('required')) {
+                        Category is required.
+                      }
+                    </p>
+                  }
+                </div>
+            </div>
+            <div class="md:col-span-2">
+              <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+              <textarea id="description" formControlName="description" rows="4" class="admin-input"></textarea>
+            </div>
+            <div class="flex items-center">
+                <input id="enabled" type="checkbox" formControlName="enabled" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <label for="enabled" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Product Enabled</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pricing & Stock -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Pricing & Stock</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 pt-4">
+            <div>
+              <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Discounted Price (₹)</label>
+              <input type="number" id="price" formControlName="price" class="admin-input">
+              <div class="h-5">
+                @if (price?.invalid && (price?.touched || price?.dirty)) {
+                  <p class="text-red-500 text-xs mt-1">
+                    @if (price?.hasError('required')) { Price is required. }
+                    @if (price?.hasError('min')) { Price cannot be negative. }
+                  </p>
+                }
+              </div>
+            </div>
+            <div>
+              <label for="oldPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Original Price (₹)</label>
+              <input type="number" id="oldPrice" formControlName="oldPrice" class="admin-input" placeholder="e.g., 1999">
+              <div class="h-5"></div>
+            </div>
+            <div>
+              <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Quantity</label>
+              <input type="number" id="stock" formControlName="stock" class="admin-input">
+              <div class="h-5">
+                @if (stock?.invalid && (stock?.touched || stock?.dirty)) {
+                  <p class="text-red-500 text-xs mt-1">
+                    @if (stock?.hasError('required')) { Stock is required. }
+                    @if (stock?.hasError('min')) { Stock cannot be negative. }
+                  </p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-8">
+        <!-- Shipping & Organization -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Shipping & Organization</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-4">
+              <div>
+                <label for="weight" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Weight (kg)</label>
+                <input type="number" id="weight" formControlName="weight" class="admin-input">
+                 <div class="h-5">
+                  @if (weight?.invalid && (weight?.touched || weight?.dirty)) {
+                    <p class="text-red-500 text-xs mt-1">
+                      @if (weight?.hasError('min')) { Weight cannot be negative. }
+                    </p>
+                  }
+                </div>
+              </div>
+              <div class="md:col-span-2 grid grid-cols-3 gap-4" formGroupName="dimensions">
+                <div>
+                  <label for="length" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">L (cm)</label>
+                  <input type="number" id="length" formControlName="length" class="admin-input">
+                   <div class="h-5">@if (dimensionsGroup?.get('length')?.invalid && (dimensionsGroup?.get('length')?.touched || dimensionsGroup?.get('length')?.dirty)) { <p class="text-red-500 text-xs mt-1">@if (dimensionsGroup?.get('length')?.hasError('min')) { Invalid. } </p> }</div>
+                </div>
+                <div>
+                  <label for="width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">W (cm)</label>
+                  <input type="number" id="width" formControlName="width" class="admin-input">
+                  <div class="h-5">@if (dimensionsGroup?.get('width')?.invalid && (dimensionsGroup?.get('width')?.touched || dimensionsGroup?.get('width')?.dirty)) { <p class="text-red-500 text-xs mt-1">@if (dimensionsGroup?.get('width')?.hasError('min')) { Invalid. } </p> }</div>
+                </div>
+                <div>
+                  <label for="height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">H (cm)</label>
+                  <input type="number" id="height" formControlName="height" class="admin-input">
+                  <div class="h-5">@if (dimensionsGroup?.get('height')?.invalid && (dimensionsGroup?.get('height')?.touched || dimensionsGroup?.get('height')?.dirty)) { <p class="text-red-500 text-xs mt-1">@if (dimensionsGroup?.get('height')?.hasError('min')) { Invalid. } </p> }</div>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags (comma-separated)</label>
+                <input type="text" id="tags" formControlName="tags" class="admin-input">
+                <div class="h-5"></div>
+              </div>
+          </div>
+        </div>
+        
+        <!-- Images -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Product Images</h2>
+            <div formArrayName="images" class="space-y-4">
+              @for(image of images.controls; track $index) {
+                <div class="flex items-center space-x-4">
+                  <img [src]="image.value || 'https://picsum.photos/seed/placeholder/100/100'" class="w-16 h-16 rounded-lg object-cover border dark:border-gray-600">
+                  <div class="flex-1">
+                    <label for="image-{{$index}}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image {{ $index + 1 }}</label>
+                    <input type="file" (change)="onFileChange($event, $index)" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600"/>
+                  </div>
+                  <button type="button" (click)="removeImage($index)" class="text-red-500 hover:text-red-700 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              }
+            </div>
+            <button type="button" (click)="addImage()" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+              Add Image
+            </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-8">
+      <button type="submit" [disabled]="productForm.invalid" class="bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+        Save Product
+      </button>
+    </div>
+  </form>
+</div>

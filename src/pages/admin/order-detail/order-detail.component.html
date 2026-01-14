@@ -1,0 +1,133 @@
+
+@if(order(); as currentOrder) {
+<div class="text-gray-800 dark:text-gray-200">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Order Details</h1>
+      <p class="text-gray-500 dark:text-gray-400 font-mono">{{ currentOrder.id }}</p>
+    </div>
+    <a routerLink="/admin/orders" class="text-primary-light dark:text-primary-dark hover:underline">&larr; Back to Orders</a>
+  </div>
+
+  <!-- Status Tracker -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-6">Order Status</h2>
+    <div class="flex items-center justify-between">
+      @for(status of ['Pending', 'Processing', 'Shipped', 'Delivered']; track status; let i = $index) {
+        <div class="flex-1 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white" [class]="aStatusIndex >= i ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'">
+               <!-- Icons -->
+               @if(i === 0) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg> }
+               @if(i === 1) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> }
+               @if(i === 2) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2-2h8a1 1 0 001-1zM21 11V5a2 2 0 00-2-2H9.5M19 17h-2a2 2 0 00-2-2H5"></path></svg> }
+               @if(i === 3) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> }
+            </div>
+            <p class="mt-2 font-semibold" [class]="aStatusIndex >= i ? 'text-green-600' : 'text-gray-500'">{{ status }}</p>
+        </div>
+        @if(i < 3) {
+            <div class="flex-1 h-1" [class]="aStatusIndex > i ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"></div>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Order Items -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Order Items ({{ currentOrder.items.length }})</h2>
+        <div class="space-y-4">
+          @for(item of currentOrder.items; track item.productId) {
+            <div class="flex items-center space-x-4 p-2 rounded-md bg-gray-50 dark:bg-gray-700/50">
+              <img [src]="item.image" [alt]="item.productName" class="w-20 h-20 rounded-lg object-cover">
+              <div class="flex-1">
+                <p class="font-semibold text-light-text dark:text-dark-text">{{ item.productName }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Qty: {{ item.quantity }}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold">₹{{ item.price }}</p>
+                <p class="text-sm font-bold">Total: ₹{{ item.price * item.quantity }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Shipping Info -->
+      @if (currentOrder.shippingInfo) {
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4">Shipping Information</h2>
+          <div class="space-y-2 text-sm">
+            <p><strong>Carrier:</strong> {{ currentOrder.shippingInfo.carrier }}</p>
+            <p><strong>Tracking Number:</strong> <span class="font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-md">{{ currentOrder.shippingInfo.trackingNumber }}</span></p>
+            <p><strong>Estimated Delivery:</strong> {{ currentOrder.shippingInfo.estimatedDelivery }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right Column -->
+    <div class="space-y-8">
+      <!-- Actions -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Actions</h2>
+        <div class="space-y-3">
+          <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Change Order Status</label>
+          <select id="status" [value]="currentOrder.status" (change)="updateStatus($event.target.value)" class="admin-input">
+            @for (s of statuses; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <!-- Customer Details -->
+       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4">Customer</h2>
+           <div class="flex items-start space-x-4">
+            <img [src]="currentOrder.customerAvatar" [alt]="currentOrder.customerName" class="w-16 h-16 rounded-full object-cover">
+            <div class="text-sm">
+              <p class="font-bold text-lg">{{currentOrder.customerName}}</p>
+              <a [href]="'mailto:' + currentOrder.customerEmail" class="text-primary-light dark:text-primary-dark hover:underline">{{currentOrder.customerEmail}}</a>
+              <div class="mt-2 pt-2 border-t dark:border-gray-700">
+                <strong class="text-gray-600 dark:text-gray-400">Shipping Address:</strong>
+                <address class="not-italic text-gray-500 dark:text-gray-300">
+                  {{currentOrder.shippingAddress.street}}<br>
+                  {{currentOrder.shippingAddress.city}}, {{currentOrder.shippingAddress.state}} {{currentOrder.shippingAddress.zip}}
+                </address>
+              </div>
+            </div>
+           </div>
+        </div>
+    </div>
+  </div>
+</div>
+} @else {
+  <p>Loading order details...</p>
+}
+
+<!-- Ship Order Modal -->
+@if(isShipModalOpen()) {
+  <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" (click)="closeModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md" (click)="$event.stopPropagation()">
+        <h2 class="text-2xl font-bold mb-4">Enter Shipping Details</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Provide tracking information for the customer.</p>
+        <form [formGroup]="shippingForm" (ngSubmit)="saveShippingInfo()" class="space-y-6">
+            <div>
+                <label for="carrier" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Shipping Carrier (e.g., FedEx)</label>
+                <input type="text" id="carrier" formControlName="carrier" class="admin-input">
+            </div>
+            <div>
+                <label for="trackingNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tracking Number</label>
+                <input type="text" id="trackingNumber" formControlName="trackingNumber" class="admin-input">
+            </div>
+            <div>
+                <label for="estimatedDelivery" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Delivery Date</label>
+                <input type="date" id="estimatedDelivery" formControlName="estimatedDelivery" class="admin-input">
+            </div>
+            <div class="flex justify-end gap-4 pt-4">
+                <button type="button" (click)="closeModal()" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 font-semibold">Cancel</button>
+                <button type="submit" [disabled]="shippingForm.invalid" class="px-4 py-2 rounded-lg bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-semibold disabled:opacity-50">Save & Ship</button>
+            </div>
+        </form>
+    </div>
+  </div>
+}

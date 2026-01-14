@@ -1,0 +1,131 @@
+
+<div class="bg-blue-50 dark:bg-gray-900 min-h-screen py-12 px-4">
+  <div class="container mx-auto max-w-4xl">
+    <h1 class="text-4xl font-bold text-center text-primary-light dark:text-blue-400 mb-8">Checkout</h1>
+
+    <!-- Progress Steps -->
+    <div class="flex justify-center items-center mb-12 space-x-2 sm:space-x-4">
+        <a routerLink="/cart" class="flex items-center text-gray-500 hover:text-primary-light dark:hover:text-blue-400">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-gray-300 dark:bg-gray-600 font-bold text-lg">1</div>
+            <span class="ml-2 font-semibold">Items</span>
+        </a>
+        <div class="flex-1 h-0.5 bg-primary-light dark:bg-blue-400"></div>
+        <div class="flex items-center text-primary-light dark:text-blue-400">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-primary-light text-white font-bold text-lg">2</div>
+            <span class="ml-2 font-semibold">Shipping</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex items-center text-gray-500">
+            <div class="rounded-full h-10 w-10 flex items-center justify-center bg-gray-300 dark:bg-gray-600 font-bold text-lg">3</div>
+            <span class="ml-2 font-semibold">Payment</span>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Shipping Form -->
+      <div class="lg:col-span-2 bg-white dark:bg-dark-card rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 text-light-text dark:text-dark-text">Shipping Address</h2>
+        <form [formGroup]="shippingForm" (ngSubmit)="proceedToPayment()" class="space-y-6">
+          
+          <!-- Full Name -->
+          <div>
+            <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+              <label for="fullName" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Full Name</label>
+              <input type="text" id="fullName" formControlName="fullName" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="John Doe">
+            </div>
+             @if(fullName?.invalid && (fullName?.dirty || fullName?.touched)) {
+                <p class="mt-2 text-sm text-red-600">Full name is required.</p>
+            }
+          </div>
+
+          <!-- Address -->
+          <div>
+            <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+              <label for="address" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Address</label>
+              <input type="text" id="address" formControlName="address" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="123 Main St">
+            </div>
+             @if(address?.invalid && (address?.dirty || address?.touched)) {
+                <p class="mt-2 text-sm text-red-600">Address is required.</p>
+            }
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- City -->
+            <div>
+              <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+                <label for="city" class="block text-xs font-medium text-gray-500 dark:text-gray-400">City</label>
+                <input type="text" id="city" formControlName="city" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Anytown">
+              </div>
+              @if(city?.invalid && (city?.dirty || city?.touched)) {
+                <p class="mt-2 text-sm text-red-600">City is required.</p>
+              }
+            </div>
+            <!-- State -->
+            <div>
+              <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+                <label for="state" class="block text-xs font-medium text-gray-500 dark:text-gray-400">State</label>
+                <input type="text" id="state" formControlName="state" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="CA">
+              </div>
+              @if(state?.invalid && (state?.dirty || state?.touched)) {
+                <p class="mt-2 text-sm text-red-600">State is required.</p>
+              }
+            </div>
+            <!-- ZIP Code -->
+            <div>
+              <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+                <label for="zip" class="block text-xs font-medium text-gray-500 dark:text-gray-400">ZIP Code</label>
+                <input type="text" id="zip" formControlName="zip" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="12345">
+              </div>
+              @if(zip?.invalid && (zip?.dirty || zip?.touched)) {
+                <p class="mt-2 text-sm text-red-600">Valid ZIP is required.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
+              <label for="phone" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Phone Number</label>
+              <input type="tel" id="phone" formControlName="phone" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="1234567890">
+            </div>
+             @if(phone?.invalid && (phone?.dirty || phone?.touched)) {
+                <p class="mt-2 text-sm text-red-600">A valid 10-digit phone number is required.</p>
+            }
+          </div>
+
+           <div class="pt-4">
+             <button type="submit" [disabled]="shippingForm.invalid" class="w-full bg-primary-light text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50">
+               Proceed to Payment
+             </button>
+           </div>
+        </form>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="bg-white dark:bg-dark-card rounded-2xl shadow-lg p-6 h-fit">
+        <h2 class="text-2xl font-bold mb-6 text-light-text dark:text-dark-text">Summary</h2>
+        <div class="space-y-3 text-gray-700 dark:text-gray-300">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span>₹{{ cartService.subtotal() }}</span>
+          </div>
+          @if(cartService.totalSavings() > 0) {
+            <div class="flex justify-between text-green-600 font-semibold">
+              <span>Discount</span>
+              <span>- ₹{{ cartService.totalSavings() }}</span>
+            </div>
+          }
+          <div class="flex justify-between">
+            <span>Shipping</span>
+            <span>₹{{ cartService.shipping() }}</span>
+          </div>
+          <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+          <div class="flex justify-between font-bold text-lg text-light-text dark:text-dark-text">
+            <span>Total</span>
+            <span>₹{{ cartService.total() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

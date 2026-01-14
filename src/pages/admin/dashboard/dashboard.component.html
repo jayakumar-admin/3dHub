@@ -1,0 +1,65 @@
+
+<div class="text-gray-800 dark:text-gray-200">
+  <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    @for(stat of stats; track stat.title) {
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center">
+        <div class="p-3 rounded-full text-white" [class]="stat.color">
+          <!-- Placeholder for icon -->
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            @if(stat.icon === 'currency-dollar') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /> }
+            @if(stat.icon === 'shopping-cart') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /> }
+            @if(stat.icon === 'cube') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /> }
+            @if(stat.icon === 'users') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-6-6h6" /> }
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ stat.title }}</p>
+          <p class="text-2xl font-semibold">{{ stat.value }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Sales Overview -->
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+       <h2 class="text-xl font-semibold mb-4">Sales Overview</h2>
+       <div class="h-64 flex items-end justify-around space-x-2 pt-4">
+          @for(item of salesData; track item.month) {
+            <div class="flex flex-col items-center flex-1">
+              <div class="w-full h-full flex items-end">
+                <div 
+                  class="w-full bg-blue-400 dark:bg-primary-dark rounded-t-md hover:opacity-80 transition-opacity" 
+                  [style.height]="getBarHeight(item.sales)"
+                  [title]="'₹' + item.sales">
+                </div>
+              </div>
+              <span class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ item.month }}</span>
+            </div>
+          }
+       </div>
+    </div>
+    <!-- Top Selling Products -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Top Selling Products</h2>
+      <div class="space-y-4">
+        @for(product of topProducts; track product.id) {
+          <div class="flex items-center space-x-4">
+            <img [src]="product.images[0]" [alt]="product.name" class="w-12 h-12 rounded-md object-cover">
+            <div class="flex-1">
+              <p class="font-semibold text-sm truncate">{{ product.name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ product.sku }}</p>
+            </div>
+            <span class="font-bold text-sm">₹{{ product.price }}</span>
+          </div>
+        } @empty {
+          <p class="text-sm text-gray-500">No sales data available to determine top products.</p>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>

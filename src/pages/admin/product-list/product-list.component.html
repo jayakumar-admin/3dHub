@@ -1,0 +1,90 @@
+
+<div class="text-gray-800 dark:text-gray-200">
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <h1 class="text-3xl font-bold">Products</h1>
+    <a routerLink="/admin/products/new" class="bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+      Add Product
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-wrap gap-4 items-center">
+    <div class="relative flex-grow max-w-xs">
+      <input 
+        type="text" 
+        placeholder="Search by Name or SKU..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        class="admin-input rounded-full pl-10 pr-4">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+        </svg>
+      </div>
+    </div>
+    <select [(ngModel)]="categoryFilter" (ngModelChange)="categoryFilter.set($event)" class="admin-input rounded-full">
+      <option value="all">All Categories</option>
+      @for(cat of categories(); track cat.id) {
+        <option [value]="cat.id">{{ cat.name }}</option>
+      }
+    </select>
+    <select [(ngModel)]="statusFilter" (ngModelChange)="statusFilter.set($event)" class="admin-input rounded-full">
+      <option value="all">All Statuses</option>
+      <option value="enabled">Enabled</option>
+      <option value="disabled">Disabled</option>
+    </select>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div class="overflow-x-auto p-2">
+      <table class="w-full text-left">
+        <thead class="border-b dark:border-gray-700">
+          <tr class="text-sm text-gray-500 dark:text-gray-400">
+            <th class="py-3 px-4 font-medium">Product</th>
+            <th class="py-3 px-4 font-medium">SKU</th>
+            <th class="py-3 px-4 font-medium">Category</th>
+            <th class="py-3 px-4 font-medium">Price</th>
+            <th class="py-3 px-4 font-medium">Discount</th>
+            <th class="py-3 px-4 font-medium">Stock</th>
+            <th class="py-3 px-4 font-medium">Status</th>
+            <th class="py-3 px-4 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(product of filteredProducts(); track product.id) {
+            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <td class="py-3 px-4 font-semibold flex items-center gap-4">
+                <img [src]="product.images[0]" [alt]="product.name" class="w-12 h-12 rounded-lg object-cover">
+                <span class="font-medium text-light-text dark:text-dark-text">{{ product.name }}</span>
+              </td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ product.sku }}</td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ getCategoryName(product.category) }}</td>
+              <td class="py-3 px-4 font-medium">₹{{ product.price }}</td>
+              <td class="py-3 px-4 text-sm text-green-600 font-semibold">{{ getDiscount(product.price, product.oldPrice) }}</td>
+              <td class="py-3 px-4">{{ product.stock }}</td>
+              <td class="py-3 px-4">
+                @if (product.enabled) {
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Enabled</span>
+                } @else {
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200">Disabled</span>
+                }
+              </td>
+              <td class="py-3 px-4 text-sm space-x-4">
+                <a [routerLink]="['/admin/products/edit', product.id]" class="text-blue-500 hover:underline font-medium">Edit</a>
+                <button (click)="deleteProduct(product.id)" class="text-red-500 hover:underline font-medium">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-16 text-gray-500">
+                <h3 class="text-lg font-semibold">No products found</h3>
+                <p class="text-sm">Try adjusting your search or filter criteria.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

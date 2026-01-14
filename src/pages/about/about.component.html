@@ -1,0 +1,62 @@
+
+@if(aboutPageSettings(); as about) {
+  <div class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
+    <!-- Hero Section -->
+    <section class="relative bg-gray-800 py-24 md:py-40 text-white text-center">
+      <div class="absolute inset-0">
+          <img [src]="about.heroImageUrl" alt="About Us Banner" class="w-full h-full object-cover opacity-30">
+      </div>
+      <div class="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl md:text-6xl font-extrabold">{{ about.heroTitle }}</h1>
+        <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-200">{{ about.heroSubtitle }}</p>
+      </div>
+    </section>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <!-- Our Story Section -->
+      <section class="mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div class="order-2 md:order-1">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4 border-l-4 border-primary-dark pl-4">{{ about.storyTitle }}</h2>
+          <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 leading-relaxed space-y-4 whitespace-pre-wrap">{{ about.storyContent }}</div>
+        </div>
+        <div class="order-1 md:order-2">
+          <img [src]="about.storyImageUrl" alt="Crafting a gift" class="rounded-xl shadow-2xl w-full h-auto">
+        </div>
+      </section>
+
+      <!-- Mission & Vision Section -->
+      @if(about.missionVisionSection.enabled) {
+        <section class="mb-20 bg-light-card dark:bg-dark-card rounded-2xl shadow-lg p-8 md:p-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">{{ about.missionVisionSection.title }}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="text-center">
+              <h3 class="text-2xl font-semibold mb-3 text-primary-light dark:text-primary-dark">{{ about.missionVisionSection.missionTitle }}</h3>
+              <p class="text-gray-600 dark:text-gray-400">{{ about.missionVisionSection.missionContent }}</p>
+            </div>
+            <div class="text-center">
+              <h3 class="text-2xl font-semibold mb-3 text-primary-light dark:text-primary-dark">{{ about.missionVisionSection.visionTitle }}</h3>
+              <p class="text-gray-600 dark:text-gray-400">{{ about.missionVisionSection.visionContent }}</p>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- Meet the Team Section -->
+      @if(about.teamSection.enabled && about.teamSection.members.length > 0) {
+        <section>
+          <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">{{ about.teamSection.title }}</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            @for(member of about.teamSection.members; track member.name) {
+              <div class="bg-light-card dark:bg-dark-card p-6 rounded-xl shadow-lg text-center transform hover:-translate-y-2 transition-transform duration-300">
+                <img [src]="member.imageUrl" [alt]="member.name" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold mb-1">{{ member.name }}</h3>
+                <p class="font-semibold text-primary-light dark:text-primary-dark mb-3">{{ member.role }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ member.bio }}</p>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  </div>
+}

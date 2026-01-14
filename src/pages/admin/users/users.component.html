@@ -1,0 +1,95 @@
+
+<div class="text-gray-800 dark:text-gray-200">
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <h1 class="text-3xl font-bold">User Management</h1>
+    <div class="relative">
+      <input 
+        type="text" 
+        placeholder="Search by Name or Email..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        class="admin-input rounded-full pl-10 pr-4">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="border-b dark:border-gray-700">
+          <tr class="text-sm text-gray-500 dark:text-gray-400">
+            <th class="py-3 px-4 font-medium">User</th>
+            <th class="py-3 px-4 font-medium">Email</th>
+            <th class="py-3 px-4 font-medium">Role</th>
+            <th class="py-3 px-4 font-medium">Joined Date</th>
+            <th class="py-3 px-4 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(user of filteredUsers(); track user.id) {
+            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <td class="py-3 px-4 font-semibold flex items-center gap-3">
+                <img [src]="user.avatar" [alt]="user.name" class="w-10 h-10 rounded-full object-cover">
+                <span class="font-medium text-light-text dark:text-dark-text">{{ user.name }}</span>
+              </td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ user.email }}</td>
+              <td class="py-3 px-4">
+                 @if (user.role === 'Admin') {
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">Admin</span>
+                } @else {
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Customer</span>
+                }
+              </td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ user.joinedDate }}</td>
+              <td class="py-3 px-4 text-sm space-x-4">
+                 <button (click)="openEditModal(user)" class="text-blue-500 hover:underline font-medium">Edit</button>
+                 <button (click)="deleteUser(user)" class="text-red-500 hover:underline font-medium">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-16 text-gray-500">
+                <h3 class="text-lg font-semibold">No users found</h3>
+                <p class="text-sm">Try adjusting your search criteria.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+@if(isModalOpen()) {
+  <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" (click)="closeModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md" (click)="$event.stopPropagation()">
+        <h2 class="text-2xl font-bold mb-4">Edit User</h2>
+        @if(editingUser(); as user) {
+            <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                    <input type="text" id="name" formControlName="name" class="admin-input">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                    <input type="email" id="email" formControlName="email" class="admin-input">
+                </div>
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                    <select id="role" formControlName="role" class="admin-input">
+                        <option value="Customer">Customer</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-4 pt-4">
+                    <button type="button" (click)="closeModal()" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 font-semibold">Cancel</button>
+                    <button type="submit" [disabled]="userForm.invalid" class="px-4 py-2 rounded-lg bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-semibold disabled:opacity-50">Save Changes</button>
+                </div>
+            </form>
+        }
+    </div>
+  </div>
+}
