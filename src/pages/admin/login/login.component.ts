@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../auth.service';
 import { CommonModule } from '@angular/common';
+import { DataService } from '../../../data.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -13,23 +14,24 @@ import { CommonModule } from '@angular/common';
 })
 export class AdminLoginComponent {
   router = inject(Router);
-  // FIX: Explicitly type `fb` to prevent TypeScript from inferring it as `unknown`.
   fb: FormBuilder = inject(FormBuilder);
   authService = inject(AuthService);
+  dataService = inject(DataService);
 
   loginError = signal<string | null>(null);
 
   loginForm = this.fb.group({
     email: ['admin1@gmail.com', [Validators.required, Validators.email]],
-    password: ['admin123', [Validators.required]],
+    password: ['12345678', [Validators.required]],
   });
 
-  login() {
+  async login() {
     this.loginError.set(null);
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      const success = this.authService.login(email!, password!);
+      const success = await this.authService.adminLogin(email!, password!);
       if (success) {
+        this.dataService.loadAdminData();
         this.router.navigate(['/admin/dashboard']);
       } else {
         this.loginError.set('Invalid email or password.');

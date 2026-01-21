@@ -1,6 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+// FIX: Import ParamMap to correctly type route parameters.
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { DataService } from '../../../data.service';
 import { Product } from '../../../models';
 import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,7 +25,8 @@ export class AdminProductEditComponent {
   notificationService = inject(NotificationService);
 
   private productIdSignal = toSignal(
-    this.route.paramMap.pipe(map(params => params.get('id')))
+    // FIX: Explicitly type `params` as `ParamMap` to resolve `get` method.
+    this.route.paramMap.pipe(map((params: ParamMap) => params.get('id')))
   );
 
   product = computed(() => {
@@ -121,6 +123,12 @@ export class AdminProductEditComponent {
       const formValue = this.productForm.getRawValue();
       const tagsArray = formValue.tags ? formValue.tags.split(',').map(t => t.trim()).filter(t => t) : [];
       const imagesArray = formValue.images ? formValue.images.filter(img => img) : [];
+      
+      // Generate ID for new products to prevent NOT NULL violation
+      if (!this.isEditMode()) {
+        formValue.id = `prod${Date.now()}`;
+      }
+
       const productToSave = { ...formValue, tags: tagsArray, images: imagesArray } as Product;
 
       this.dataService.saveProduct(productToSave);

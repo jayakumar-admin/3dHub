@@ -1,7 +1,8 @@
 
-import { Injectable, signal, computed, effect, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, signal, computed, effect, PLATFORM_ID, Inject, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { OrderItem, Product } from './models';
+import { DataService } from './data.service';
 
 // Define a type for the shipping address form
 export type ShippingAddress = {
@@ -18,6 +19,9 @@ export type ShippingAddress = {
 })
 export class CartService {
   private isBrowser = false;
+  private dataService = inject(DataService);
+  private settings = this.dataService.getSettings();
+
   cartItems = signal<OrderItem[]>([]);
   shippingAddress = signal<ShippingAddress>(null);
 
@@ -45,7 +49,26 @@ export class CartService {
   cartCount = computed(() => this.cartItems().reduce((acc, item) => acc + item.quantity, 0));
   
   subtotal = computed(() => this.cartItems().reduce((acc, item) => acc + item.price * item.quantity, 0));
-  shipping = computed(() => this.subtotal() > 0 ? 50 : 0); // Flat rate shipping if cart is not empty
+  
+  shipping = computed(() => {
+    const shippingSettings = this.settings().shipping;
+    const subtotal = this.subtotal();
+
+    if (subtotal === 0) {
+      return 0; // No items, no shipping cost.
+    }
+
+    if (shippingSettings.freeShippingEnabled && subtotal >= shippingSettings.freeShippingThreshold) {
+      return 0; // Free shipping threshold met.
+    }
+
+    if (shippingSettings.flatRateEnabled) {
+      return shippingSettings.flatRateCost; // Apply flat rate.
+    }
+    
+    return 0; // Default to 0 if no shipping method is configured.
+  });
+
   total = computed(() => this.subtotal() + this.shipping());
 
   totalSavings = computed(() => {

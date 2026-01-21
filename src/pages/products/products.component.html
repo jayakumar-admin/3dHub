@@ -1,18 +1,119 @@
 
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <h1 class="text-3xl font-bold text-light-text dark:text-dark-text mb-2">All Products</h1>
-  <p class="text-gray-600 dark:text-gray-400 mb-8">Discover our full collection of unique and personalized gifts.</p>
+<div>
+  <!-- Banner Section -->
+  <div class="bg-light-card dark:bg-dark-bg text-light-text dark:text-dark-text border-b border-gray-200 dark:border-gray-800">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="mb-6">
+        <h1 class="text-5xl font-extrabold">All Products</h1>
+        <p class="mt-3 text-lg text-gray-500 dark:text-gray-400 max-w-2xl">
+          Discover our full collection of unique, handcrafted, and personalized gifts.
+        </p>
+      </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @for (product of filteredProducts(); track product.id) {
-      <app-product-card [product]="product"></app-product-card>
-    }
-  </div>
-  
-  @if (filteredProducts().length === 0) {
-    <div class="text-center py-16">
-      <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">No Products Found</h2>
-      <p class="text-gray-500 mt-2">No products matched your search query. Please try another search.</p>
+      <!-- Top Bar: Sort & Mobile Filter Toggle -->
+      <div class="flex justify-between items-center">
+        <button (click)="toggleFilters()" class="md:hidden flex items-center gap-2 text-sm font-semibold p-2 rounded-md border border-gray-300 dark:border-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M4 8h16M6 12h12m-9 4h6"></path></svg>
+          Filters
+        </button>
+        <p class="text-sm text-gray-600 dark:text-gray-400 hidden md:block">
+          <span class="font-semibold text-light-text dark:text-dark-text">{{ filteredProducts().length }}</span>
+          {{ filteredProducts().length === 1 ? 'product' : 'products' }} found
+        </p>
+        <div class="flex items-center gap-2 text-sm">
+          <label for="sort" class="font-semibold">Sort by:</label>
+          <select id="sort" [value]="sortBy()" (change)="updateSortBy($event)" class="rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-light-card dark:bg-dark-card focus:border-primary-light dark:focus:border-primary-dark focus:ring-primary-light dark:focus:ring-primary-dark">
+            <option value="featured">Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Customer Rating</option>
+          </select>
+        </div>
+      </div>
     </div>
-  }
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- Backdrop for mobile filter -->
+      @if (isFiltersOpen()) {
+        <div (click)="toggleFilters()" class="fixed inset-0 bg-black/50 z-30 md:hidden"></div>
+      }
+
+      <!-- Filter Sidebar -->
+      <aside [class]="isFiltersOpen() ? 'translate-x-0' : '-translate-x-full'" class="fixed top-0 left-0 w-72 h-full bg-light-card dark:bg-dark-card z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:w-64 md:h-auto md:bg-transparent md:dark:bg-transparent md:z-auto flex-shrink-0">
+        <div class="p-6 space-y-8 h-full overflow-y-auto md:p-0">
+          <div class="flex justify-between items-center md:hidden">
+            <h2 class="text-xl font-bold">Filters</h2>
+            <button (click)="toggleFilters()" class="p-2">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+            <h3 class="font-bold text-lg mb-4">Category</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <button (click)="selectCategory('all')" class="w-full text-left p-2 rounded-md transition-colors" [class]="selectedCategory() === 'all' ? 'bg-primary-light/10 dark:bg-primary-dark/20 font-semibold text-primary-light dark:text-primary-dark' : 'hover:bg-gray-100 dark:hover:bg-gray-700'">
+                  All Categories
+                </button>
+              </li>
+              @for (category of categories(); track category.id) {
+                <li>
+                  <button (click)="selectCategory(category.id)" class="w-full text-left p-2 rounded-md transition-colors" [class]="selectedCategory() === category.id ? 'bg-primary-light/10 dark:bg-primary-dark/20 font-semibold text-primary-light dark:text-primary-dark' : 'hover:bg-gray-100 dark:hover:bg-gray-700'">
+                    {{ category.name }}
+                  </button>
+                </li>
+              }
+            </ul>
+          </div>
+
+          <!-- Price Filter -->
+          <div class="border-b border-gray-200 dark:border-gray-700 py-6">
+            <h3 class="font-bold text-lg mb-4">Price Range</h3>
+            <div class="space-y-4">
+              <input type="range" [min]="0" [max]="maxPrice()" [value]="priceFilter()" (input)="updatePriceFilter($event)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+              <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <span>₹0</span>
+                <span class="font-semibold">₹{{ priceFilter() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reset Button -->
+          <div class="pt-6">
+            <button (click)="resetFilters()" class="w-full text-center bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 4l16 16"></path></svg>
+              Reset Filters
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1">
+        <!-- Product Grid -->
+        @if (filteredProducts().length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+            @for (product of filteredProducts(); track product.id) {
+              <app-product-card [product]="product"></app-product-card>
+            }
+          </div>
+        } @else {
+          <div class="text-center py-16 bg-light-card dark:bg-dark-card rounded-xl shadow">
+            <div class="flex justify-center mb-4">
+                <svg class="w-16 h-16 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10l.01.01"></path></svg>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">No Products Found</h2>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your filters to find what you're looking for.</p>
+            <button (click)="resetFilters()" class="mt-6 inline-block bg-primary-light text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+              Clear All Filters
+            </button>
+          </div>
+        }
+      </main>
+    </div>
+  </div>
 </div>

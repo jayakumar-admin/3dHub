@@ -38,7 +38,7 @@ app.use('/api/settings', require('./routes/settings'));
 // --- Start Server ---
 
 // Set the port for the server. It will use the port from the .env file, or default to 3000 if not specified.
-const PORT = process.env.PORT || 4200;
+const PORT = process.env.PORT || 3000;
 
 // Start listening for incoming requests on the specified port.
 app.listen(PORT, () => {

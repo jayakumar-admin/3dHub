@@ -6,7 +6,7 @@ import { DataService } from '../../../data.service';
 import { NotificationService } from '../../../notification.service';
 import { Feature, Settings, SocialMediaLink, Testimonial, QuickLink, HeroSlide, TeamMember } from '../../../models';
 
-type SettingsTab = 'general' | 'home' | 'about' | 'footer' | 'seo' | 'payment';
+type SettingsTab = 'general' | 'home' | 'about' | 'shipping' | 'returns' | 'payment' | 'footer' | 'seo';
 
 @Component({
   selector: 'app-admin-settings',
@@ -91,6 +91,17 @@ export class AdminSettingsComponent {
         razorpayKeyId: ['', Validators.required],
         companyNameForPayment: [''],
         companyLogoForPayment: [''],
+      }),
+      shipping: this.fb.group({
+        flatRateEnabled: [true],
+        flatRateCost: [0, [Validators.required, Validators.min(0)]],
+        freeShippingEnabled: [true],
+        freeShippingThreshold: [0, [Validators.required, Validators.min(0)]],
+      }),
+      returns: this.fb.group({
+        returnsEnabled: [true],
+        returnWindowDays: [15, [Validators.required, Validators.min(0)]],
+        returnPolicy: [''],
       })
     });
 

@@ -1,6 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+// FIX: Import ParamMap to correctly type route parameters.
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { DataService } from '../../../data.service';
@@ -22,7 +23,10 @@ export class AdminOrderDetailComponent {
   fb: FormBuilder = inject(FormBuilder);
   notificationService = inject(NotificationService);
 
-  private orderIdSignal = toSignal(this.route.paramMap.pipe(map(params => params.get('id'))));
+  private orderIdSignal = toSignal(
+    // FIX: Explicitly type `params` as `ParamMap` to resolve `get` method.
+    this.route.paramMap.pipe(map((params: ParamMap) => params.get('id')))
+  );
 
   order = computed(() => {
     const id = this.orderIdSignal();

@@ -1,6 +1,7 @@
 
 import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
+import { customerAuthGuard } from './customer-auth.guard';
 
 export const APP_ROUTES: Routes = [
   {
@@ -9,14 +10,18 @@ export const APP_ROUTES: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./pages/home/home.component').then(c => c.HomeComponent) },
+      { path: 'login', loadComponent: () => import('./pages/login/login.component').then(c => c.LoginComponent) },
+      { path: 'signup', loadComponent: () => import('./pages/signup/signup.component').then(c => c.SignupComponent) },
       { path: 'product/:id', loadComponent: () => import('./pages/product-detail/product-detail.component').then(c => c.ProductDetailComponent) },
       { path: 'cart', loadComponent: () => import('./pages/cart/cart.component').then(c => c.CartComponent) },
-      { path: 'shipping', loadComponent: () => import('./pages/shipping/shipping.component').then(c => c.ShippingComponent) },
-      { path: 'payment', loadComponent: () => import('./pages/payment/payment.component').then(c => c.PaymentComponent) },
-      { path: 'orders', loadComponent: () => import('./pages/orders/orders.component').then(c => c.OrdersComponent) },
+      { path: 'shipping', loadComponent: () => import('./pages/shipping/shipping.component').then(c => c.ShippingComponent), canActivate: [customerAuthGuard] },
+      { path: 'payment', loadComponent: () => import('./pages/payment/payment.component').then(c => c.PaymentComponent), canActivate: [customerAuthGuard] },
+      { path: 'orders', loadComponent: () => import('./pages/orders/orders.component').then(c => c.OrdersComponent), canActivate: [customerAuthGuard] },
+      { path: 'orders/:id', loadComponent: () => import('./pages/order-detail/order-detail.component').then(c => c.OrderDetailComponent), canActivate: [customerAuthGuard] },
       { path: 'products', loadComponent: () => import('./pages/products/products.component').then(c => c.ProductsComponent) },
       { path: 'about', loadComponent: () => import('./pages/about/about.component').then(c => c.AboutComponent) },
-      { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(c => c.ContactComponent) }
+      { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(c => c.ContactComponent) },
+      { path: 'wishlist', loadComponent: () => import('./pages/wishlist/wishlist.component').then(c => c.WishlistComponent) }
     ]
   },
   {

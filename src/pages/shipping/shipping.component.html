@@ -31,7 +31,7 @@
           <div>
             <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
               <label for="fullName" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Full Name</label>
-              <input type="text" id="fullName" formControlName="fullName" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="John Doe">
+              <input type="text" id="fullName" formControlName="fullName" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="John Doe">
             </div>
              @if(fullName?.invalid && (fullName?.dirty || fullName?.touched)) {
                 <p class="mt-2 text-sm text-red-600">Full name is required.</p>
@@ -42,7 +42,7 @@
           <div>
             <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
               <label for="address" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Address</label>
-              <input type="text" id="address" formControlName="address" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="123 Main St">
+              <input type="text" id="address" formControlName="address" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="123 Main St">
             </div>
              @if(address?.invalid && (address?.dirty || address?.touched)) {
                 <p class="mt-2 text-sm text-red-600">Address is required.</p>
@@ -54,7 +54,7 @@
             <div>
               <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
                 <label for="city" class="block text-xs font-medium text-gray-500 dark:text-gray-400">City</label>
-                <input type="text" id="city" formControlName="city" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="Anytown">
+                <input type="text" id="city" formControlName="city" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="Anytown">
               </div>
               @if(city?.invalid && (city?.dirty || city?.touched)) {
                 <p class="mt-2 text-sm text-red-600">City is required.</p>
@@ -64,7 +64,7 @@
             <div>
               <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
                 <label for="state" class="block text-xs font-medium text-gray-500 dark:text-gray-400">State</label>
-                <input type="text" id="state" formControlName="state" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="CA">
+                <input type="text" id="state" formControlName="state" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="CA">
               </div>
               @if(state?.invalid && (state?.dirty || state?.touched)) {
                 <p class="mt-2 text-sm text-red-600">State is required.</p>
@@ -74,7 +74,7 @@
             <div>
               <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
                 <label for="zip" class="block text-xs font-medium text-gray-500 dark:text-gray-400">ZIP Code</label>
-                <input type="text" id="zip" formControlName="zip" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="12345">
+                <input type="text" id="zip" formControlName="zip" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="12345">
               </div>
               @if(zip?.invalid && (zip?.dirty || zip?.touched)) {
                 <p class="mt-2 text-sm text-red-600">Valid ZIP is required.</p>
@@ -86,7 +86,7 @@
           <div>
             <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
               <label for="phone" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Phone Number</label>
-              <input type="tel" id="phone" formControlName="phone" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 sm:text-sm" placeholder="1234567890">
+              <input type="tel" id="phone" formControlName="phone" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="1234567890">
             </div>
              @if(phone?.invalid && (phone?.dirty || phone?.touched)) {
                 <p class="mt-2 text-sm text-red-600">A valid 10-digit phone number is required.</p>

@@ -1,0 +1,21 @@
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-3xl font-bold text-light-text dark:text-dark-text mb-2">My Wishlist</h1>
+  <p class="text-gray-600 dark:text-gray-400 mb-8">Your collection of favorite items.</p>
+
+  @if (wishlistItems().length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      @for (product of wishlistItems(); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      }
+    </div>
+  } @else {
+    <div class="text-center bg-white dark:bg-dark-card rounded-2xl shadow-lg p-12">
+      <h2 class="text-2xl font-bold text-light-text dark:text-dark-text">Your wishlist is empty</h2>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Add items you love to your wishlist to see them here.</p>
+      <a routerLink="/products" class="mt-6 inline-block bg-primary-light text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+        Discover Products
+      </a>
+    </div>
+  }
+</div>

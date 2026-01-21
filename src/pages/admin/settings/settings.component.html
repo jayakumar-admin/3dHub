@@ -15,6 +15,8 @@
         <button (click)="setTab('general')" [class]="activeTab() === 'general' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">General & Contact</button>
         <button (click)="setTab('home')" [class]="activeTab() === 'home' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Home Page</button>
         <button (click)="setTab('about')" [class]="activeTab() === 'about' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">About Page</button>
+        <button (click)="setTab('shipping')" [class]="activeTab() === 'shipping' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Shipping</button>
+        <button (click)="setTab('returns')" [class]="activeTab() === 'returns' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Returns</button>
         <button (click)="setTab('payment')" [class]="activeTab() === 'payment' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Payments</button>
         <button (click)="setTab('footer')" [class]="activeTab() === 'footer' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Footer</button>
         <button (click)="setTab('seo')" [class]="activeTab() === 'seo' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">SEO</button>
@@ -291,6 +293,78 @@
         </div>
       </div>
     }
+
+    <!-- Shipping Tab -->
+    @if(activeTab() === 'shipping') {
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" formGroupName="shipping">
+        <h2 class="text-xl font-semibold border-b dark:border-gray-700 pb-4 mb-6">Shipping Configuration</h2>
+        <div class="space-y-6">
+          <!-- Flat Rate Shipping -->
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enable Flat Rate Shipping</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="flatRateEnabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <label for="flatRateCost" class="block text-sm font-medium mb-1">Flat Rate Cost (₹)</label>
+              <input type="number" id="flatRateCost" formControlName="flatRateCost" class="admin-input">
+              <p class="text-xs text-gray-500 mt-1">This cost will be applied to all orders that don't qualify for free shipping.</p>
+            </div>
+          </div>
+
+          <!-- Free Shipping -->
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enable Free Shipping</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="freeShippingEnabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <label for="freeShippingThreshold" class="block text-sm font-medium mb-1">Free Shipping Threshold (₹)</label>
+              <input type="number" id="freeShippingThreshold" formControlName="freeShippingThreshold" class="admin-input">
+              <p class="text-xs text-gray-500 mt-1">Orders with a subtotal greater than or equal to this amount will have free shipping.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    
+    <!-- Returns Tab -->
+    @if(activeTab() === 'returns') {
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" formGroupName="returns">
+        <h2 class="text-xl font-semibold border-b dark:border-gray-700 pb-4 mb-6">Return Configuration</h2>
+        <div class="space-y-6">
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enable Returns</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="returnsEnabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Allow customers to request returns for eligible items.</p>
+          </div>
+          
+          <div>
+            <label for="returnWindowDays" class="block text-sm font-medium mb-1">Return Window (in days)</label>
+            <input type="number" id="returnWindowDays" formControlName="returnWindowDays" class="admin-input">
+            <p class="text-xs text-gray-500 mt-1">Number of days a customer has to return an item after it has been delivered.</p>
+          </div>
+
+           <div>
+            <label for="returnPolicy" class="block text-sm font-medium mb-1">Return Policy</label>
+            <textarea id="returnPolicy" formControlName="returnPolicy" rows="6" class="admin-input"></textarea>
+            <p class="text-xs text-gray-500 mt-1">This policy will be displayed to customers. Use new lines for paragraphs.</p>
+          </div>
+        </div>
+      </div>
+    }
+
 
     <!-- Payments Tab -->
     @if(activeTab() === 'payment') {

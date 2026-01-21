@@ -7,43 +7,33 @@
       @for (filter of ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']; track filter) {
         <button 
           (click)="setFilter(filter)"
-          class="px-4 py-2 rounded-full text-sm font-semibold transition-colors"
+          class="px-4 py-2 rounded-full text-sm font-semibold transition-colors whitespace-nowrap"
           [class]="activeFilter() === filter ? 'bg-primary-light text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'">
             {{ filter }}
         </button>
       }
     </div>
     
-    <div class="space-y-6">
+    <div class="space-y-4">
       @for (order of filteredOrders(); track order.id) {
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-          <div class="flex flex-wrap justify-between items-center gap-4 mb-4 pb-4 border-b dark:border-gray-700">
-            <div>
-              <p class="font-bold text-lg text-light-text dark:text-dark-text">{{ order.id }}</p>
+        <a [routerLink]="['/orders', order.id]" class="block border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer">
+          <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex-1 min-w-[150px]">
+              <p class="font-bold text-base text-light-text dark:text-dark-text truncate">{{ order.id }}</p>
               <p class="text-sm text-gray-500 dark:text-gray-400">Placed on {{ order.orderDate }}</p>
             </div>
-            <div>
+            <div class="text-right">
               <p class="text-sm text-gray-500 dark:text-gray-400">Total</p>
-              <p class="font-bold text-lg text-light-text dark:text-dark-text">₹{{ order.totalAmount }}</p>
+              <p class="font-bold text-base text-light-text dark:text-dark-text">₹{{ order.totalAmount }}</p>
             </div>
-            <span [class]="'px-3 py-1 text-sm font-medium rounded-full ' + getStatusClass(order.status)">
-              {{ order.status }}
-            </span>
+            <div class="flex items-center gap-4">
+                <span [class]="'px-3 py-1 text-sm font-medium rounded-full ' + getStatusClass(order.status)">
+                {{ order.status }}
+                </span>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </div>
           </div>
-
-          <div class="space-y-4">
-             @for (item of order.items; track item.productId) {
-              <div class="flex items-center space-x-4">
-                <img [src]="item.image" [alt]="item.productName" class="w-16 h-16 rounded-md object-cover">
-                <div class="flex-1">
-                  <p class="font-semibold text-light-text dark:text-dark-text">{{ item.productName }}</p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Qty: {{ item.quantity }}</p>
-                </div>
-                <p class="font-semibold">₹{{ item.price }}</p>
-              </div>
-             }
-          </div>
-        </div>
+        </a>
       } @empty {
         <div class="text-center py-12">
             <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">No Orders Found</h2>

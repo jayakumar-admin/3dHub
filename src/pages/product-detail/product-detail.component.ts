@@ -1,6 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+// FIX: Import ParamMap to correctly type route parameters.
+import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { DataService } from '../../data.service';
 import { map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -19,7 +20,8 @@ export class ProductDetailComponent {
   cartService = inject(CartService);
 
   private productIdSignal = toSignal(
-    this.route.paramMap.pipe(map(params => params.get('id')))
+    // FIX: Explicitly type `params` as `ParamMap` to resolve `get` method.
+    this.route.paramMap.pipe(map((params: ParamMap) => params.get('id')))
   );
 
   product = computed(() => {

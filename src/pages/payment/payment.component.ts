@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../notification.service';
 import { DataService } from '../../data.service';
 import { Settings } from '../../models';
+import { AuthService } from '../../auth.service';
 
 // This lets TypeScript know that the Razorpay object is loaded from an external script.
 declare var Razorpay: any;
@@ -21,15 +22,24 @@ export class PaymentComponent {
   cartService = inject(CartService);
   dataService = inject(DataService);
   notificationService = inject(NotificationService);
+  authService = inject(AuthService);
 
   settings = this.dataService.getSettings();
   paymentSettings = computed(() => this.settings().payment);
+  currentUser = this.authService.currentUser;
   
   placeOrder() {
     const paymentConfig = this.paymentSettings();
     if (!paymentConfig.razorpayEnabled || !paymentConfig.razorpayKeyId) {
       this.notificationService.show('Payment processing is not configured.', 'error');
       return;
+    }
+    
+    const currentUser = this.currentUser();
+    if(!currentUser) {
+        this.notificationService.show('You must be logged in to place an order.', 'error');
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/payment' } });
+        return;
     }
 
     const shippingAddr = this.cartService.shippingAddress();
@@ -46,18 +56,40 @@ export class PaymentComponent {
       name: paymentConfig.companyNameForPayment,
       description: "Order Payment",
       image: paymentConfig.companyLogoForPayment,
-      // order_id: "order_9A33XG579H2PA", // This is a sample Order ID. In a real app, you would create this on your server.
       handler: (response: any) => {
         // This function is called after the payment is successful.
-        console.log('Razorpay Response:', response);
-        this.notificationService.show(`Payment successful! ID: ${response.razorpay_payment_id}`, 'success');
-        this.cartService.clearCart();
-        this.router.navigate(['/orders']);
+        const orderData = {
+          items: this.cartService.cartItems(),
+          totalAmount: this.cartService.total(),
+          shippingAddress: {
+            street: shippingAddr.address,
+            city: shippingAddr.city,
+            state: shippingAddr.state,
+            zip: shippingAddr.zip,
+          },
+          customerDetails: {
+            name: currentUser.name,
+            email: currentUser.email,
+            avatar: currentUser.avatar,
+          },
+          userId: currentUser.id
+        };
+        
+        this.dataService.createOrder(orderData).subscribe({
+          next: (orderResponse) => {
+             this.notificationService.show(`Payment successful! Order placed: ${orderResponse.order.id}`, 'success');
+             this.cartService.clearCart();
+             this.router.navigate(['/orders']);
+          },
+          error: (err) => {
+            console.error('Order creation failed:', err);
+            this.notificationService.show('Payment was successful, but there was an error creating your order. Please contact support.', 'error');
+          }
+        });
       },
       prefill: {
         name: shippingAddr.fullName,
-        // For a real app, you'd get the email from the logged-in user or a form.
-        email: "customer@example.com", 
+        email: currentUser.email, 
         contact: shippingAddr.phone
       },
       notes: {

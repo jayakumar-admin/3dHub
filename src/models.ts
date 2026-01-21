@@ -61,10 +61,12 @@ export interface OrderItem {
 export interface User {
     id: string;
     name: string;
+    phone:string;
     email: string;
     avatar: string;
     role: 'Admin' | 'Customer';
     joinedDate: string;
+    password?: string; // Added for sign-up and login
 }
 
 // New Settings Models
@@ -135,6 +137,19 @@ export interface PaymentSettings {
     companyLogoForPayment: string;
 }
 
+export interface ShippingSettings {
+  flatRateEnabled: boolean;
+  flatRateCost: number;
+  freeShippingEnabled: boolean;
+  freeShippingThreshold: number;
+}
+
+export interface ReturnSettings {
+  returnsEnabled: boolean;
+  returnWindowDays: number;
+  returnPolicy: string;
+}
+
 
 export interface Settings {
   general: {
@@ -179,4 +194,6 @@ export interface Settings {
   };
   aboutPage: AboutPageSettings;
   payment: PaymentSettings;
+  shipping: ShippingSettings;
+  returns: ReturnSettings;
 }
