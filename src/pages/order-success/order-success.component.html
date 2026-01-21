@@ -1,0 +1,62 @@
+
+<app-confetti></app-confetti>
+<div class="relative min-h-[80vh] flex items-center justify-center py-12 px-4 z-10">
+  <div class="max-w-2xl w-full bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 text-center animate-fade-in-up">
+    <div class="w-24 h-24 bg-green-100 dark:bg-green-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-light-text dark:text-dark-text">Thank You!</h1>
+    <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Your order has been placed successfully.</p>
+    
+    @if(order(); as o) {
+      <div class="mt-8 text-left border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+        <p class="text-sm text-gray-500 mb-4">Order ID: <span class="font-mono bg-gray-100 dark:bg-gray-700 p-1 rounded-md">{{ o.id }}</span></p>
+
+        <div class="space-y-4 max-h-60 overflow-y-auto pr-2">
+          @for(item of o.items; track item.productId) {
+            <div class="flex items-center space-x-4">
+              <img [src]="item.image" [alt]="item.productName" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+              <div class="flex-1 text-sm">
+                <p class="font-semibold text-light-text dark:text-dark-text">{{ item.productName }}</p>
+                <p class="text-gray-500">Qty: {{ item.quantity }}</p>
+              </div>
+              <p class="text-sm font-semibold">₹{{ item.price * item.quantity }}</p>
+            </div>
+          }
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between items-center font-bold text-lg">
+          <span>Total Paid:</span>
+          <span>₹{{ o.totalAmount }}</span>
+        </div>
+      </div>
+    }
+
+    <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+      <a routerLink="/orders" class="px-6 py-3 rounded-lg font-semibold border-2 border-primary-light text-primary-light dark:border-primary-dark dark:text-primary-dark hover:bg-primary-light/10 dark:hover:bg-primary-dark/10 transition-colors">
+        View My Orders
+      </a>
+      <a routerLink="/products" class="px-6 py-3 rounded-lg font-semibold bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 hover:opacity-90 transition-opacity">
+        Continue Shopping
+      </a>
+    </div>
+  </div>
+</div>
+<style>
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+</style>

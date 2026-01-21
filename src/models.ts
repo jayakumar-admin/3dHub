@@ -61,12 +61,13 @@ export interface OrderItem {
 export interface User {
     id: string;
     name: string;
-    phone:string;
     email: string;
     avatar: string;
     role: 'Admin' | 'Customer';
     joinedDate: string;
     password?: string; // Added for sign-up and login
+    // FIX: Add optional phone property to User model to match signup form
+    phone?: string;
 }
 
 // New Settings Models

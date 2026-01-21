@@ -45,8 +45,8 @@ router.post('/login', async (req, res) => {
     res.json({ token, user: userToSend });
 
   } catch (err) {
-    console.error('Admin login error:', err);
-    res.status(500).send('Server error during authentication.');
+    console.error('Admin login error:', err.message);
+    res.status(500).json({ message: `Server error during authentication: ${err.message}` });
   }
 });
 
@@ -72,17 +72,16 @@ router.post('/user/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     
     const newUserId = `user${Date.now()}`;
-    const avatar = `https://picsum.photos/seed/${name}/100/100`;
     
     const newUserResult = await db.query(queries.createUser, [
-        newUserId, name, email, hashedPassword, avatar
+        newUserId, name, email, hashedPassword, null
     ]);
 
     res.status(201).json(newUserResult.rows[0]);
 
   } catch (err) {
-    console.error('Signup error:', err);
-    res.status(500).json({ message: 'Server error during registration.' });
+    console.error('Signup error:', err.message);
+    res.status(500).json({ message: `Server error during registration: ${err.message}` });
   }
 });
 
@@ -125,8 +124,8 @@ router.post('/user/login', async (req, res) => {
     res.json({ token, user: userToSend });
 
   } catch (err) {
-    console.error('User login error:', err);
-    res.status(500).json({ message: 'Server error during authentication.' });
+    console.error('User login error:', err.message);
+    res.status(500).json({ message: `Server error during authentication: ${err.message}` });
   }
 });
 

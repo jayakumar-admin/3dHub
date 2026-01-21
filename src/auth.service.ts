@@ -74,11 +74,12 @@ export class AuthService {
         id: `user${Date.now()}`,
         name: userData.name!,
         email: userData.email!,
-        phone:userData.phone!,
         password: userData.password!, // In real app, this would be hashed
         avatar: `https://picsum.photos/seed/${userData.name}/100/100`,
         role: 'Customer',
-        joinedDate: new Date().toISOString().split('T')[0]
+        joinedDate: new Date().toISOString().split('T')[0],
+        // FIX: Include phone number when creating a new mock user.
+        phone: userData.phone
       };
       this.dataService.createUser(newUser).subscribe();
       this.setSession(newUser, `mock-user-token-${newUser.id}`);

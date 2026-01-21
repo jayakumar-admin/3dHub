@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 // FIX: Import ParamMap to correctly type route parameters.
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { DataService } from '../../../data.service';
@@ -23,6 +23,8 @@ export class AdminProductEditComponent {
   fb: FormBuilder = inject(FormBuilder);
   router = inject(Router);
   notificationService = inject(NotificationService);
+
+  loadingImages = signal<Record<number, boolean>>({});
 
   private productIdSignal = toSignal(
     // FIX: Explicitly type `params` as `ParamMap` to resolve `get` method.
@@ -108,12 +110,20 @@ export class AdminProductEditComponent {
   onFileChange(event: Event, index: number) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        this.images.at(index).setValue(result);
-      };
-      reader.readAsDataURL(file);
+      this.loadingImages.update(l => ({ ...l, [index]: true }));
+      this.dataService.uploadImage(file, 'products').subscribe({
+        next: (res) => {
+          this.images.at(index).setValue(res.imageUrl);
+          this.notificationService.show('Image uploaded successfully!', 'success');
+        },
+        error: (err) => {
+          const message = err?.error?.message || 'An unknown server error occurred.';
+          this.notificationService.show(`Image upload failed: ${message}`, 'error');
+        },
+        complete: () => {
+          this.loadingImages.update(l => ({ ...l, [index]: false }));
+        }
+      });
     }
   }
 

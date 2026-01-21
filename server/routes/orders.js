@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
     // If any error occurs, rollback the transaction
     await client.query('ROLLBACK');
     console.error('Order creation error:', err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   } finally {
     // Release the client back to the pool
     client.release();
@@ -73,7 +73,7 @@ router.get('/', verifyToken, async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 
@@ -98,7 +98,7 @@ router.get('/:id', verifyToken, async (req, res) => {
     res.json(order);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 
@@ -128,7 +128,7 @@ router.put('/:id/status', verifyToken, async (req, res) => {
     res.json({ msg: 'Order status updated' });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 

@@ -7,7 +7,7 @@ export const environment = {
    * Use mock data for development when true.
    * Set to false to switch to using the live API.
    */
-  useTestData: false,
+  useTestData: true,
   
   /**
    * The base URL for the API.

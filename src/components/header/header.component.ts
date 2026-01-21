@@ -1,7 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../theme.service';
 import { SearchService } from '../../search.service';
@@ -14,7 +14,7 @@ import { WishlistService } from '../../wishlist.service';
   selector: 'app-header',
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule]
+  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, NgOptimizedImage]
 })
 export class HeaderComponent {
   themeService = inject(ThemeService);

@@ -1,0 +1,14 @@
+
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-50">
+  @for(piece of confettiPieces(); track $index) {
+    <div 
+      class="confetti-piece"
+      [style.background-color]="piece.color"
+      [style.left]="piece.left"
+      [style.top]="piece.top"
+      [style.animation-delay]="piece.animationDelay"
+      [style.animation-duration]="piece.animationDuration"
+      [style.transform]="piece.transform">
+    </div>
+  }
+</div>

@@ -19,7 +19,7 @@ router.get('/', verifyToken, async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 
@@ -42,7 +42,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     res.json(rows[0]);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 
@@ -67,7 +67,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
     res.json({ msg: 'User deleted' });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 

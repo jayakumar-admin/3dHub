@@ -9,8 +9,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
           </svg>
         </button>
-        <a routerLink="/home" class="flex-shrink-0">
-          <h1 class="text-2xl font-bold text-light-text dark:text-primary-dark">{{ settings().general.websiteName }}</h1>
+        <a routerLink="/home" class="flex-shrink-0 flex items-center">
+          @if (themeService.theme() === 'dark' && settings().general.logoUrlDark) {
+            <img [ngSrc]="settings().general.logoUrlDark" alt="Website Logo" class="h-10 w-auto" height="40" width="150">
+          } @else if (themeService.theme() === 'light' && settings().general.logoUrlLight) {
+            <img [ngSrc]="settings().general.logoUrlLight" alt="Website Logo" class="h-10 w-auto" height="40" width="150">
+          } @else {
+            <h1 class="text-2xl font-bold text-light-text dark:text-primary-dark">{{ settings().general.websiteName }}</h1>
+          }
         </a>
       </div>
 

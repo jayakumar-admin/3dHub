@@ -35,7 +35,77 @@
               <label for="websiteName" class="block text-sm font-medium mb-1">Website Name</label>
               <input type="text" id="websiteName" formControlName="websiteName" class="admin-input">
             </div>
-            <!-- Logo fields could be here -->
+            <!-- Light Theme Logo -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Light Theme Logo</label>
+                <div class="mt-2 flex items-center gap-4">
+                    <div class="relative w-32 h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md border border-dashed dark:border-gray-600">
+                        @if(settingsForm.get('general.logoUrlLight')?.value) {
+                            <img [src]="settingsForm.get('general.logoUrlLight')?.value" alt="Light Logo Preview" class="max-w-full max-h-full object-contain p-1">
+                        } @else {
+                            <span class="text-xs text-gray-500">No Logo</span>
+                        }
+                        @if(loadingImages()['general.logoUrlLight']) {
+                            <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                        }
+                    </div>
+                    <div>
+                        <input type="file" #lightLogoInput (change)="onFileChange($event, 'general.logoUrlLight', 'settings')" accept="image/*" class="hidden"/>
+                        <button type="button" (click)="lightLogoInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                        @if(settingsForm.get('general.logoUrlLight')?.value) {
+                            <button type="button" (click)="removeImage('general.logoUrlLight')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dark Theme Logo -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Dark Theme Logo</label>
+                 <div class="mt-2 flex items-center gap-4">
+                    <div class="relative w-32 h-16 flex items-center justify-center bg-gray-900 rounded-md border border-dashed dark:border-gray-600">
+                        @if(settingsForm.get('general.logoUrlDark')?.value) {
+                            <img [src]="settingsForm.get('general.logoUrlDark')?.value" alt="Dark Logo Preview" class="max-w-full max-h-full object-contain p-1">
+                        } @else {
+                            <span class="text-xs text-gray-500">No Logo</span>
+                        }
+                         @if(loadingImages()['general.logoUrlDark']) {
+                            <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                        }
+                    </div>
+                    <div>
+                        <input type="file" #darkLogoInput (change)="onFileChange($event, 'general.logoUrlDark', 'settings')" accept="image/*" class="hidden"/>
+                        <button type="button" (click)="darkLogoInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                        @if(settingsForm.get('general.logoUrlDark')?.value) {
+                            <button type="button" (click)="removeImage('general.logoUrlDark')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+             <!-- Favicon -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Favicon</label>
+                 <div class="mt-2 flex items-center gap-4">
+                    <div class="relative w-16 h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md border border-dashed dark:border-gray-600">
+                        @if(settingsForm.get('general.faviconUrl')?.value) {
+                            <img [src]="settingsForm.get('general.faviconUrl')?.value" alt="Favicon Preview" class="max-w-full max-h-full object-contain p-1">
+                        } @else {
+                            <span class="text-xs text-gray-500">None</span>
+                        }
+                         @if(loadingImages()['general.faviconUrl']) {
+                            <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                        }
+                    </div>
+                    <div>
+                        <input type="file" #faviconInput (change)="onFileChange($event, 'general.faviconUrl', 'settings')" accept="image/png, image/x-icon" class="hidden"/>
+                        <button type="button" (click)="faviconInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                        @if(settingsForm.get('general.faviconUrl')?.value) {
+                            <button type="button" (click)="removeImage('general.faviconUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
           </div>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" formGroupName="contact">
@@ -107,7 +177,28 @@
                       <input type="text" formControlName="ctaText" placeholder="Button Text" class="admin-input">
                       <input type="text" formControlName="ctaLink" placeholder="Button Link (e.g., /products)" class="admin-input">
                     </div>
-                    <input type="text" formControlName="imageUrl" placeholder="Background Image URL" class="admin-input w-full">
+                     <div>
+                        <label class="block text-sm font-medium mb-1">Background Image</label>
+                        <div class="mt-2 flex items-center gap-4">
+                            <div class="relative w-32 h-16 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-md border border-dashed dark:border-gray-600">
+                                @if(slide.get('imageUrl')?.value) {
+                                    <img [src]="slide.get('imageUrl')?.value" alt="Slide Preview" class="max-w-full max-h-full object-cover">
+                                } @else {
+                                    <span class="text-xs text-gray-500">No Image</span>
+                                }
+                                @if(loadingImages()['homePage.heroSection.slides.'+$index+'.imageUrl']) {
+                                    <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                                }
+                            </div>
+                            <div>
+                                <input type="file" #slideImageInput (change)="onArrayFileChange($event, 'homePage.heroSection.slides', $index, 'imageUrl', 'settings')" accept="image/*" class="hidden"/>
+                                <button type="button" (click)="slideImageInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                                @if(slide.get('imageUrl')?.value) {
+                                    <button type="button" (click)="removeArrayImage('homePage.heroSection.slides', $index, 'imageUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
                   </div>
                 </div>
               }
@@ -166,12 +257,33 @@
                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                        </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input type="text" formControlName="author" placeholder="Author Name" class="admin-input">
                       <input type="text" formControlName="role" placeholder="Author Role" class="admin-input">
-                      <input type="text" formControlName="avatarUrl" placeholder="Avatar Image URL" class="admin-input">
                     </div>
-                    <textarea formControlName="quote" placeholder="Testimonial quote..." rows="2" class="admin-input w-full"></textarea>
+                     <textarea formControlName="quote" placeholder="Testimonial quote..." rows="2" class="admin-input w-full"></textarea>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Avatar Image</label>
+                        <div class="mt-2 flex items-center gap-4">
+                            <div class="relative w-16 h-16 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full border border-dashed dark:border-gray-600">
+                                @if(testimonial.get('avatarUrl')?.value) {
+                                    <img [src]="testimonial.get('avatarUrl')?.value" alt="Avatar Preview" class="w-full h-full object-cover rounded-full">
+                                } @else {
+                                    <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                }
+                                @if(loadingImages()['homePage.testimonialsSection.testimonials.'+$index+'.avatarUrl']) {
+                                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                                }
+                            </div>
+                            <div>
+                                <input type="file" #avatarInput (change)="onArrayFileChange($event, 'homePage.testimonialsSection.testimonials', $index, 'avatarUrl', 'testimonials')" accept="image/*" class="hidden"/>
+                                <button type="button" (click)="avatarInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                                @if(testimonial.get('avatarUrl')?.value) {
+                                    <button type="button" (click)="removeArrayImage('homePage.testimonialsSection.testimonials', $index, 'avatarUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
                   </div>
                 }
                  <button type="button" (click)="addTestimonial()" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
@@ -201,9 +313,26 @@
               <input type="text" id="aboutHeroSubtitle" formControlName="heroSubtitle" class="admin-input">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hero Image</label>
-              <img [src]="settingsForm.get('aboutPage.heroImageUrl')?.value || 'https://picsum.photos/seed/placeholder/400/200'" alt="Hero Image Preview" class="w-full h-48 rounded-lg object-cover border dark:border-gray-600 my-2">
-              <input type="file" (change)="onFileChange($event, 'aboutPage.heroImageUrl')" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600"/>
+              <label class="block text-sm font-medium mb-1">Hero Image</label>
+              <div class="mt-2 flex items-center gap-4">
+                  <div class="relative w-48 h-24 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md border border-dashed dark:border-gray-600">
+                      @if(settingsForm.get('aboutPage.heroImageUrl')?.value) {
+                          <img [src]="settingsForm.get('aboutPage.heroImageUrl')?.value" alt="Hero Preview" class="max-w-full max-h-full object-cover">
+                      } @else {
+                          <span class="text-xs text-gray-500">No Image</span>
+                      }
+                      @if(loadingImages()['aboutPage.heroImageUrl']) {
+                          <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                      }
+                  </div>
+                  <div>
+                      <input type="file" #aboutHeroImageInput (change)="onFileChange($event, 'aboutPage.heroImageUrl', 'settings')" accept="image/*" class="hidden"/>
+                      <button type="button" (click)="aboutHeroImageInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                      @if(settingsForm.get('aboutPage.heroImageUrl')?.value) {
+                          <button type="button" (click)="removeImage('aboutPage.heroImageUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                      }
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -221,9 +350,26 @@
               <textarea id="aboutStoryContent" formControlName="storyContent" rows="6" class="admin-input"></textarea>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Story Image</label>
-              <img [src]="settingsForm.get('aboutPage.storyImageUrl')?.value || 'https://picsum.photos/seed/placeholder/400/200'" alt="Story Image Preview" class="w-full h-48 rounded-lg object-cover border dark:border-gray-600 my-2">
-              <input type="file" (change)="onFileChange($event, 'aboutPage.storyImageUrl')" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600"/>
+              <label class="block text-sm font-medium mb-1">Story Image</label>
+              <div class="mt-2 flex items-center gap-4">
+                  <div class="relative w-48 h-24 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md border border-dashed dark:border-gray-600">
+                      @if(settingsForm.get('aboutPage.storyImageUrl')?.value) {
+                          <img [src]="settingsForm.get('aboutPage.storyImageUrl')?.value" alt="Story Preview" class="max-w-full max-h-full object-cover">
+                      } @else {
+                          <span class="text-xs text-gray-500">No Image</span>
+                      }
+                      @if(loadingImages()['aboutPage.storyImageUrl']) {
+                          <div class="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                      }
+                  </div>
+                  <div>
+                      <input type="file" #aboutStoryImageInput (change)="onFileChange($event, 'aboutPage.storyImageUrl', 'settings')" accept="image/*" class="hidden"/>
+                      <button type="button" (click)="aboutStoryImageInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                      @if(settingsForm.get('aboutPage.storyImageUrl')?.value) {
+                          <button type="button" (click)="removeImage('aboutPage.storyImageUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                      }
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -272,15 +418,32 @@
                     <h4 class="font-semibold">Team Member {{ $index + 1 }}</h4>
                     <button type="button" (click)="removeTeamMember($index)" class="text-red-500 p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" formControlName="name" placeholder="Name" class="admin-input">
                     <input type="text" formControlName="role" placeholder="Role" class="admin-input">
-                    <textarea formControlName="bio" placeholder="Short Bio" rows="1" class="admin-input md:col-span-3"></textarea>
                   </div>
+                  <textarea formControlName="bio" placeholder="Short Bio" rows="2" class="admin-input w-full"></textarea>
                    <div>
-                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Image</label>
-                      <img [src]="member.get('imageUrl')?.value || 'https://picsum.photos/seed/placeholder/200/200'" alt="Team Member Preview" class="w-24 h-24 rounded-full object-cover border dark:border-gray-600 my-2">
-                      <input type="file" (change)="onTeamMemberFileChange($event, $index)" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600"/>
+                      <label class="block text-sm font-medium mb-1">Profile Image</label>
+                      <div class="mt-2 flex items-center gap-4">
+                            <div class="relative w-24 h-24 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full border border-dashed dark:border-gray-600">
+                                @if(member.get('imageUrl')?.value) {
+                                    <img [src]="member.get('imageUrl')?.value" alt="Team Member Preview" class="w-full h-full object-cover rounded-full">
+                                } @else {
+                                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                }
+                                @if(loadingImages()['aboutPage.teamSection.members.'+$index+'.imageUrl']) {
+                                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                                }
+                            </div>
+                            <div>
+                                <input type="file" #teamMemberImageInput (change)="onArrayFileChange($event, 'aboutPage.teamSection.members', $index, 'imageUrl', 'team')" accept="image/*" class="hidden"/>
+                                <button type="button" (click)="teamMemberImageInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                                @if(member.get('imageUrl')?.value) {
+                                    <button type="button" (click)="removeArrayImage('aboutPage.teamSection.members', $index, 'imageUrl')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
               }
@@ -395,8 +558,25 @@
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">Company Logo for Checkout</label>
-             <img [src]="settingsForm.get('payment.companyLogoForPayment')?.value || 'https://picsum.photos/seed/placeholder/200/200'" alt="Company Logo Preview" class="w-24 h-24 rounded-full object-cover border dark:border-gray-600 my-2">
-            <input type="file" (change)="onFileChange($event, 'payment.companyLogoForPayment')" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600"/>
+            <div class="mt-2 flex items-center gap-4">
+                <div class="relative w-24 h-24 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full border border-dashed dark:border-gray-600">
+                    @if(settingsForm.get('payment.companyLogoForPayment')?.value) {
+                        <img [src]="settingsForm.get('payment.companyLogoForPayment')?.value" alt="Payment Logo Preview" class="w-full h-full object-cover rounded-full">
+                    } @else {
+                        <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" /></svg>
+                    }
+                    @if(loadingImages()['payment.companyLogoForPayment']) {
+                        <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center"><svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                    }
+                </div>
+                <div>
+                    <input type="file" #paymentLogoInput (change)="onFileChange($event, 'payment.companyLogoForPayment', 'settings')" accept="image/*" class="hidden"/>
+                    <button type="button" (click)="paymentLogoInput.click()" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Upload</button>
+                    @if(settingsForm.get('payment.companyLogoForPayment')?.value) {
+                        <button type="button" (click)="removeImage('payment.companyLogoForPayment')" class="ml-4 text-sm font-semibold text-red-500 hover:text-red-700">Remove</button>
+                    }
+                </div>
+            </div>
           </div>
         </div>
       </div>

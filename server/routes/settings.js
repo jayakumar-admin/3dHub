@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
     res.json(result.rows[0].data);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 
@@ -37,7 +37,7 @@ router.put('/', verifyToken, async (req, res) => {
     res.json({ msg: 'Settings updated successfully' });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: `Server Error: ${err.message}` });
   }
 });
 

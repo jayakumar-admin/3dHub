@@ -12,12 +12,13 @@ export class NotificationService {
   notification = signal<Notification | null>(null);
   private timeoutId: any;
 
-  show(message: string, type: NotificationType = 'success', duration: number = 3000) {
+  show(message: string, type: NotificationType = 'success', duration?: number) {
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }
     this.notification.set({ message, type });
-    this.timeoutId = setTimeout(() => this.hide(), duration);
+    const displayTime = duration ?? (type === 'error' ? 5000 : 3000);
+    this.timeoutId = setTimeout(() => this.hide(), displayTime);
   }
 
   hide() {

@@ -26,6 +26,8 @@ export class AdminUsersComponent {
     id: [''],
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
+    // FIX: Add phone field to user form to align with User model changes
+    phone: [''],
     role: ['Customer' as 'Admin' | 'Customer', Validators.required],
     avatar: [''],
     joinedDate: [''],
@@ -53,6 +55,8 @@ export class AdminUsersComponent {
         id: user.id,
         name: user.name,
         email: user.email,
+        // FIX: Provide phone value to prevent runtime errors with setValue
+        phone: user.phone || '',
         role: user.role,
         avatar: user.avatar,
         joinedDate: user.joinedDate,

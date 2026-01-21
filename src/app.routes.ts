@@ -18,6 +18,7 @@ export const APP_ROUTES: Routes = [
       { path: 'payment', loadComponent: () => import('./pages/payment/payment.component').then(c => c.PaymentComponent), canActivate: [customerAuthGuard] },
       { path: 'orders', loadComponent: () => import('./pages/orders/orders.component').then(c => c.OrdersComponent), canActivate: [customerAuthGuard] },
       { path: 'orders/:id', loadComponent: () => import('./pages/order-detail/order-detail.component').then(c => c.OrderDetailComponent), canActivate: [customerAuthGuard] },
+      { path: 'order-success/:id', loadComponent: () => import('./pages/order-success/order-success.component').then(c => c.OrderSuccessComponent), canActivate: [customerAuthGuard] },
       { path: 'products', loadComponent: () => import('./pages/products/products.component').then(c => c.ProductsComponent) },
       { path: 'about', loadComponent: () => import('./pages/about/about.component').then(c => c.AboutComponent) },
       { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(c => c.ContactComponent) },

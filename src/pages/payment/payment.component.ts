@@ -5,7 +5,7 @@ import { CartService } from '../../cart.service';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../notification.service';
 import { DataService } from '../../data.service';
-import { Settings } from '../../models';
+import { Order, Settings } from '../../models';
 import { AuthService } from '../../auth.service';
 
 // This lets TypeScript know that the Razorpay object is loaded from an external script.
@@ -77,13 +77,27 @@ export class PaymentComponent {
         
         this.dataService.createOrder(orderData).subscribe({
           next: (orderResponse) => {
+            const newOrder: Order = {
+              id: orderResponse.order.id,
+              orderDate: new Date().toISOString().split('T')[0],
+              customerName: orderData.customerDetails.name,
+              customerEmail: orderData.customerDetails.email,
+              customerAvatar: orderData.customerDetails.avatar,
+              shippingAddress: orderData.shippingAddress,
+              totalAmount: orderData.totalAmount,
+              status: 'Pending',
+              items: orderData.items,
+            };
+            this.dataService.addOrderToSignal(newOrder);
+            
              this.notificationService.show(`Payment successful! Order placed: ${orderResponse.order.id}`, 'success');
              this.cartService.clearCart();
-             this.router.navigate(['/orders']);
+             this.router.navigate(['/order-success', orderResponse.order.id]);
           },
           error: (err) => {
+            const message = err?.error?.message || 'Please contact support.';
             console.error('Order creation failed:', err);
-            this.notificationService.show('Payment was successful, but there was an error creating your order. Please contact support.', 'error');
+            this.notificationService.show(`Payment was successful, but creating your order failed: ${message}`, 'error');
           }
         });
       },

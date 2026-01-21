@@ -16,11 +16,11 @@ type SettingsTab = 'general' | 'home' | 'about' | 'shipping' | 'returns' | 'paym
 })
 export class AdminSettingsComponent {
   dataService = inject(DataService);
-  // FIX: Explicitly type `fb` to prevent TypeScript from inferring it as `unknown`.
   fb: FormBuilder = inject(FormBuilder);
   notificationService = inject(NotificationService);
 
   activeTab = signal<SettingsTab>('general');
+  loadingImages = signal<Record<string, boolean>>({});
   settingsForm: FormGroup;
 
   constructor() {
@@ -204,28 +204,59 @@ export class AdminSettingsComponent {
   }
   removeTeamMember(index: number) { this.teamMembers.removeAt(index); }
   
-  onFileChange(event: Event, formControlPath: string) {
+  onFileChange(event: Event, formControlPath: string, folder: string) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        this.settingsForm.get(formControlPath)?.setValue(result);
-      };
-      reader.readAsDataURL(file);
+      this.loadingImages.update(l => ({ ...l, [formControlPath]: true }));
+      this.dataService.uploadImage(file, folder).subscribe({
+        next: (res) => {
+          this.settingsForm.get(formControlPath)?.setValue(res.imageUrl);
+          this.notificationService.show('Image uploaded!', 'success');
+        },
+        error: (err) => {
+          const message = err?.error?.message || 'Please try again.';
+          this.notificationService.show(`Upload failed: ${message}`, 'error');
+           this.loadingImages.update(l => ({ ...l, [formControlPath]: false }));
+        },
+        complete: () => {
+          this.loadingImages.update(l => ({ ...l, [formControlPath]: false }));
+        }
+      });
     }
   }
 
-  onTeamMemberFileChange(event: Event, index: number) {
+  onArrayFileChange(event: Event, formArrayPath: string, index: number, controlName: string, folder: string) {
     const file = (event.target as HTMLInputElement).files?.[0];
+    const loadingKey = `${formArrayPath}.${index}.${controlName}`;
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        this.teamMembers.at(index).get('imageUrl')?.setValue(result);
-      };
-      reader.readAsDataURL(file);
+      this.loadingImages.update(l => ({ ...l, [loadingKey]: true }));
+      this.dataService.uploadImage(file, folder).subscribe({
+        next: (res) => {
+          const formArray = this.settingsForm.get(formArrayPath) as FormArray;
+          formArray.at(index).get(controlName)?.setValue(res.imageUrl);
+          this.notificationService.show('Image uploaded!', 'success');
+        },
+        error: (err) => {
+          const message = err?.error?.message || 'Please try again.';
+          this.notificationService.show(`Upload failed: ${message}`, 'error');
+           this.loadingImages.update(l => ({ ...l, [loadingKey]: false }));
+        },
+        complete: () => {
+          this.loadingImages.update(l => ({ ...l, [loadingKey]: false }));
+        }
+      });
     }
+  }
+  
+  removeImage(formControlPath: string) {
+    this.settingsForm.get(formControlPath)?.setValue('');
+    this.notificationService.show('Image removed.');
+  }
+
+  removeArrayImage(formArrayPath: string, index: number, controlName: string) {
+    const formArray = this.settingsForm.get(formArrayPath) as FormArray;
+    formArray.at(index).get(controlName)?.setValue('');
+    this.notificationService.show('Image removed.');
   }
 
   saveSettings() {
