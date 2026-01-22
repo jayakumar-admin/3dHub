@@ -70,6 +70,15 @@ export interface User {
     phone?: string;
 }
 
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  status: 'New' | 'Read' | 'Archived';
+  submitted_at: string;
+}
+
 // New Settings Models
 export interface SocialMediaLink {
   platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin';

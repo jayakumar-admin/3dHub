@@ -13,10 +13,10 @@ const URL_SUFFIX = `?alt=media`;
 const fbUrl = (path) => `${BUCKET_BASE_URL}${encodeURIComponent(path)}${URL_SUFFIX}`;
 
 const users = [
-  { id: 'user1', name: 'Admin User', email: 'admin1@gmail.com', phone:'123456',password: adminPasswordHash, avatar: fbUrl('3dHub/users/admin.png'), role: 'Admin', joined_date: '2023-01-15'},
-  { id: 'user2', name: 'Alice Johnson', email: 'alice.j@example.com', phone:'123456', password: 12345678, avatar: fbUrl('3dHub/users/user1.png'), role: 'Customer', joined_date: '2024-03-10'},
-  { id: 'user3', name: 'Bob Williams', email: 'bob.w@example.com',  phone:'123456',password: null, avatar: fbUrl('3dHub/users/user2.png'), role: 'Customer', joined_date: '2024-05-02'},
-  { id: 'user4', name: 'Charlie Brown', email: 'charlie.b@example.com', phone:'123456', password: null, avatar: fbUrl('3dHub/users/user3.png'), role: 'Customer', joined_date: '2024-06-20'},
+  { id: 'user1', name: 'Admin User', email: 'admin1@gmail.com', password: adminPasswordHash, avatar: fbUrl('3dHub/users/admin.png'), role: 'Admin', joined_date: '2023-01-15'},
+  { id: 'user2', name: 'Alice Johnson', email: 'alice.j@example.com', password: null, avatar: fbUrl('3dHub/users/user1.png'), role: 'Customer', joined_date: '2024-03-10'},
+  { id: 'user3', name: 'Bob Williams', email: 'bob.w@example.com', password: null, avatar: fbUrl('3dHub/users/user2.png'), role: 'Customer', joined_date: '2024-05-02'},
+  { id: 'user4', name: 'Charlie Brown', email: 'charlie.b@example.com', password: null, avatar: fbUrl('3dHub/users/user3.png'), role: 'Customer', joined_date: '2024-06-20'},
 ];
 
 const categories = [
@@ -135,6 +135,12 @@ const order_items = [
     { order_id: 'ORD-2024-003', product_id: 'prod4', product_name: 'Custom Neon Sign', quantity: 1, price: 3499, old_price: null, image: fbUrl('3dHub/products/prod4_thumb.jpg') },
 ];
 
+const contact_submissions = [
+  { name: 'John Doe', email: 'john.d@example.com', message: 'I have a question about the Resin Wall Clock. Is it possible to get it in a custom color?', status: 'New' },
+  { name: 'Jane Smith', email: 'jane.s@example.com', message: 'Just wanted to say I love my new Luxury Gift Hamper! The quality is amazing. Thank you!', status: 'Read' },
+  { name: 'Sam Wilson', email: 'sam.w@example.com', message: 'There was an issue with my recent delivery. The tracking number does not seem to be working. Can you please look into it? My order ID is ORD-2024-002.', status: 'New' },
+];
+
 const settings = {
     general: {
       websiteName: '3D Hub',
@@ -220,4 +226,4 @@ const settings = {
     }
 };
 
-module.exports = { users, categories, products, orders, order_items, settings };
+module.exports = { users, categories, products, orders, order_items, settings, contact_submissions };

@@ -1,4 +1,3 @@
-
 // Load environment variables from a .env file into process.env
 require('dotenv').config();
 
@@ -34,6 +33,7 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/upload', require('./routes/upload'));
+app.use('/api/contact', require('./routes/contact'));
 
 
 // --- Start Server ---

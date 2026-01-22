@@ -19,6 +19,7 @@ export class AdminLoginComponent {
   dataService = inject(DataService);
 
   loginError = signal<string | null>(null);
+  showPassword = signal(false);
 
   loginForm = this.fb.group({
     email: ['admin1@gmail.com', [Validators.required, Validators.email]],

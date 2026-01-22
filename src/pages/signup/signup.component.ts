@@ -18,6 +18,7 @@ export class SignupComponent {
 
   isLoading = signal(false);
   signupError = signal<string | null>(null);
+  showPassword = signal(false);
 
   signupForm = this.fb.group({
     name: ['', Validators.required],

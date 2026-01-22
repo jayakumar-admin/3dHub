@@ -1,11 +1,11 @@
 
 import { Injectable, signal, inject } from '@angular/core';
-import { Product, Category, Order, User, Settings, OrderItem } from './models';
+import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission } from './models';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable, of } from 'rxjs';
 import { environment } from './environments/environment';
-import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_ORDERS, MOCK_USERS, MOCK_SETTINGS } from './data/mock-data';
+import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_ORDERS, MOCK_USERS, MOCK_SETTINGS, MOCK_CONTACT_SUBMISSIONS } from './data/mock-data';
 import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
@@ -20,6 +20,7 @@ export class DataService {
   private orders = signal<Order[]>([]);
   private users = signal<User[]>([]);
   private settings = signal<Settings>(this.getDefaultSettings());
+  private contactSubmissions = signal<ContactSubmission[]>([]);
 
   constructor() {
     if (environment.useTestData) {
@@ -47,6 +48,7 @@ export class DataService {
     this.orders.set(MOCK_ORDERS);
     this.users.set(MOCK_USERS);
     this.settings.set(MOCK_SETTINGS);
+    this.contactSubmissions.set(MOCK_CONTACT_SUBMISSIONS);
   }
 
   loadPublicData() {
@@ -76,6 +78,10 @@ export class DataService {
       next: u => this.users.set(u),
       error: err => this.handleError('Failed to load users', err)
     });
+    this.http.get<ContactSubmission[]>(`${this.apiUrl}/contact`, this.getAuthHeaders()).subscribe({
+      next: cs => this.contactSubmissions.set(cs),
+      error: err => this.handleError('Failed to load contact submissions', err)
+    });
   }
 
   // --- Getters ---
@@ -88,8 +94,42 @@ export class DataService {
   getOrderById(id: string) { return this.orders().find(o => o.id === id); }
   getUsers() { return this.users; }
   getSettings() { return this.settings; }
+  getContactSubmissions() { return this.contactSubmissions; }
   
   // --- Data Manipulation Methods ---
+
+  submitContactForm(formData: { name: string, email: string, message: string }): Observable<ContactSubmission> {
+    if (environment.useTestData) {
+      const newSubmission: ContactSubmission = {
+        id: Date.now(),
+        ...formData,
+        status: 'New',
+        submitted_at: new Date().toISOString()
+      };
+      this.contactSubmissions.update(submissions => [newSubmission, ...submissions]);
+      return of(newSubmission);
+    } else {
+      return this.http.post<ContactSubmission>(`${this.apiUrl}/contact`, formData);
+    }
+  }
+
+  updateContactSubmissionStatus(id: number, status: ContactSubmission['status']) {
+    if (environment.useTestData) {
+      this.contactSubmissions.update(submissions => 
+        submissions.map(s => s.id === id ? { ...s, status } : s)
+      );
+    } else {
+      this.http.put<ContactSubmission>(`${this.apiUrl}/contact/${id}/status`, { status }, this.getAuthHeaders())
+        .subscribe({
+          next: updatedSubmission => {
+            this.contactSubmissions.update(submissions => 
+              submissions.map(s => s.id === id ? updatedSubmission : s)
+            );
+          },
+          error: err => this.handleError('Failed to update submission status', err)
+        });
+    }
+  }
 
   uploadImage(file: File, folder: string): Observable<{ imageUrl: string }> {
     const formData = new FormData();

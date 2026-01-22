@@ -3,6 +3,7 @@
 
 -- Drop tables if they exist to ensure a clean slate.
 -- The order is important due to foreign key constraints.
+DROP TABLE IF EXISTS contact_submissions;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
@@ -15,7 +16,6 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255), -- Can be null for customers who don't create an account
     avatar VARCHAR(255),
@@ -103,6 +103,18 @@ CREATE TABLE settings (
     data JSONB NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Contact Submissions Table
+-- Stores messages sent through the contact form.
+CREATE TABLE contact_submissions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'New' CHECK (status IN ('New', 'Read', 'Archived')),
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 
 -- Note: Initial data (like the default admin user and settings)
 -- will be inserted by the seeder script (seeder.js), not here.

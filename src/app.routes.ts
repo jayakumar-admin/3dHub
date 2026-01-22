@@ -42,6 +42,7 @@ export const APP_ROUTES: Routes = [
         { path: 'orders', loadComponent: () => import('./pages/admin/order-list/order-list.component').then(c => c.AdminOrderListComponent) },
         { path: 'orders/:id', loadComponent: () => import('./pages/admin/order-detail/order-detail.component').then(c => c.AdminOrderDetailComponent) },
         { path: 'users', loadComponent: () => import('./pages/admin/users/users.component').then(c => c.AdminUsersComponent) },
+        { path: 'contact-submissions', loadComponent: () => import('./pages/admin/contact-submissions/contact-submissions.component').then(c => c.AdminContactSubmissionsComponent) },
         { path: 'settings', loadComponent: () => import('./pages/admin/settings/settings.component').then(c => c.AdminSettingsComponent) },
     ]
   },

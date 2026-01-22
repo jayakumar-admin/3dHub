@@ -1,0 +1,96 @@
+
+<div class="text-gray-800 dark:text-gray-200">
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <h1 class="text-3xl font-bold">Contact Submissions</h1>
+    <div class="relative">
+      <input 
+        type="text" 
+        placeholder="Search messages..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        class="admin-input rounded-full pl-10 pr-4">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="border-b dark:border-gray-700">
+          <tr class="text-sm text-gray-500 dark:text-gray-400">
+            <th class="py-3 px-4 font-medium">From</th>
+            <th class="py-3 px-4 font-medium">Message</th>
+            <th class="py-3 px-4 font-medium">Date</th>
+            <th class="py-3 px-4 font-medium">Status</th>
+            <th class="py-3 px-4 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(submission of filteredSubmissions(); track submission.id) {
+            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <td class="py-3 px-4">
+                <p class="font-medium text-light-text dark:text-dark-text">{{ submission.name }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ submission.email }}</p>
+              </td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400 max-w-sm truncate">
+                {{ submission.message }}
+              </td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                {{ submission.submitted_at | date:'medium' }}
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 text-xs font-medium rounded-full" [class]="getStatusClass(submission.status)">
+                  {{ submission.status }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-sm">
+                <button (click)="openModal(submission)" class="text-blue-500 hover:underline font-medium">View</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-16 text-gray-500">
+                <h3 class="text-lg font-semibold">No submissions found</h3>
+                <p class="text-sm">There are no contact messages to display.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- View Submission Modal -->
+@if(viewingSubmission(); as submission) {
+  <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50" (click)="closeModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-lg" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-start">
+            <h2 class="text-2xl font-bold mb-4">Message from {{ submission.name }}</h2>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+        </div>
+        
+        <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 border-b dark:border-gray-700 pb-4">
+            <p><strong>Email:</strong> <a [href]="'mailto:' + submission.email" class="text-blue-500 hover:underline">{{ submission.email }}</a></p>
+            <p><strong>Received:</strong> {{ submission.submitted_at | date:'full' }}</p>
+            <p><strong>Status:</strong> <span class="px-2 py-0.5 text-xs font-medium rounded-full" [class]="getStatusClass(submission.status)">{{ submission.status }}</span></p>
+        </div>
+        
+        <div class="prose dark:prose-invert max-w-none mb-6 whitespace-pre-wrap">
+            {{ submission.message }}
+        </div>
+
+        <div class="flex justify-end gap-4 pt-4 border-t dark:border-gray-700">
+            @if(submission.status !== 'Archived') {
+              <button type="button" (click)="updateStatus(submission, 'Archived')" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 font-semibold">Archive</button>
+            }
+            @if(submission.status !== 'Read') {
+              <button type="button" (click)="updateStatus(submission, 'Read')" class="px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold">Mark as Read</button>
+            }
+            <button type="button" (click)="closeModal()" class="px-4 py-2 rounded-lg bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-semibold">Close</button>
+        </div>
+    </div>
+  </div>
+}

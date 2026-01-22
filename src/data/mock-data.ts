@@ -1,5 +1,5 @@
 
-import { Product, Category, Order, User, Settings } from '../models';
+import { Product, Category, Order, User, Settings, ContactSubmission } from '../models';
 
 const BUCKET_NAME = 'ajrmart-14f90.appspot.com';
 const BUCKET_BASE_URL = `https://firebasestorage.googleapis.com/v0/b/${BUCKET_NAME}/o/`;
@@ -48,6 +48,13 @@ export const MOCK_ORDERS: Order[] = [
     { id: 'ORD-2024-004', orderDate: '2024-07-24', customerName: 'Diana Prince', customerEmail: 'diana.p@example.com', customerAvatar: fbUrl('3dHub/users/user4.png'), shippingAddress: { street: '1 Paradise Island', city: 'Themyscira', state: 'DC', zip: '12345' }, totalAmount: 2298, status: 'Pending', items: [{ productId: 'prod8', productName: 'Explosion Gift Box', quantity: 1, price: 1199, image: fbUrl('3dHub/products/prod8_thumb.jpg'), oldPrice: 1499 }, { productId: 'prod7', productName: 'Personalized Name Plate', quantity: 1, price: 999, image: fbUrl('3dHub/products/prod7_thumb.jpg') }] },
     { id: 'ORD-2024-005', orderDate: '2024-07-25', customerName: 'Alice Johnson', customerEmail: 'alice.j@example.com', customerAvatar: fbUrl('3dHub/users/user1.png'), shippingAddress: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' }, totalAmount: 1899, status: 'Cancelled', items: [{ productId: 'prod6', productName: 'Enchanted Rose Lamp', quantity: 1, price: 1899, image: fbUrl('3dHub/products/prod6_thumb.jpg') }] },
     { id: 'ORD-2024-006', orderDate: '2024-07-26', customerName: 'Bob Williams', customerEmail: 'bob.w@example.com', customerAvatar: fbUrl('3dHub/users/user2.png'), shippingAddress: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' }, totalAmount: 3398, status: 'Processing', items: [{ productId: 'prod9', productName: 'Galaxy Moon Lamp', quantity: 1, price: 1799, image: fbUrl('3dHub/products/prod9_thumb.jpg') }, { productId: 'prod10', productName: 'Couple Caricature Stand', quantity: 1, price: 1599, image: fbUrl('3dHub/products/prod10_thumb.jpg'), oldPrice: 1999 }] }
+];
+
+// --- MOCK CONTACT SUBMISSIONS ---
+export const MOCK_CONTACT_SUBMISSIONS: ContactSubmission[] = [
+  { id: 1, name: 'John Doe', email: 'john.d@example.com', message: 'I have a question about the Resin Wall Clock. Is it possible to get it in a custom color?', status: 'New', submitted_at: '2024-07-28T10:30:00Z' },
+  { id: 2, name: 'Jane Smith', email: 'jane.s@example.com', message: 'Just wanted to say I love my new Luxury Gift Hamper! The quality is amazing. Thank you!', status: 'Read', submitted_at: '2024-07-27T15:00:00Z' },
+  { id: 3, name: 'Sam Wilson', email: 'sam.w@example.com', message: 'There was an issue with my recent delivery. The tracking number does not seem to be working. Can you please look into it? My order ID is ORD-2024-002.', status: 'New', submitted_at: '2024-07-28T12:00:00Z' },
 ];
 
 // --- MOCK SETTINGS ---

@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const db = require('./db');
-const { users, categories, products, orders, order_items, settings } = require('./seed-data');
+const { users, categories, products, orders, order_items, settings, contact_submissions } = require('./seed-data');
 
 // Function to clear all data from the tables
 const destroyData = async () => {
@@ -9,6 +9,7 @@ const destroyData = async () => {
   try {
     console.log('Destroying existing data...');
     // The order of deletion is important due to foreign key constraints
+    await client.query('DELETE FROM contact_submissions');
     await client.query('DELETE FROM order_items');
     await client.query('DELETE FROM orders');
     await client.query('DELETE FROM products');
@@ -34,8 +35,8 @@ const importData = async () => {
     // 1. Seed users
     for (const user of users) {
       await client.query(
-        'INSERT INTO users (id, name, email, phone,password, avatar, role, joined_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-        [user.id, user.name, user.email,user.phone, user.password, user.avatar, user.role, user.joined_date]
+        'INSERT INTO users (id, name, email, password, avatar, role, joined_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+        [user.id, user.name, user.email, user.password, user.avatar, user.role, user.joined_date]
       );
     }
     console.log('Users seeded.');
@@ -82,6 +83,16 @@ const importData = async () => {
       [1, JSON.stringify(settings)]
     );
     console.log('Settings seeded.');
+
+    // 7. Seed contact submissions
+    for (const submission of contact_submissions) {
+      await client.query(
+        'INSERT INTO contact_submissions (name, email, message, status) VALUES ($1, $2, $3, $4)',
+        [submission.name, submission.email, submission.message, submission.status]
+      );
+    }
+    console.log('Contact submissions seeded.');
+
 
     console.log('Data seeded successfully!');
   } catch (error) {

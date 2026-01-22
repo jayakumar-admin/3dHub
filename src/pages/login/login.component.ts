@@ -19,6 +19,7 @@ export class LoginComponent {
 
   isLoading = signal(false);
   loginError = signal<string | null>(null);
+  showPassword = signal(false);
 
   loginForm = this.fb.group({
     email: ['alice.j@example.com', [Validators.required, Validators.email]],
