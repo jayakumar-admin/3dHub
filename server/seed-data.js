@@ -13,10 +13,10 @@ const URL_SUFFIX = `?alt=media`;
 const fbUrl = (path) => `${BUCKET_BASE_URL}${encodeURIComponent(path)}${URL_SUFFIX}`;
 
 const users = [
-  { id: 'user1', name: 'Admin User', email: 'admin1@gmail.com', password: adminPasswordHash, avatar: fbUrl('3dHub/users/admin.png'), role: 'Admin', joined_date: '2023-01-15'},
-  { id: 'user2', name: 'Alice Johnson', email: 'alice.j@example.com', password: null, avatar: fbUrl('3dHub/users/user1.png'), role: 'Customer', joined_date: '2024-03-10'},
-  { id: 'user3', name: 'Bob Williams', email: 'bob.w@example.com', password: null, avatar: fbUrl('3dHub/users/user2.png'), role: 'Customer', joined_date: '2024-05-02'},
-  { id: 'user4', name: 'Charlie Brown', email: 'charlie.b@example.com', password: null, avatar: fbUrl('3dHub/users/user3.png'), role: 'Customer', joined_date: '2024-06-20'},
+  { id: 'user1', name: 'Admin User', email: 'admin1@gmail.com', phone:'123456',password: adminPasswordHash, avatar: fbUrl('3dHub/users/admin.png'), role: 'Admin', joined_date: '2023-01-15'},
+  { id: 'user2', name: 'Alice Johnson', email: 'alice.j@example.com', phone:'123456', password: 12345678, avatar: fbUrl('3dHub/users/user1.png'), role: 'Customer', joined_date: '2024-03-10'},
+  { id: 'user3', name: 'Bob Williams', email: 'bob.w@example.com',  phone:'123456',password: null, avatar: fbUrl('3dHub/users/user2.png'), role: 'Customer', joined_date: '2024-05-02'},
+  { id: 'user4', name: 'Charlie Brown', email: 'charlie.b@example.com', phone:'123456', password: null, avatar: fbUrl('3dHub/users/user3.png'), role: 'Customer', joined_date: '2024-06-20'},
 ];
 
 const categories = [

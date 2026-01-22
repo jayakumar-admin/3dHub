@@ -34,8 +34,8 @@ const importData = async () => {
     // 1. Seed users
     for (const user of users) {
       await client.query(
-        'INSERT INTO users (id, name, email, password, avatar, role, joined_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-        [user.id, user.name, user.email, user.password, user.avatar, user.role, user.joined_date]
+        'INSERT INTO users (id, name, email, phone,password, avatar, role, joined_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        [user.id, user.name, user.email,user.phone, user.password, user.avatar, user.role, user.joined_date]
       );
     }
     console.log('Users seeded.');
