@@ -85,7 +85,7 @@ export class ProfileComponent implements OnInit {
     this.isUploadingAvatar.set(true);
     this.dataService.uploadImage(file, 'avatars').subscribe({
       next: async (res) => {
-        await this.authService.updateProfile({...this.detailsForm.value, avatar: res.imageUrl });
+        await this.authService.updateProfile({ avatar: res.imageUrl });
         this.notificationService.show('Profile picture updated!', 'success');
       },
       error: (err) => {

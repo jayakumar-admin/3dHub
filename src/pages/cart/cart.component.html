@@ -1,4 +1,3 @@
-
 <div class="bg-blue-50 dark:bg-gray-900 min-h-screen py-12 px-4">
   <div class="container mx-auto max-w-4xl">
     <h1 class="text-4xl font-bold text-center text-primary-light dark:text-blue-400 mb-8">Shopping Cart</h1>
@@ -34,7 +33,13 @@
                   <h3 class="font-semibold text-lg text-light-text dark:text-dark-text">{{ item.productName }}</h3>
                   <div class="flex items-center mt-2">
                     <label class="text-sm mr-2">Qty:</label>
-                    <input type="number" [value]="item.quantity" (change)="updateQuantity(item, +$event.target.value)" min="1" class="w-16 rounded-md border border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 focus:border-blue-500 focus:ring-blue-500">
+                    <input 
+                      type="number" 
+                      [value]="item.quantity" 
+                      (change)="updateQuantity(item, $event)" 
+                      min="1" 
+                      [max]="getStockForProduct(item.productId)"
+                      class="w-20 rounded-md border border-gray-300 dark:border-gray-600 shadow-sm dark:bg-gray-700 focus:border-blue-500 focus:ring-blue-500">
                   </div>
                   <button (click)="removeItem(item)" class="text-sm text-red-500 hover:underline mt-1">Remove</button>
                 </div>

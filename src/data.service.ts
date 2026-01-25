@@ -4,7 +4,7 @@ import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission,
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable, of, forkJoin } from 'rxjs';
-import { tap, finalize, map } from 'rxjs/operators';
+import { tap, finalize, map, catchError } from 'rxjs/operators';
 import { environment } from './environments/environment';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_ORDERS, MOCK_USERS, MOCK_SETTINGS, MOCK_CONTACT_SUBMISSIONS } from './data/mock-data';
 import { NotificationService } from './notification.service';
@@ -129,6 +129,35 @@ export class DataService {
   }
 
   // --- Data Manipulation Methods ---
+
+  loadUserOrders(): Observable<Order[]> {
+    if (environment.useTestData) {
+        const user = this.authService.currentUser();
+        if (user) {
+            const userOrders = MOCK_ORDERS.filter(o => o.customerEmail === user.email);
+            this.orders.set(userOrders);
+        }
+        return of(this.orders());
+    }
+
+    if (!this.authService.isLoggedIn() || this.authService.isAdmin()) {
+        return of([]);
+    }
+
+    this.loadingService.start();
+    return this.http.get<Order[]>(`${this.apiUrl}/orders/my-orders`, this.getAuthHeaders()).pipe(
+        tap(orders => {
+            this.orders.set(orders);
+        }),
+        finalize(() => {
+            this.loadingService.stop();
+        }),
+        catchError(err => {
+            this.handleError('Failed to load your orders', err);
+            return of([]);
+        })
+    );
+  }
 
   submitContactForm(formData: { name: string, email: string, message: string }): Observable<ContactSubmission> {
     if (environment.useTestData) {

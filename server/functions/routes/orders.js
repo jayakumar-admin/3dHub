@@ -58,6 +58,23 @@ router.post('/', async (req, res) => {
   }
 });
 
+/**
+ * @route   GET /api/orders/my-orders
+ * @desc    Get all orders for the logged-in user
+ * @access  Private (Customer)
+ */
+router.get('/my-orders', verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { rows } = await db.query(queries.getOrdersByUserId, [userId]);
+    res.json(rows);
+  } catch (err) {
+    console.error('Get user orders error:', err.message);
+    res.status(500).json({ message: `Server Error: ${err.message}` });
+  }
+});
+
+
 // --- Protected Admin Routes ---
 
 /**
@@ -80,20 +97,26 @@ router.get('/', verifyToken, async (req, res) => {
 /**
  * @route   GET /api/orders/:id
  * @desc    Get a single order with its items
- * @access  Private (Admin only)
+ * @access  Private (Admin or Customer who owns order)
  */
 router.get('/:id', verifyToken, async (req, res) => {
-  if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
-  
   try {
     const orderResult = await db.query(queries.getOrderById, [req.params.id]);
     if (orderResult.rows.length === 0) {
       return res.status(404).json({ msg: 'Order not found' });
     }
     const order = orderResult.rows[0];
+    
+    // Security check: Allow admins OR the user who owns the order
+    if (req.user.role !== 'Admin' && order.user_id !== req.user.id) {
+        return res.status(403).json({ msg: 'Access denied to this order.' });
+    }
 
     const itemsResult = await db.query(queries.getOrderItemsByOrderId, [req.params.id]);
+    const reviewsResult = await db.query(queries.getReviewedProductIdsByOrderId, [req.params.id]);
+
     order.items = itemsResult.rows;
+    order.reviewedProductIds = reviewsResult.rows.map(r => r.product_id);
 
     res.json(order);
   } catch (err) {

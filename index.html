@@ -33,6 +33,21 @@
       @apply block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary-light dark:focus:ring-primary-dark focus:border-primary-light dark:focus:border-primary-dark shadow-sm transition-colors;
     }
 </style>
+<style>
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slide-content {
+    animation: slideInUp 0.8s ease-out 0.3s forwards;
+  }
+</style>
 <script type="importmap">
 {
   "imports": {
@@ -55,7 +70,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+<body class="bg-light-bg dark:bg-dark-bg transition-colors duration-300 text-light-text dark:text-dark-text">
   <app-root></app-root>
 </body>
 </html>
