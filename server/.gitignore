@@ -9,8 +9,10 @@ firebase-debug.*.log*
 
 # Firebase cache
 .firebase/
-
+.env
+*.local
 # Firebase config
+.env
 
 # Uncomment this if you'd like others to create their own Firebase project.
 # For a team working on the same Firebase project(s), it is recommended to leave
@@ -62,8 +64,9 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
+
 
 # dataconnect generated files
 .dataconnect
+
+*.local
