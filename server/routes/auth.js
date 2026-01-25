@@ -1,9 +1,10 @@
-
 const router = require('express').Router();
 const db = require('../db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const queries = require('../queries').auth;
+const verifyToken = require('../middleware/verifyToken');
+
 
 /**
  * @route   POST /api/auth/login
@@ -58,8 +59,8 @@ router.post('/login', async (req, res) => {
 router.post('/user/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
 
-  if (!name || !email || !password ||!phone) {
-    return res.status(400).json({ message: 'Name, email,phone and password are required.' });
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Name, email, and password are required.' });
   }
 
   try {
@@ -74,7 +75,7 @@ router.post('/user/signup', async (req, res) => {
     const newUserId = `user${Date.now()}`;
     
     const newUserResult = await db.query(queries.createUser, [
-        newUserId, name, email, hashedPassword, null
+        newUserId, name, email, hashedPassword, null, phone
     ]);
 
     res.status(201).json(newUserResult.rows[0]);
@@ -126,6 +127,48 @@ router.post('/user/login', async (req, res) => {
   } catch (err) {
     console.error('User login error:', err.message);
     res.status(500).json({ message: `Server error during authentication: ${err.message}` });
+  }
+});
+
+/**
+ * @route   POST /api/auth/change-password
+ * @desc    Change a logged-in user's password.
+ * @access  Private
+ */
+router.post('/change-password', verifyToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'All password fields are required.' });
+  }
+  
+  if (newPassword.length < 8) {
+     return res.status(400).json({ message: 'New password must be at least 8 characters long.' });
+  }
+
+  try {
+    const userResult = await db.query(queries.getUserPasswordById, [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    const { password: hashedPassword } = userResult.rows[0];
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, hashedPassword);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Incorrect current password.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const newHashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await db.query(queries.changePassword, [newHashedPassword, userId]);
+
+    res.json({ message: 'Password changed successfully.' });
+
+  } catch (err) {
+    console.error('Change password error:', err.message);
+    res.status(500).json({ message: `Server error: ${err.message}` });
   }
 });
 

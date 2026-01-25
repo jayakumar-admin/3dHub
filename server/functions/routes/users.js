@@ -1,10 +1,9 @@
-
 const router = require('express').Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const queries = require('../queries').users;
 
-// All routes in this file are protected and for Admin use only.
+// All routes in this file are protected and for Admin use only unless specified otherwise.
 
 /**
  * @route   GET /api/users
@@ -24,6 +23,47 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 /**
+ * @route   PUT /api/users/profile
+ * @desc    Update the logged-in user's own profile
+ * @access  Private (Any authenticated user)
+ */
+router.put('/profile', verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { name, email, phone, avatar } = req.body;
+  
+  // Basic validation
+  if (!name || !email) {
+    return res.status(400).json({ message: 'Name and email are required.' });
+  }
+
+  try {
+    // We need the current user's avatar in case it's not being updated
+    const currentUserData = await db.query('SELECT avatar FROM users WHERE id = $1', [userId]);
+    const currentAvatar = currentUserData.rows[0].avatar;
+
+    const { rows } = await db.query(queries.updateUserProfile, [
+        name,
+        email,
+        phone,
+        avatar || currentAvatar, // Use new avatar if provided, else keep old one
+        userId
+    ]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('User profile update error:', err.message);
+    // Handle unique constraint violation for email
+    if (err.code === '23505') {
+        return res.status(400).json({ message: 'This email is already in use by another account.' });
+    }
+    res.status(500).json({ message: `Server Error: ${err.message}` });
+  }
+});
+
+
+/**
  * @route   PUT /api/users/:id
  * @desc    Update a user's details (name, email, role)
  * @access  Private (Admin only)
@@ -31,11 +71,11 @@ router.get('/', verifyToken, async (req, res) => {
 router.put('/:id', verifyToken, async (req, res) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
   
-  const { name, email, phone, role } = req.body;
+  const { name, email, role } = req.body;
   const { id } = req.params;
   
   try {
-    const { rows } = await db.query(queries.updateUser, [name, email,phone, role, id]);
+    const { rows } = await db.query(queries.updateUser, [name, email, role, id]);
     if (rows.length === 0) {
       return res.status(404).json({ msg: 'User not found' });
     }

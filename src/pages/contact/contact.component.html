@@ -51,7 +51,7 @@
           <div>
             <div class="relative rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 shadow-sm focus-within:ring-1 focus-within:ring-primary-light dark:focus-within:ring-primary-dark focus-within:border-primary-light dark:focus-within:border-primary-dark">
               <label for="name" class="block text-xs font-medium text-gray-500 dark:text-gray-400">Your Name</label>
-              <input type="text" id="name" formControlName="name" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="Your Name">
+              <input type="text" id="name" formControlName="name" class="block w-full border-0 p-0 bg-transparent font-mono tracking-wider text-light-text dark:text-dark-text placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm" placeholder="John Doe">
             </div>
              @if(name?.invalid && (name?.dirty || name?.touched)) {
                 <p class="mt-2 text-sm text-red-600">Name is required.</p>

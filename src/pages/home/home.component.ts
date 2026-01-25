@@ -5,16 +5,19 @@ import { ProductCardComponent } from '../../components/product-card/product-card
 import { CommonModule } from '@angular/common';
 import { SearchService } from '../../search.service';
 import { RouterLink } from '@angular/router';
+import { LoadingService } from '../../loading.service';
+import { ProductCardSkeletonComponent } from '../../components/product-card-skeleton/product-card-skeleton.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ProductCardComponent, CommonModule, RouterLink],
+  imports: [ProductCardComponent, CommonModule, RouterLink, ProductCardSkeletonComponent],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dataService = inject(DataService);
   searchService = inject(SearchService);
+  loadingService = inject(LoadingService);
 
   private settings = this.dataService.getSettings();
   categories = this.dataService.getCategories();

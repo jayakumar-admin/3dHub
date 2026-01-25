@@ -1,8 +1,7 @@
-
 import { Injectable, signal, PLATFORM_ID, Inject, inject, computed, Injector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from './environments/environment';
 import { User } from './models';
@@ -74,12 +73,12 @@ export class AuthService {
         id: `user${Date.now()}`,
         name: userData.name!,
         email: userData.email!,
-        phone: userData.phone!,
         password: userData.password!, // In real app, this would be hashed
         avatar: `https://picsum.photos/seed/${userData.name}/100/100`,
         role: 'Customer',
         joinedDate: new Date().toISOString().split('T')[0],
         // FIX: Include phone number when creating a new mock user.
+        phone: userData.phone
       };
       this.dataService.createUser(newUser).subscribe();
       this.setSession(newUser, `mock-user-token-${newUser.id}`);
@@ -93,6 +92,48 @@ export class AuthService {
         console.error('Signup failed', error);
         return false;
       }
+    }
+  }
+
+  async updateProfile(userData: Partial<User>): Promise<boolean> {
+    try {
+      // In test data mode, just update the signal
+      if (environment.useTestData) {
+          this.currentUser.update(u => u ? { ...u, ...userData } : null);
+          return true;
+      }
+      
+      const updatedUser = await firstValueFrom(this.dataService.updateUserProfile(userData));
+      const userToStore = { ...this.currentUser()!, ...updatedUser };
+      this.setSession(userToStore, this.getToken()!);
+      return true;
+    } catch(error) {
+      console.error("Profile update failed", error);
+      return false;
+    }
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    if (environment.useTestData) {
+        // Mock implementation
+        const user = this.currentUser();
+        if (user && user.password === currentPassword) {
+            user.password = newPassword;
+            return { success: true, message: 'Password changed successfully!' };
+        } else {
+            return { success: false, message: 'Incorrect current password.' };
+        }
+    }
+
+    try {
+        const response = await firstValueFrom(this.http.post<{ message: string }>(
+            `${this.apiUrl}/change-password`, 
+            { currentPassword, newPassword }, 
+            this.getAuthHeaders()
+        ));
+        return { success: true, message: response.message };
+    } catch (error: any) {
+        return { success: false, message: error.error?.message || 'An unknown error occurred.' };
     }
   }
 
@@ -129,6 +170,12 @@ export class AuthService {
       sessionStorage.setItem('currentUser', JSON.stringify(userToStore));
       sessionStorage.setItem('authToken', token);
     }
+  }
+  
+  private getAuthHeaders(): { headers: HttpHeaders } {
+    const token = this.getToken();
+    if (!token) return { headers: new HttpHeaders() };
+    return { headers: new HttpHeaders({ 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }) };
   }
 
   getToken(): string | null {

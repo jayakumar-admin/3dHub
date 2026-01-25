@@ -23,7 +23,7 @@ export class ShippingComponent {
     address: ['', Validators.required],
     city: ['', Validators.required],
     state: ['', Validators.required],
-    zip: ['', [Validators.required, Validators.pattern('^[0-9]{5}(?:-[0-9]{4})?$')]],
+    zip: ['', [Validators.required, Validators.pattern('^[0-9]{6}(?:-[0-9]{4})?$')]],
     phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
   });
 

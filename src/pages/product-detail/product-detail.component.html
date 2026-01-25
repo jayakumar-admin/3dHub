@@ -33,8 +33,7 @@
            }
           <span class="text-sm text-gray-500 dark:text-gray-400 ml-2">({{ p.reviews }} reviews)</span>
         </div>
-        <p class="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">{{ p.description }}</p>
-
+        
         <div class="mb-6">
           <span class="text-lg font-medium text-gray-500 dark:text-gray-400">Availability:</span>
           @if (p.stock > 0) {
@@ -57,24 +56,132 @@
         }
         
         <!-- Actions -->
-        <div class="flex items-center space-x-4 mb-2">
-            <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
-                <button (click)="decrementQuantity()" class="px-4 py-2 font-bold">-</button>
-                <span class="px-4 py-2">{{ quantity() }}</span>
-                <button (click)="incrementQuantity()" class="px-4 py-2 font-bold">+</button>
+        @if (p.stock > 0) {
+          <div class="flex items-center space-x-4 mb-2">
+              <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <button (click)="decrementQuantity()" class="px-4 py-2 font-bold">-</button>
+                  <span class="px-4 py-2">{{ quantity() }}</span>
+                  <button (click)="incrementQuantity()" class="px-4 py-2 font-bold">+</button>
+              </div>
+               <button (click)="addToCart()" class="flex-1 bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+                  Add to Cart
+              </button>
+          </div>
+          @if (itemAdded()) {
+            <div class="mt-4 text-green-600 font-semibold transition-opacity duration-300">
+              ✓ Added to cart!
             </div>
-             <button (click)="addToCart()" class="flex-1 bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
-                Add to Cart
+          }
+        } @else {
+          <div class="mt-6">
+            <button disabled class="w-full bg-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400 font-bold py-3 px-6 rounded-lg cursor-not-allowed">
+              Out of Stock
             </button>
-        </div>
-
-        @if (itemAdded()) {
-          <div class="mt-4 text-green-600 font-semibold transition-opacity duration-300">
-            ✓ Added to cart!
           </div>
         }
       </div>
     </div>
+    
+    <!-- Tabs and Details Section -->
+    <div class="mt-16">
+      <!-- Tab Headers -->
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex -mb-px space-x-8" aria-label="Tabs">
+          <button (click)="setTab('description')" [class]="activeTab() === 'description' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            Description
+          </button>
+          <button (click)="setTab('info')" [class]="activeTab() === 'info' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            Additional Information
+          </button>
+          <button (click)="setTab('reviews')" [class]="activeTab() === 'reviews' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            Reviews ({{p.reviews}})
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="py-8">
+        @if (activeTab() === 'description') {
+          <div class="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 leading-relaxed">
+            <p>{{ p.description }}</p>
+          </div>
+        }
+        @if (activeTab() === 'info') {
+          <div class="max-w-2xl">
+            <dl class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">SKU</dt>
+                <dd class="mt-1 text-sm font-mono text-gray-900 dark:text-gray-100">{{ p.sku }}</dd>
+              </div>
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Category</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ dataService.getCategoryById(p.category)?.name }}</dd>
+              </div>
+              @if(p.weight) {
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Weight</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ p.weight }} kg</dd>
+                </div>
+              }
+              @if(p.dimensions) {
+                <div class="sm:col-span-1">
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Dimensions</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ p.dimensions.length }} x {{ p.dimensions.width }} x {{ p.dimensions.height }} cm</dd>
+                </div>
+              }
+              @if(p.tags && p.tags.length > 0) {
+                <div class="sm:col-span-2">
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tags</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                    <div class="flex flex-wrap gap-2">
+                      @for(tag of p.tags; track tag) {
+                        <span class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full text-xs font-medium">{{ tag }}</span>
+                      }
+                    </div>
+                  </dd>
+                </div>
+              }
+            </dl>
+          </div>
+        }
+        @if (activeTab() === 'reviews') {
+          <div class="space-y-8 max-w-4xl">
+            @for (review of reviews(); track review.id) {
+              <div class="flex space-x-4 border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
+                <img class="w-12 h-12 rounded-full object-cover" [src]="review.userAvatar" [alt]="review.userName + ' avatar'">
+                <div class="flex-1">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-semibold">{{ review.userName }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ review.createdAt | date:'longDate' }}</p>
+                    </div>
+                    <div class="flex items-center">
+                      @for (i of [1,2,3,4,5]; track i) { <svg class="w-4 h-4" [class]="i <= review.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg> }
+                    </div>
+                  </div>
+                  <p class="mt-2 text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ review.comment }}</p>
+                </div>
+              </div>
+            } @empty {
+              <p class="text-gray-500">There are no reviews for this product yet.</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+    
+    <!-- Related Products -->
+    @if(relatedProducts().length > 0) {
+      <div class="mt-16">
+        <h2 class="text-3xl font-bold mb-6">Related Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          @for(related of relatedProducts(); track related.id) {
+            <app-product-card [product]="related"></app-product-card>
+          }
+        </div>
+      </div>
+    }
+
   } @else {
     <div class="text-center py-16">
       <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">Product not found</h2>

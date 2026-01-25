@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { customerAuthGuard } from './customer-auth.guard';
@@ -22,7 +21,8 @@ export const APP_ROUTES: Routes = [
       { path: 'products', loadComponent: () => import('./pages/products/products.component').then(c => c.ProductsComponent) },
       { path: 'about', loadComponent: () => import('./pages/about/about.component').then(c => c.AboutComponent) },
       { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(c => c.ContactComponent) },
-      { path: 'wishlist', loadComponent: () => import('./pages/wishlist/wishlist.component').then(c => c.WishlistComponent) }
+      { path: 'wishlist', loadComponent: () => import('./pages/wishlist/wishlist.component').then(c => c.WishlistComponent) },
+      { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then(c => c.ProfileComponent), canActivate: [customerAuthGuard] }
     ]
   },
   {

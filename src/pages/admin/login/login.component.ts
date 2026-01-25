@@ -22,8 +22,8 @@ export class AdminLoginComponent {
   showPassword = signal(false);
 
   loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
+    email: ['admin1@gmail.com', [Validators.required, Validators.email]],
+    password: ['12345678', [Validators.required]],
   });
 
   async login() {
@@ -32,8 +32,13 @@ export class AdminLoginComponent {
       const { email, password } = this.loginForm.value;
       const success = await this.authService.adminLogin(email!, password!);
       if (success) {
-        this.dataService.loadAdminData();
-        this.router.navigate(['/admin/dashboard']);
+        // The data service will now show a global loader
+        this.dataService.loadAdminData().subscribe({
+            next: () => this.router.navigate(['/admin/dashboard']),
+            error: (err) => {
+                this.loginError.set('Failed to load required admin data.');
+            }
+        });
       } else {
         this.loginError.set('Invalid email or password.');
       }

@@ -5,10 +5,12 @@ const queries = {
     findAdminByEmail: 'SELECT * FROM users WHERE email = $1 AND role = \'Admin\'',
     findUserByEmail: 'SELECT * FROM users WHERE email = $1',
     createUser: `
-      INSERT INTO users (id, name, email, password, avatar, role, joined_date) 
-      VALUES ($1, $2, $3, $4, $5, 'Customer', CURRENT_DATE)
-      RETURNING id, name, email, avatar, role, joined_date AS "joinedDate"
-    `
+      INSERT INTO users (id, name, email, password, avatar, phone, role, joined_date) 
+      VALUES ($1, $2, $3, $4, $5, $6, 'Customer', CURRENT_DATE)
+      RETURNING id, name, email, avatar, phone, role, joined_date AS "joinedDate"
+    `,
+    getUserPasswordById: 'SELECT password FROM users WHERE id = $1',
+    changePassword: 'UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
   },
   products: {
     getAllProducts: `
@@ -41,11 +43,40 @@ const queries = {
   },
   orders: {
     getAllOrders: `
-      SELECT 
-        id, order_date AS "orderDate", customer_name AS "customerName", customer_email AS "customerEmail", 
-        total_amount AS "totalAmount", shipping_address AS "shippingAddress", status, user_id, 
-        shipping_info AS "shippingInfo", created_at, updated_at 
-      FROM orders ORDER BY order_date DESC`,
+      SELECT
+          o.id,
+          o.order_date AS "orderDate",
+          o.customer_name AS "customerName",
+          o.customer_email AS "customerEmail",
+          u.avatar AS "customerAvatar",
+          o.total_amount AS "totalAmount",
+          o.shipping_address AS "shippingAddress",
+          o.status,
+          o.user_id,
+          o.shipping_info AS "shippingInfo",
+          o.created_at,
+          o.updated_at,
+          COALESCE(json_agg(
+              json_build_object(
+                  'productId', oi.product_id,
+                  'productName', oi.product_name,
+                  'quantity', oi.quantity,
+                  'price', oi.price,
+                  'oldPrice', oi.old_price,
+                  'image', oi.image
+              )
+          ) FILTER (WHERE oi.id IS NOT NULL), '[]'::json) AS items
+      FROM
+          orders o
+      LEFT JOIN
+          order_items oi ON o.id = oi.order_id
+      LEFT JOIN
+          users u ON o.user_id = u.id
+      GROUP BY
+          o.id, u.avatar
+      ORDER BY
+          o.order_date DESC
+    `,
     getOrderById: `
       SELECT
         id, order_date AS "orderDate", customer_name AS "customerName", customer_email AS "customerEmail", 
@@ -72,12 +103,16 @@ const queries = {
   users: {
     getAllUsers: `
       SELECT 
-        id, name, email, avatar, role, joined_date AS "joinedDate" 
+        id, name, email, avatar, phone, role, joined_date AS "joinedDate" 
       FROM users ORDER BY joined_date DESC`,
     updateUser: `
       UPDATE users SET name = $1, email = $2, role = $3, updated_at = CURRENT_TIMESTAMP 
       WHERE id = $4 
-      RETURNING id, name, email, avatar, role, joined_date AS "joinedDate"`,
+      RETURNING id, name, email, avatar, phone, role, joined_date AS "joinedDate"`,
+    updateUserProfile: `
+      UPDATE users SET name = $1, email = $2, phone = $3, avatar = $4, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $5 
+      RETURNING id, name, email, avatar, phone, role, joined_date AS "joinedDate"`,
     deleteUser: 'DELETE FROM users WHERE id = $1',
   },
   settings: {

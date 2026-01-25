@@ -4,16 +4,19 @@ import { DataService } from '../../data.service';
 import { SearchService } from '../../search.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { CommonModule } from '@angular/common';
+import { LoadingService } from '../../loading.service';
+import { ProductCardSkeletonComponent } from '../../components/product-card-skeleton/product-card-skeleton.component';
 
 @Component({
   selector: 'app-products',
   templateUrl: './products.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ProductCardComponent, CommonModule],
+  imports: [ProductCardComponent, CommonModule, ProductCardSkeletonComponent],
 })
 export class ProductsComponent {
   dataService = inject(DataService);
   searchService = inject(SearchService);
+  loadingService = inject(LoadingService);
 
   allProducts = this.dataService.getProducts();
   categories = this.dataService.getCategories();

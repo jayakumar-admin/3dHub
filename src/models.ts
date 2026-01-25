@@ -47,6 +47,7 @@ export interface Order {
     trackingNumber: string;
     estimatedDelivery: string;
   };
+  reviewedProductIds?: string[];
 }
 
 export interface OrderItem {
@@ -77,6 +78,17 @@ export interface ContactSubmission {
   message: string;
   status: 'New' | 'Read' | 'Archived';
   submitted_at: string;
+}
+
+export interface Review {
+  id: number;
+  productId: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
 }
 
 // New Settings Models

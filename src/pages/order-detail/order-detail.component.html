@@ -46,8 +46,19 @@
               <div class="flex-1">
                 <a [routerLink]="['/product', item.productId]" class="font-semibold hover:underline">{{ item.productName }}</a>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Qty: {{ item.quantity }}</p>
+                
+                @if (currentOrder.status === 'Delivered') {
+                  @if (currentOrder.reviewedProductIds?.includes(item.productId)) {
+                    <div class="flex items-center gap-1 text-sm text-green-600 mt-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      <span>Review Submitted</span>
+                    </div>
+                  } @else {
+                    <button (click)="openReviewModal(item)" class="text-sm text-blue-500 hover:underline mt-1 font-semibold">Write a Review</button>
+                  }
+                }
                 @if(isReturnable()) {
-                  <button (click)="requestReturn(item)" class="text-sm text-blue-500 hover:underline mt-1">Request Return</button>
+                  <button (click)="requestReturn(item)" class="text-sm text-blue-500 hover:underline mt-1 ml-4">Request Return</button>
                 }
               </div>
               <div class="text-right">
@@ -103,3 +114,12 @@
   </div>
 }
 </div>
+@if(isReviewModalOpen() && itemToReview(); as item) {
+  <app-review-modal 
+    [productName]="item.productName" 
+    [productId]="item.productId"
+    [orderId]="order()?.id || ''"
+    (close)="closeReviewModal()"
+    (submitted)="handleReviewSubmitted()">
+  </app-review-modal>
+}

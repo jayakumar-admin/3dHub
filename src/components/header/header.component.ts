@@ -50,6 +50,9 @@ export class HeaderComponent {
   }
 
   logout() {
+    if (this.isAdmin()) {
+      this.dataService.clearAdminData();
+    }
     this.authService.logout();
     this.isProfileMenuOpen.set(false);
     this.router.navigate(['/home']);

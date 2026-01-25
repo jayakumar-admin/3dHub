@@ -2,7 +2,7 @@
 const admin = require('firebase-admin');
 
 try {
-  if (!process.env.FIREBASE_SERVICE_ACCOUNT || !process.env.FIREBASE_SERVICE_ACCOUNT) {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT || !process.env.APP_FIREBASE_STORAGE_BUCKET) {
     throw new Error('Firebase environment variables not set. Image uploads will fail.');
   }
   

@@ -1,4 +1,3 @@
-
 const router = require('express').Router();
 const multer = require('multer');
 const { bucket } = require('../firebase');
@@ -13,18 +12,14 @@ const upload = multer({
 /**
  * @route   POST /api/upload
  * @desc    Upload an image to Firebase Storage
- * @access  Private (Admin only)
+ * @access  Private (Any authenticated user)
  */
 router.post('/', [verifyToken, upload.single('image')], async (req, res) => {
-  if (req.user.role !== 'Admin') {
-    return res.status(403).send('Access Denied.');
-  }
-
   if (!req.file) {
     return res.status(400).send('No image file uploaded.');
   }
   
-  const folder = req.body.folder || 'misc'; // e.g., 'products', 'settings'
+  const folder = req.body.folder || 'misc'; // e.g., 'products', 'settings', 'avatars'
   const blob = bucket.file(`3dHub/${folder}/${Date.now()}_${req.file.originalname}`);
   
   const blobStream = blob.createWriteStream({

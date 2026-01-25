@@ -1,9 +1,9 @@
-
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-// FIX: Import ParamMap to correctly type route parameters.
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+// FIX: `of` is imported from 'rxjs', not 'rxjs/operators', and `Observable` is imported for explicit typing.
+import { Observable, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { DataService } from '../../../data.service';
 import { Order } from '../../../models';
 import { CommonModule } from '@angular/common';
@@ -19,19 +19,35 @@ import { NotificationService } from '../../../notification.service';
 export class AdminOrderDetailComponent {
   route = inject(ActivatedRoute);
   dataService = inject(DataService);
-  // FIX: Explicitly type `fb` to prevent TypeScript from inferring it as `unknown`.
   fb: FormBuilder = inject(FormBuilder);
   notificationService = inject(NotificationService);
+  router = inject(Router);
 
-  private orderIdSignal = toSignal(
-    // FIX: Explicitly type `params` as `ParamMap` to resolve `get` method.
-    this.route.paramMap.pipe(map((params: ParamMap) => params.get('id')))
+  // FIX: Explicitly typing the observable helps TypeScript's inference for `toSignal`.
+  private order$: Observable<Order | undefined> = this.route.paramMap.pipe(
+    map((params: ParamMap) => params.get('id')),
+    switchMap(id => {
+      if (!id) {
+        return of(undefined);
+      }
+      
+      const existingOrder = this.dataService.getOrderById(id);
+      if (existingOrder && existingOrder.items && existingOrder.items.length > 0) {
+        return of(existingOrder);
+      }
+      
+      return this.dataService.fetchOrderDetails(id).pipe(
+        catchError(err => {
+            console.error('Failed to fetch order details', err);
+            this.notificationService.show('Order not found.', 'error');
+            this.router.navigate(['/admin/orders']);
+            return of(undefined);
+        })
+      );
+    })
   );
 
-  order = computed(() => {
-    const id = this.orderIdSignal();
-    return id ? this.dataService.getOrderById(id) : undefined;
-  });
+  order = toSignal(this.order$);
 
   isShipModalOpen = signal(false);
   statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -42,10 +58,6 @@ export class AdminOrderDetailComponent {
     estimatedDelivery: ['', Validators.required],
   });
 
-  get a() {
-    return 's'
-  }
-
   updateStatus(newStatus: Order['status']) {
     const order = this.order();
     if (!order) return;
@@ -53,6 +65,7 @@ export class AdminOrderDetailComponent {
     if (newStatus === 'Shipped') {
       this.isShipModalOpen.set(true);
     } else {
+      // FIX: The type of `order` is now correctly inferred as `Order`, making `id` accessible.
       this.dataService.updateOrderStatus(order.id, newStatus);
       this.notificationService.show(`Order status updated to ${newStatus}`);
     }
@@ -66,6 +79,7 @@ export class AdminOrderDetailComponent {
     const order = this.order();
     if (order) {
         const shippingInfo = this.shippingForm.value as Order['shippingInfo'];
+        // FIX: The type of `order` is now correctly inferred as `Order`, making `id` accessible.
         this.dataService.updateOrderStatus(order.id, 'Shipped', shippingInfo);
         this.notificationService.show('Order marked as shipped and details saved.');
         this.closeModal();
@@ -79,6 +93,7 @@ export class AdminOrderDetailComponent {
 
   // UI Helpers
   get aStatusIndex() {
+    // FIX: The type of `order` is now correctly inferred, so `status` is accessible.
     const status = this.order()?.status;
     if(!status) return -1;
     return this.statuses.indexOf(status);

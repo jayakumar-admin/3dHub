@@ -82,13 +82,19 @@
       <!-- Main Content -->
       <main class="flex-1">
         <!-- Product Grid -->
-        @if (filteredProducts().length > 0) {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+          @if (loadingService.isLoading() && filteredProducts().length === 0) {
+            @for (i of [1,2,3,4,5,6,7,8,9]; track i) {
+              <app-product-card-skeleton></app-product-card-skeleton>
+            }
+          } @else {
             @for (product of filteredProducts(); track product.id) {
               <app-product-card [product]="product"></app-product-card>
             }
-          </div>
-        } @else {
+          }
+        </div>
+
+        @if (!loadingService.isLoading() && filteredProducts().length === 0) {
           <div class="text-center py-16 bg-light-card dark:bg-dark-card rounded-xl shadow">
             <div class="flex justify-center mb-4">
                 <svg class="w-16 h-16 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 10l.01.01"></path></svg>

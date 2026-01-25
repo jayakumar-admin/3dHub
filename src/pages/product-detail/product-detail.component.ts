@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, effect } from '@angular/core';
 // FIX: Import ParamMap to correctly type route parameters.
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { DataService } from '../../data.service';
@@ -7,12 +7,14 @@ import { map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CartService } from '../../cart.service';
+import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { Review } from '../../models';
 
 @Component({
   selector: 'app-product-detail',
   templateUrl: './product-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink, ProductCardComponent]
 })
 export class ProductDetailComponent {
   route = inject(ActivatedRoute);
@@ -29,9 +31,11 @@ export class ProductDetailComponent {
     return id ? this.dataService.getProductById(id) : undefined;
   });
   
+  reviews = signal<Review[]>([]);
   selectedImage = signal<string | undefined>(undefined);
   quantity = signal(1);
   itemAdded = signal(false);
+  activeTab = signal<'description' | 'info' | 'reviews'>('description');
 
   discount = computed(() => {
     const p = this.product();
@@ -43,14 +47,37 @@ export class ProductDetailComponent {
     return { savedAmount, percentage };
   });
 
+  relatedProducts = computed(() => {
+    const p = this.product();
+    if (!p) return [];
+    
+    return this.dataService.getProducts()()
+      .filter(prod => prod.category === p.category && prod.id !== p.id)
+      .slice(0, 4);
+  });
+
   constructor() {
     // Effect to update selected image when product loads
-    computed(() => {
+    effect(() => {
         const p = this.product();
-        if(p && p.images.length > 0) {
+        if(p && p.images.length > 0 && !this.selectedImage()) {
             this.selectedImage.set(p.images[0]);
         }
     });
+
+    // Effect to fetch reviews when product changes
+    effect(() => {
+      const id = this.productIdSignal();
+      if (id) {
+        this.dataService.getReviews(id).subscribe(reviews => {
+          this.reviews.set(reviews);
+        });
+      }
+    }, { allowSignalWrites: true });
+  }
+
+  setTab(tab: 'description' | 'info' | 'reviews') {
+    this.activeTab.set(tab);
   }
 
   selectImage(imageUrl: string) {
@@ -68,7 +95,7 @@ export class ProductDetailComponent {
 
   addToCart() {
     const p = this.product();
-    if (p) {
+    if (p && p.stock > 0) {
       this.cartService.addToCart(p, this.quantity());
       this.itemAdded.set(true);
       setTimeout(() => this.itemAdded.set(false), 2000); // Hide message after 2 seconds

@@ -4,7 +4,7 @@
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    @for(stat of stats; track stat.title) {
+   @for(stat of stats(); track stat.title) {
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center">
         <div class="p-3 rounded-full text-white" [class]="stat.color">
           <!-- Placeholder for icon -->
@@ -46,7 +46,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <h2 class="text-xl font-semibold mb-4">Top Selling Products</h2>
       <div class="space-y-4">
-        @for(product of topProducts; track product.id) {
+     @for(product of topProducts(); track product.id) {
           <div class="flex items-center space-x-4">
             <img [src]="product.images[0]" [alt]="product.name" class="w-12 h-12 rounded-md object-cover">
             <div class="flex-1">

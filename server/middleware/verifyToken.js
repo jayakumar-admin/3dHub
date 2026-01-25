@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 
 module.exports = function(req, res, next) {
@@ -9,7 +8,7 @@ module.exports = function(req, res, next) {
   if (!token) return res.status(401).send('Access Denied. Token format is invalid.');
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
     req.user = verified;
     next();
   } catch (err) {

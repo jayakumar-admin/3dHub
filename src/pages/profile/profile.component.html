@@ -1,0 +1,114 @@
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-3xl font-bold text-light-text dark:text-dark-text mb-8">My Profile</h1>
+  @if(currentUser(); as user) {
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      
+      <!-- Left Sidebar for Navigation -->
+      <aside class="md:col-span-1">
+        <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg p-4">
+          <ul class="space-y-2">
+            <li>
+              <button (click)="setTab('details')" class="w-full text-left p-3 rounded-md transition-colors text-sm font-semibold" [class]="activeTab() === 'details' ? 'bg-primary-light text-white dark:bg-primary-dark dark:text-black' : 'hover:bg-gray-100 dark:hover:bg-gray-700'">
+                Profile Details
+              </button>
+            </li>
+            <li>
+              <button (click)="setTab('password')" class="w-full text-left p-3 rounded-md transition-colors text-sm font-semibold" [class]="activeTab() === 'password' ? 'bg-primary-light text-white dark:bg-primary-dark dark:text-black' : 'hover:bg-gray-100 dark:hover:bg-gray-700'">
+                Change Password
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="md:col-span-3">
+        <!-- Profile Details Tab -->
+        @if (activeTab() === 'details') {
+          <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 class="text-xl font-bold">Profile Details</h2>
+              <p class="text-sm text-gray-500 mt-1">Update your personal information and profile picture.</p>
+            </div>
+            <form [formGroup]="detailsForm" (ngSubmit)="saveDetails()" class="p-6 space-y-6">
+              <!-- Avatar Upload -->
+              <div class="flex items-center gap-6">
+                <div class="relative">
+                  <img class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600" [src]="user.avatar" [alt]="user.name">
+                  @if (isUploadingAvatar()) {
+                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
+                      <svg class="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    </div>
+                  }
+                </div>
+                <div>
+                  <input type="file" #avatarUpload (change)="onFileChange($event)" class="hidden" accept="image/*">
+                  <button type="button" (click)="avatarUpload.click()" class="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">Change Picture</button>
+                  <p class="text-xs text-gray-500 mt-2">JPG, GIF or PNG. 1MB max.</p>
+                </div>
+              </div>
+
+              <!-- Form Fields -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label for="name" class="block text-sm font-medium mb-1">Full Name</label>
+                  <input type="text" id="name" formControlName="name" class="admin-input">
+                  @if(name?.invalid && (name?.dirty || name?.touched)) { <p class="mt-1 text-xs text-red-500">Full name is required.</p> }
+                </div>
+                <div>
+                  <label for="email" class="block text-sm font-medium mb-1">Email Address</label>
+                  <input type="email" id="email" formControlName="email" class="admin-input">
+                  @if(email?.invalid && (email?.dirty || email?.touched)) { <p class="mt-1 text-xs text-red-500">A valid email is required.</p> }
+                </div>
+                <div>
+                  <label for="phone" class="block text-sm font-medium mb-1">Phone Number</label>
+                  <input type="tel" id="phone" formControlName="phone" class="admin-input">
+                   @if(phone?.invalid && (phone?.dirty || phone?.touched)) { <p class="mt-1 text-xs text-red-500">A valid 10-digit phone is required.</p> }
+                </div>
+              </div>
+
+              <div class="text-right border-t border-gray-200 dark:border-gray-700 pt-5">
+                <button type="submit" [disabled]="detailsForm.invalid || isSavingDetails()" class="px-6 py-2.5 rounded-lg font-semibold bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 hover:opacity-90 transition-opacity disabled:opacity-50">
+                  @if(isSavingDetails()) { <span>Saving...</span> } @else { <span>Save Changes</span> }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- Change Password Tab -->
+        @if (activeTab() === 'password') {
+          <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-lg">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 class="text-xl font-bold">Change Password</h2>
+              <p class="text-sm text-gray-500 mt-1">For your security, we recommend choosing a strong password.</p>
+            </div>
+            <form [formGroup]="passwordForm" (ngSubmit)="savePassword()" class="p-6 space-y-6">
+              <div>
+                <label for="currentPassword" class="block text-sm font-medium mb-1">Current Password</label>
+                <input type="password" id="currentPassword" formControlName="currentPassword" class="admin-input">
+                @if(currentPassword?.invalid && (currentPassword?.dirty || currentPassword?.touched)) { <p class="mt-1 text-xs text-red-500">Current password is required.</p> }
+              </div>
+              <div>
+                <label for="newPassword" class="block text-sm font-medium mb-1">New Password</label>
+                <input type="password" id="newPassword" formControlName="newPassword" class="admin-input">
+                @if(newPassword?.invalid && (newPassword?.dirty || newPassword?.touched)) { <p class="mt-1 text-xs text-red-500">Password must be at least 8 characters.</p> }
+              </div>
+              <div>
+                <label for="confirmPassword" class="block text-sm font-medium mb-1">Confirm New Password</label>
+                <input type="password" id="confirmPassword" formControlName="confirmPassword" class="admin-input">
+                @if(confirmPassword?.errors?.['passwordMismatch'] && (confirmPassword?.dirty || confirmPassword?.touched)) { <p class="mt-1 text-xs text-red-500">Passwords do not match.</p> }
+              </div>
+
+              <div class="text-right border-t border-gray-200 dark:border-gray-700 pt-5">
+                <button type="submit" [disabled]="passwordForm.invalid || isSavingPassword()" class="px-6 py-2.5 rounded-lg font-semibold bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900 hover:opacity-90 transition-opacity disabled:opacity-50">
+                   @if(isSavingPassword()) { <span>Saving...</span> } @else { <span>Update Password</span> }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+      </main>
+    </div>
+  }
+</div>

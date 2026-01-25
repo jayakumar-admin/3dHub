@@ -2,11 +2,11 @@
 const admin = require('firebase-admin');
 
 try {
-  if (!process.env.FIREBASE_SERVICE_ACCOUNT || !process.env.FIREBASE_STORAGE_BUCKET) {
+  if (!process.env.APP_FIREBASE_SERVICE_ACCOUNT || !process.env.APP_FIREBASE_STORAGE_BUCKET) {
     throw new Error('Firebase environment variables not set. Image uploads will fail.');
   }
   
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  const serviceAccount = JSON.parse(process.env.APP_FIREBASE_SERVICE_ACCOUNT);
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -7,17 +7,21 @@ import { DataService } from '../../data.service';
 import { Order, OrderItem } from '../../models';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../notification.service';
+import { ReviewModalComponent } from '../../components/review-modal/review-modal.component';
 
 @Component({
   selector: 'app-order-detail',
   templateUrl: './order-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ReviewModalComponent],
 })
 export class OrderDetailComponent {
   route = inject(ActivatedRoute);
   dataService = inject(DataService);
   notificationService = inject(NotificationService);
+
+  isReviewModalOpen = signal(false);
+  itemToReview = signal<OrderItem | null>(null);
 
   private orderIdSignal = toSignal(
     this.route.paramMap.pipe(map(params => params.get('id')))
@@ -69,5 +73,21 @@ export class OrderDetailComponent {
     // In a real application, this would trigger a backend process.
     // For this demo, we'll just show a notification.
     this.notificationService.show(`Return requested for ${item.productName}. We will contact you shortly.`);
+  }
+
+  openReviewModal(item: OrderItem) {
+    this.itemToReview.set(item);
+    this.isReviewModalOpen.set(true);
+  }
+
+  closeReviewModal() {
+    this.isReviewModalOpen.set(false);
+    this.itemToReview.set(null);
+  }
+  
+  handleReviewSubmitted() {
+    this.notificationService.show('Thank you for your review!', 'success');
+    this.closeReviewModal();
+    // The data service will automatically refetch the order details
   }
 }

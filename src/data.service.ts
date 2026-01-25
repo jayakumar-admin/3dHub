@@ -1,18 +1,21 @@
 
 import { Injectable, signal, inject } from '@angular/core';
-import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission } from './models';
+import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission, Review } from './models';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
+import { tap, finalize, map } from 'rxjs/operators';
 import { environment } from './environments/environment';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_ORDERS, MOCK_USERS, MOCK_SETTINGS, MOCK_CONTACT_SUBMISSIONS } from './data/mock-data';
 import { NotificationService } from './notification.service';
+import { LoadingService } from './loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
+  private loadingService = inject(LoadingService);
   private apiUrl = environment.apiUrl;
 
   private products = signal<Product[]>([]);
@@ -21,15 +24,18 @@ export class DataService {
   private users = signal<User[]>([]);
   private settings = signal<Settings>(this.getDefaultSettings());
   private contactSubmissions = signal<ContactSubmission[]>([]);
+  isAdminDataLoaded = signal(false);
 
   constructor() {
     if (environment.useTestData) {
+      this.loadingService.start();
       this.loadMockData();
+      // Use a timeout to simulate a small delay even for mock data
+      setTimeout(() => this.loadingService.stop(), 300);
     } else {
-      this.loadPublicData();
-      if (this.authService.isAdmin()) {
-        this.loadAdminData();
-      }
+      this.loadInitialPublicData().subscribe({
+        error: (err) => this.handleError('Failed to load initial public data', err),
+      });
     }
   }
 
@@ -39,49 +45,50 @@ export class DataService {
     this.notificationService.show(`${userMessage}: ${serverMessage}`, 'error');
   }
 
-  // --- Data Loading ---
-  
   private loadMockData() {
-    console.log('--- RUNNING IN TEST MODE ---');
     this.products.set(MOCK_PRODUCTS);
     this.categories.set(MOCK_CATEGORIES);
     this.orders.set(MOCK_ORDERS);
     this.users.set(MOCK_USERS);
     this.settings.set(MOCK_SETTINGS);
     this.contactSubmissions.set(MOCK_CONTACT_SUBMISSIONS);
+    this.isAdminDataLoaded.set(true);
   }
 
-  loadPublicData() {
-    if (environment.useTestData) return;
-    this.http.get<Settings>(`${this.apiUrl}/settings`).subscribe({
-      next: s => this.settings.set(s),
-      error: err => this.handleError('Failed to load settings', err)
-    });
-    this.http.get<Product[]>(`${this.apiUrl}/products`).subscribe({
-      next: p => this.products.set(p),
-      error: err => this.handleError('Failed to load products', err)
-    });
-    this.http.get<Category[]>(`${this.apiUrl}/products/categories`).subscribe({
-      next: c => this.categories.set(c),
-      error: err => this.handleError('Failed to load categories', err)
-    });
+  private loadInitialPublicData(): Observable<any> {
+    this.loadingService.start();
+    return forkJoin([
+      this.http.get<Settings>(`${this.apiUrl}/settings`).pipe(tap(s => this.settings.set(s))),
+      this.http.get<Product[]>(`${this.apiUrl}/products`).pipe(tap(p => this.products.set(p))),
+      this.http.get<Category[]>(`${this.apiUrl}/products/categories`).pipe(tap(c => this.categories.set(c)))
+    ]).pipe(
+      finalize(() => {
+        this.loadingService.stop();
+      })
+    );
   }
 
-  loadAdminData() {
-    if (environment.useTestData) return; // In test mode, all data is loaded at once.
-    if (!this.authService.isAdmin()) return;
-    this.http.get<Order[]>(`${this.apiUrl}/orders`, this.getAuthHeaders()).subscribe({
-      next: o => this.orders.set(o),
-      error: err => this.handleError('Failed to load orders', err)
-    });
-    this.http.get<User[]>(`${this.apiUrl}/users`, this.getAuthHeaders()).subscribe({
-      next: u => this.users.set(u),
-      error: err => this.handleError('Failed to load users', err)
-    });
-    this.http.get<ContactSubmission[]>(`${this.apiUrl}/contact`, this.getAuthHeaders()).subscribe({
-      next: cs => this.contactSubmissions.set(cs),
-      error: err => this.handleError('Failed to load contact submissions', err)
-    });
+  loadAdminData(): Observable<any> {
+    if (environment.useTestData || !this.authService.isAdmin()) return of(null);
+    
+    this.loadingService.start(); // Ensure loader is on for admin data fetch
+    return forkJoin([
+      this.http.get<Order[]>(`${this.apiUrl}/orders`, this.getAuthHeaders()).pipe(tap(o => this.orders.set(o))),
+      this.http.get<User[]>(`${this.apiUrl}/users`, this.getAuthHeaders()).pipe(tap(u => this.users.set(u))),
+      this.http.get<ContactSubmission[]>(`${this.apiUrl}/contact`, this.getAuthHeaders()).pipe(tap(cs => this.contactSubmissions.set(cs)))
+    ]).pipe(
+      tap(() => this.isAdminDataLoaded.set(true)),
+      finalize(() => {
+        this.loadingService.stop();
+      })
+    );
+  }
+  
+  clearAdminData() {
+    this.orders.set([]);
+    this.users.set([]);
+    this.contactSubmissions.set([]);
+    this.isAdminDataLoaded.set(false);
   }
 
   // --- Getters ---
@@ -96,6 +103,31 @@ export class DataService {
   getSettings() { return this.settings; }
   getContactSubmissions() { return this.contactSubmissions; }
   
+  fetchOrderDetails(id: string): Observable<Order> {
+    if (environment.useTestData) {
+      const order = this.getOrderById(id);
+      if (order) {
+        return of(order);
+      } else {
+        return of(null).pipe(map(() => { throw new Error(`Mock Order with ID ${id} not found`); }));
+      }
+    }
+    
+    return this.http.get<Order>(`${this.apiUrl}/orders/${id}`, this.getAuthHeaders()).pipe(
+      tap(detailedOrder => {
+        this.orders.update(currentOrders => {
+          const index = currentOrders.findIndex(o => o.id === id);
+          if (index > -1) {
+            const newOrders = [...currentOrders];
+            newOrders[index] = detailedOrder;
+            return newOrders;
+          }
+          return [detailedOrder, ...currentOrders];
+        });
+      })
+    );
+  }
+
   // --- Data Manipulation Methods ---
 
   submitContactForm(formData: { name: string, email: string, message: string }): Observable<ContactSubmission> {
@@ -136,8 +168,6 @@ export class DataService {
     formData.append('image', file);
     formData.append('folder', folder);
     
-    // Note: When sending FormData, HttpClient sets the Content-Type header automatically,
-    // so we don't include it in our custom headers to avoid conflicts.
     const token = this.authService.getToken();
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
     return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload`, formData, { headers });
@@ -211,10 +241,13 @@ export class DataService {
       this.users.update(users => [...users, user]);
       return of(user);
     } else {
-      // In a real app, the password would be sent and hashed on the backend.
       const { password, ...userData } = user;
       return this.http.post<User>(`${this.apiUrl}/users`, userData);
     }
+  }
+  
+  updateUserProfile(userData: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/users/profile`, userData, this.getAuthHeaders());
   }
 
   saveUser(userToSave: User) {
@@ -278,6 +311,30 @@ export class DataService {
     } else {
       return this.http.post<{success: boolean, order: Order}>(`${this.apiUrl}/orders`, orderData);
     }
+  }
+  
+  getReviews(productId: string): Observable<Review[]> {
+    if (environment.useTestData) {
+      // Mocked for now, in a real app this would be a separate mock data array
+      return of([]);
+    }
+    return this.http.get<Review[]>(`${this.apiUrl}/products/${productId}/reviews`);
+  }
+
+  submitReview(productId: string, orderId: string, rating: number, comment: string): Observable<any> {
+    const body = { orderId, rating, comment };
+    return this.http.post(`${this.apiUrl}/products/${productId}/reviews`, body, this.getAuthHeaders()).pipe(
+      tap((newReview: any) => {
+        // After a review is submitted, refetch product data to get updated rating
+        this.http.get<Product>(`${this.apiUrl}/products/${productId}`).subscribe(updatedProduct => {
+          this.products.update(products => 
+            products.map(p => p.id === productId ? updatedProduct : p)
+          );
+        });
+        // Also update the order to mark the item as reviewed
+        this.fetchOrderDetails(orderId).subscribe();
+      })
+    );
   }
 
   getTopSellingProducts(limit: number): Product[] {
