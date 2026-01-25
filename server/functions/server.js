@@ -25,12 +25,12 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/contact', require('./routes/contact'));
 
 // --- LOCAL SERVER ONLY ---
-if (require.main === module) {
-  const PORT = process.env.PORT || 8080;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
+// if (require.main === module) {
+//   const PORT = process.env.PORT || 8080;
+//   app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+//   });
+// }
 
 // 👇 THIS IS THE KEY LINE FOR FIREBASE
 module.exports = app;

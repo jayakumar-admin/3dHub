@@ -59,7 +59,7 @@ router.post('/user/signup', async (req, res) => {
   const { name, email, phone, password } = req.body;
 
   if (!name || !email || !password ||!phone) {
-    return res.status(400).json({ message: 'Name, email,phone and password are required.' });
+    return res.status(400).json({ message: 'Name, email, phone, and password are required.' });
   }
 
   try {

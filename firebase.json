@@ -1,0 +1,25 @@
+{
+ "hosting": {
+    "public": "dist/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      
+      {
+        "source": "**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/**",
+        "destination": "https://ajrmart.com",
+        "type": 301
+      }
+    ],
+    "predeploy": [
+      "npm run build"
+    ]
+  }
+}

@@ -35,7 +35,7 @@ router.put('/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   
   try {
-    const { rows } = await db.query(queries.updateUser, [name, email, role, phone, id]);
+    const { rows } = await db.query(queries.updateUser, [name, email,phone, role, id]);
     if (rows.length === 0) {
       return res.status(404).json({ msg: 'User not found' });
     }

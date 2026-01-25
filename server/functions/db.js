@@ -8,6 +8,16 @@ const pool = new Pool({
   password: process.env.PG_PASSWORD,
   port: process.env.PG_PORT,
 });
+
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: isProd ? { rejectUnauthorized: false } : false,
+//   max: 10,
+//   idleTimeoutMillis: 30000,
+//   connectionTimeoutMillis: 10000
+// });
+
+
 // const pool = new Pool({
 //   user: 'postgres',
 //   host:'localhost',

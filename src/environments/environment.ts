@@ -7,11 +7,12 @@ export const environment = {
    * Use mock data for development when true.
    * Set to false to switch to using the live API.
    */
-  useTestData: true,
+  useTestData: false,
   
   /**
    * The base URL for the API.
    * This is used only when `useTestData` is false.
    */
-  apiUrl: 'http://localhost:3000/api'
+  
+  apiUrl: 'https://api-wddjmdzuzq-uc.a.run.app/api'
 };

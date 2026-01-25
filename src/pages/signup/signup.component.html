@@ -11,7 +11,7 @@
         <form [formGroup]="signupForm" (ngSubmit)="signup()" class="space-y-4">
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-            <input type="text" id="name" formControlName="name" class="admin-input" placeholder="John Doe">
+            <input type="text" id="name" formControlName="name" class="admin-input" placeholder="Your Name">
             @if(name?.invalid && (name?.dirty || name?.touched)) {
                 <p class="mt-1 text-xs text-red-600">Full name is required.</p>
             }
