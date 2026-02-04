@@ -192,15 +192,27 @@ export class DataService {
     }
   }
 
-  uploadImage(file: File, folder: string): Observable<{ imageUrl: string }> {
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('folder', folder);
-    
-    const token = this.authService.getToken();
-    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
-    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload`, formData, { headers });
-  }
+uploadImage(
+  file: File,
+  folder: string
+): Observable<{ imageUrl: string }> {
+
+  const formData = new FormData();
+  formData.append('image', file, file.name);
+  formData.append('folder', folder);
+
+  const token = this.authService.getToken();
+
+  const headers = token
+    ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+    : undefined;
+
+  return this.http.post<{ imageUrl: string }>(
+    `${this.apiUrl}/upload`,
+    formData,
+    { headers }
+  );
+}
 
   updateOrderStatus(orderId: string, status: Order['status'], shippingInfo?: Order['shippingInfo']) {
     if (environment.useTestData) {
