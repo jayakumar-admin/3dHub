@@ -1,5 +1,5 @@
 
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission, Review } from './models';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
@@ -37,6 +37,18 @@ export class DataService {
         error: (err) => this.handleError('Failed to load initial public data', err),
       });
     }
+
+    // Reactively load user-specific data based on authentication state
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user && user.role === 'Customer') {
+        this.loadUserOrders().subscribe();
+      } else if (!user && !this.isAdminDataLoaded()) {
+        // If logged out and it's not an admin session, clear customer orders.
+        // This prevents customer data from persisting after logout.
+        this.orders.set([]);
+      }
+    });
   }
 
   private handleError(userMessage: string, error: any) {
@@ -192,27 +204,15 @@ export class DataService {
     }
   }
 
-uploadImage(
-  file: File,
-  folder: string
-): Observable<{ imageUrl: string }> {
-
-  const formData = new FormData();
-  formData.append('image', file, file.name);
-  formData.append('folder', folder);
-
-  const token = this.authService.getToken();
-
-  const headers = token
-    ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    : undefined;
-
-  return this.http.post<{ imageUrl: string }>(
-    `${this.apiUrl}/upload`,
-    formData,
-    { headers }
-  );
-}
+  uploadImage(file: File, folder: string): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('folder', folder);
+    
+    const token = this.authService.getToken();
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload`, formData, { headers });
+  }
 
   updateOrderStatus(orderId: string, status: Order['status'], shippingInfo?: Order['shippingInfo']) {
     if (environment.useTestData) {
@@ -417,7 +417,16 @@ uploadImage(
       },
       payment: { razorpayEnabled: false, razorpayKeyId: '', companyNameForPayment: '', companyLogoForPayment: '' },
       shipping: { flatRateEnabled: false, flatRateCost: 0, freeShippingEnabled: false, freeShippingThreshold: 0 },
-      returns: { returnsEnabled: false, returnWindowDays: 0, returnPolicy: '' }
+      returns: { returnsEnabled: false, returnWindowDays: 0, returnPolicy: '' },
+      whatsappNotifications: {
+        enableOrderNotifications: false,
+        apiProvider: 'none',
+        apiKey: '',
+        senderNumber: '',
+        adminPhoneNumber: '',
+        customerOrderMessage: '',
+        adminOrderMessage: ''
+      }
     };
   }
 }

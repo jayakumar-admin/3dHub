@@ -6,7 +6,7 @@ import { DataService } from '../../../data.service';
 import { NotificationService } from '../../../notification.service';
 import { Feature, Settings, SocialMediaLink, Testimonial, QuickLink, HeroSlide, TeamMember } from '../../../models';
 
-type SettingsTab = 'general' | 'home' | 'about' | 'shipping' | 'returns' | 'payment' | 'footer' | 'seo';
+type SettingsTab = 'general' | 'home' | 'about' | 'shipping' | 'returns' | 'payment' | 'footer' | 'seo' | 'notifications';
 
 @Component({
   selector: 'app-admin-settings',
@@ -102,6 +102,15 @@ export class AdminSettingsComponent {
         returnsEnabled: [true],
         returnWindowDays: [15, [Validators.required, Validators.min(0)]],
         returnPolicy: [''],
+      }),
+      whatsappNotifications: this.fb.group({
+        enableOrderNotifications: [true],
+        apiProvider: ['none', Validators.required],
+        apiKey: [''],
+        senderNumber: [''],
+        adminPhoneNumber: ['', Validators.required],
+        customerOrderMessage: ['', Validators.required],
+        adminOrderMessage: ['', Validators.required],
       })
     });
 

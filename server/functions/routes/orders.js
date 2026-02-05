@@ -9,8 +9,8 @@ const queries = require('../queries').orders;
  * @desc    Create a new order
  * @access  Public
  */
-router.post('/', async (req, res) => {
-  const { items, customerDetails, totalAmount, shippingAddress, userId } = req.body;
+router.post('/', async (req, res, next) => {
+  const { items, customerDetails, totalAmount, shippingAddress, userId, paymentDetails } = req.body;
   
   const client = await db.getClient();
   try {
@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
       totalAmount,
       shippingAddress,
       userId, // Can be null for guest checkouts
+      paymentDetails ? JSON.stringify(paymentDetails) : null,
     ]);
     const newOrder = orderData.rows[0];
 
@@ -50,8 +51,7 @@ router.post('/', async (req, res) => {
   } catch (err) {
     // If any error occurs, rollback the transaction
     await client.query('ROLLBACK');
-    console.error('Order creation error:', err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   } finally {
     // Release the client back to the pool
     client.release();
@@ -63,14 +63,13 @@ router.post('/', async (req, res) => {
  * @desc    Get all orders for the logged-in user
  * @access  Private (Customer)
  */
-router.get('/my-orders', verifyToken, async (req, res) => {
+router.get('/my-orders', verifyToken, async (req, res, next) => {
   const userId = req.user.id;
   try {
     const { rows } = await db.query(queries.getOrdersByUserId, [userId]);
     res.json(rows);
   } catch (err) {
-    console.error('Get user orders error:', err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -82,15 +81,14 @@ router.get('/my-orders', verifyToken, async (req, res) => {
  * @desc    Get all orders
  * @access  Private (Admin only)
  */
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
 
   try {
     const { rows } = await db.query(queries.getAllOrders);
     res.json(rows);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -99,7 +97,7 @@ router.get('/', verifyToken, async (req, res) => {
  * @desc    Get a single order with its items
  * @access  Private (Admin or Customer who owns order)
  */
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/:id', verifyToken, async (req, res, next) => {
   try {
     const orderResult = await db.query(queries.getOrderById, [req.params.id]);
     if (orderResult.rows.length === 0) {
@@ -120,8 +118,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 
     res.json(order);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -130,7 +127,7 @@ router.get('/:id', verifyToken, async (req, res) => {
  * @desc    Update the status of an order
  * @access  Private (Admin only)
  */
-router.put('/:id/status', verifyToken, async (req, res) => {
+router.put('/:id/status', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
 
   const { status, shippingInfo } = req.body;
@@ -150,8 +147,7 @@ router.put('/:id/status', verifyToken, async (req, res) => {
 
     res.json({ msg: 'Order status updated' });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 

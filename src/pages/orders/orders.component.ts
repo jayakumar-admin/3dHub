@@ -1,5 +1,4 @@
-
-import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DataService } from '../../data.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -12,7 +11,7 @@ type StatusFilter = 'All' | 'Pending' | 'Processing' | 'Shipped' | 'Delivered' |
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
 })
-export class OrdersComponent implements OnInit {
+export class OrdersComponent {
   dataService = inject(DataService);
   activeFilter = signal<StatusFilter>('All');
 
@@ -24,10 +23,6 @@ export class OrdersComponent implements OnInit {
     }
     return orders.filter(order => order.status === filter);
   });
-  
-  ngOnInit() {
-    this.dataService.loadUserOrders().subscribe();
-  }
 
   setFilter(filter: StatusFilter) {
     this.activeFilter.set(filter);

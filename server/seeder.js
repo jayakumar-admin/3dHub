@@ -9,6 +9,7 @@ const destroyData = async () => {
     console.log('Destroying existing data...');
     // The order of deletion is important due to foreign key constraints
     await client.query('DELETE FROM contact_submissions');
+    await client.query('DELETE FROM reviews');
     await client.query('DELETE FROM order_items');
     await client.query('DELETE FROM orders');
     await client.query('DELETE FROM products');

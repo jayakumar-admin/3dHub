@@ -10,15 +10,14 @@ const queries = require('../queries').users;
  * @desc    Get all users
  * @access  Private (Admin only)
  */
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
 
   try {
     const { rows } = await db.query(queries.getAllUsers);
     res.json(rows);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -27,7 +26,7 @@ router.get('/', verifyToken, async (req, res) => {
  * @desc    Update the logged-in user's own profile
  * @access  Private (Any authenticated user)
  */
-router.put('/profile', verifyToken, async (req, res) => {
+router.put('/profile', verifyToken, async (req, res, next) => {
   const userId = req.user.id;
   const { name, email, phone, avatar } = req.body;
   
@@ -53,12 +52,11 @@ router.put('/profile', verifyToken, async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error('User profile update error:', err.message);
     // Handle unique constraint violation for email
     if (err.code === '23505') {
         return res.status(400).json({ message: 'This email is already in use by another account.' });
     }
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -68,7 +66,7 @@ router.put('/profile', verifyToken, async (req, res) => {
  * @desc    Update a user's details (name, email, role)
  * @access  Private (Admin only)
  */
-router.put('/:id', verifyToken, async (req, res) => {
+router.put('/:id', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
   
   const { name, email, role } = req.body;
@@ -81,8 +79,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -91,7 +88,7 @@ router.put('/:id', verifyToken, async (req, res) => {
  * @desc    Delete a user
  * @access  Private (Admin only)
  */
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
 
   // Prevent admin from deleting their own account via this endpoint for safety.
@@ -106,8 +103,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
     }
     res.json({ msg: 'User deleted' });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 

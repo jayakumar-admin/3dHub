@@ -11,7 +11,7 @@ const verifyToken = require('../middleware/verifyToken');
  * @desc    Authenticate an admin user and return a JWT.
  * @access  Public
  */
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
 
   // Basic validation
@@ -46,8 +46,7 @@ router.post('/login', async (req, res) => {
     res.json({ token, user: userToSend });
 
   } catch (err) {
-    console.error('Admin login error:', err.message);
-    res.status(500).json({ message: `Server error during authentication: ${err.message}` });
+    next(err);
   }
 });
 
@@ -56,7 +55,7 @@ router.post('/login', async (req, res) => {
  * @desc    Register a new customer.
  * @access  Public
  */
-router.post('/user/signup', async (req, res) => {
+router.post('/user/signup', async (req, res, next) => {
   const { name, email, phone, password } = req.body;
 
   if (!name || !email || !password) {
@@ -81,8 +80,7 @@ router.post('/user/signup', async (req, res) => {
     res.status(201).json(newUserResult.rows[0]);
 
   } catch (err) {
-    console.error('Signup error:', err.message);
-    res.status(500).json({ message: `Server error during registration: ${err.message}` });
+    next(err);
   }
 });
 
@@ -91,7 +89,7 @@ router.post('/user/signup', async (req, res) => {
  * @desc    Authenticate a customer and return a JWT and user object.
  * @access  Public
  */
-router.post('/user/login', async (req, res) => {
+router.post('/user/login', async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -125,8 +123,7 @@ router.post('/user/login', async (req, res) => {
     res.json({ token, user: userToSend });
 
   } catch (err) {
-    console.error('User login error:', err.message);
-    res.status(500).json({ message: `Server error during authentication: ${err.message}` });
+    next(err);
   }
 });
 
@@ -135,7 +132,7 @@ router.post('/user/login', async (req, res) => {
  * @desc    Change a logged-in user's password.
  * @access  Private
  */
-router.post('/change-password', verifyToken, async (req, res) => {
+router.post('/change-password', verifyToken, async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
   const userId = req.user.id;
 
@@ -167,8 +164,7 @@ router.post('/change-password', verifyToken, async (req, res) => {
     res.json({ message: 'Password changed successfully.' });
 
   } catch (err) {
-    console.error('Change password error:', err.message);
-    res.status(500).json({ message: `Server error: ${err.message}` });
+    next(err);
   }
 });
 

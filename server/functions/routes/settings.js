@@ -1,4 +1,3 @@
-
 const router = require('express').Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
@@ -9,7 +8,7 @@ const queries = require('../queries').settings;
  * @desc    Get the website settings
  * @access  Public
  */
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     // Settings are stored as a single JSONB object in a table, identified by id=1.
     const result = await db.query(queries.getSettings);
@@ -18,8 +17,7 @@ router.get('/', async (req, res) => {
     }
     res.json(result.rows[0].data);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -28,7 +26,7 @@ router.get('/', async (req, res) => {
  * @desc    Update the website settings
  * @access  Private (Admin only)
  */
-router.put('/', verifyToken, async (req, res) => {
+router.put('/', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') return res.status(403).send('Access Denied.');
 
   try {
@@ -36,8 +34,7 @@ router.put('/', verifyToken, async (req, res) => {
     await db.query(queries.updateSettings, [newSettings]);
     res.json({ msg: 'Settings updated successfully' });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 

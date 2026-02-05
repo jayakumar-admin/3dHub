@@ -57,18 +57,25 @@ export class ProductDetailComponent {
   });
 
   constructor() {
-    // Effect to update selected image when product loads
+    // Effect to reset component state when product loads or changes
     effect(() => {
         const p = this.product();
-        if(p && p.images.length > 0 && !this.selectedImage()) {
+        if(p && p.images.length > 0) {
             this.selectedImage.set(p.images[0]);
+            this.quantity.set(1);
+            this.activeTab.set('description');
+        } else {
+            // If product is not found or has no images, clear the image
+            this.selectedImage.set(undefined);
         }
-    });
+    }, { allowSignalWrites: true });
 
     // Effect to fetch reviews when product changes
     effect(() => {
       const id = this.productIdSignal();
       if (id) {
+        // Clear previous reviews before fetching new ones
+        this.reviews.set([]);
         this.dataService.getReviews(id).subscribe(reviews => {
           this.reviews.set(reviews);
         });

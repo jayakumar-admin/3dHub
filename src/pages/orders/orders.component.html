@@ -1,4 +1,3 @@
-
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <h1 class="text-3xl font-bold text-light-text dark:text-dark-text mb-6">Your Orders</h1>
 
@@ -20,7 +19,7 @@
           <div class="flex flex-wrap justify-between items-center gap-4">
             <div class="flex-1 min-w-[150px]">
               <p class="font-bold text-base text-light-text dark:text-dark-text truncate">{{ order.id }}</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Placed on {{ order.orderDate }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Placed on {{ order.orderDate | date:'dd MMM yyyy, h:mm:ss a':'Asia/Kolkata' }} IST</p>
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-500 dark:text-gray-400">Total</p>

@@ -11,7 +11,7 @@
   <!-- Tabs -->
   <div class="mb-8">
     <div class="border-b border-gray-200 dark:border-gray-700">
-      <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+      <nav class="flex -mb-px space-x-6 overflow-x-auto" aria-label="Tabs">
         <button (click)="setTab('general')" [class]="activeTab() === 'general' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">General & Contact</button>
         <button (click)="setTab('home')" [class]="activeTab() === 'home' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Home Page</button>
         <button (click)="setTab('about')" [class]="activeTab() === 'about' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">About Page</button>
@@ -20,6 +20,7 @@
         <button (click)="setTab('payment')" [class]="activeTab() === 'payment' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Payments</button>
         <button (click)="setTab('footer')" [class]="activeTab() === 'footer' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Footer</button>
         <button (click)="setTab('seo')" [class]="activeTab() === 'seo' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">SEO</button>
+        <button (click)="setTab('notifications')" [class]="activeTab() === 'notifications' ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">WhatsApp Notifications</button>
       </nav>
     </div>
   </div>
@@ -657,6 +658,66 @@
             <label for="metaDescription" class="block text-sm font-medium mb-1">Meta Description</label>
             <textarea id="metaDescription" formControlName="metaDescription" rows="4" class="admin-input w-full"></textarea>
             <p class="text-xs text-gray-500 mt-1">Recommended length: 150-160 characters.</p>
+          </div>
+        </div>
+      </div>
+    }
+    
+    <!-- Notifications Tab -->
+    @if(activeTab() === 'notifications') {
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" formGroupName="whatsappNotifications">
+        <h2 class="text-xl font-semibold border-b dark:border-gray-700 pb-4 mb-6">WhatsApp Order Notifications</h2>
+        <div class="space-y-6">
+           <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enable WhatsApp Order Notifications</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="enableOrderNotifications">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="apiProvider" class="block text-sm font-medium mb-1">Notification Method</label>
+            <select id="apiProvider" formControlName="apiProvider" class="admin-input">
+              <option value="none">Client-side Link (wa.me)</option>
+              <option value="mock_server">Server-side API (Simulated)</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">"Client-side" opens a WhatsApp link. "Server-side" simulates a backend API call (check browser console).</p>
+          </div>
+
+          @if (settingsForm.get('whatsappNotifications.apiProvider')?.value === 'mock_server') {
+            <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 space-y-4">
+              <h3 class="font-semibold text-blue-800 dark:text-blue-200">API Configuration (Simulated)</h3>
+              <div>
+                <label for="apiKey" class="block text-sm font-medium mb-1">API Key</label>
+                <input type="text" id="apiKey" formControlName="apiKey" class="admin-input" placeholder="Enter your WhatsApp provider API Key">
+              </div>
+              <div>
+                <label for="senderNumber" class="block text-sm font-medium mb-1">API Sender Number</label>
+                <input type="text" id="senderNumber" formControlName="senderNumber" class="admin-input" placeholder="e.g., 919999988888">
+                 <p class="text-xs text-gray-500 mt-1">The business number registered with your API provider.</p>
+              </div>
+            </div>
+          }
+
+          <div>
+            <label for="adminPhoneNumber" class="block text-sm font-medium mb-1">Admin's WhatsApp Number (to receive notifications)</label>
+            <input type="text" id="adminPhoneNumber" formControlName="adminPhoneNumber" class="admin-input">
+            <p class="text-xs text-gray-500 mt-1">Include country code without '+' or spaces (e.g., 919876543210).</p>
+          </div>
+
+          <div>
+            <label for="customerOrderMessage" class="block text-sm font-medium mb-1">Customer Message Template</label>
+            <textarea id="customerOrderMessage" formControlName="customerOrderMessage" rows="4" class="admin-input"></textarea>
+            <p class="text-xs text-gray-500 mt-1">Use placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+          </div>
+          
+          <div>
+            <label for="adminOrderMessage" class="block text-sm font-medium mb-1">Admin Message Template</label>
+            <textarea id="adminOrderMessage" formControlName="adminOrderMessage" rows="3" class="admin-input"></textarea>
+            <p class="text-xs text-gray-500 mt-1">Use placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
           </div>
         </div>
       </div>

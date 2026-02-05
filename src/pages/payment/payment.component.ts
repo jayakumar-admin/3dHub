@@ -1,10 +1,11 @@
+
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../cart.service';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../notification.service';
 import { DataService } from '../../data.service';
-import { Order } from '../../models';
+import { Order, PaymentDetails } from '../../models';
 import { AuthService } from '../../auth.service';
 import { environment } from '../../environments/environment';
 
@@ -31,7 +32,7 @@ export class PaymentComponent {
   skipPaymentEnabled = environment.skipPayment;
   isPlacingOrder = signal(false);
 
-  private _createOrder(isMock: boolean = false) {
+  private _createOrder(paymentDetails: PaymentDetails) {
     this.isPlacingOrder.set(true);
 
     const currentUser = this.currentUser();
@@ -65,6 +66,7 @@ export class PaymentComponent {
         avatar: currentUser.avatar,
       },
       userId: currentUser.id,
+      paymentDetails: paymentDetails,
     };
 
     this.dataService.createOrder(orderData).subscribe({
@@ -79,10 +81,13 @@ export class PaymentComponent {
           totalAmount: orderData.totalAmount,
           status: 'Pending',
           items: orderData.items,
+          paymentDetails: paymentDetails
         };
         this.dataService.addOrderToSignal(newOrder);
 
-        const successMessage = isMock
+        this.sendWhatsappNotifications(newOrder, shippingAddr.phone);
+
+        const successMessage = paymentDetails.provider === 'Mock'
           ? `Order placed successfully (mock): ${orderResponse.order.id}`
           : `Payment successful! Order placed: ${orderResponse.order.id}`;
         this.notificationService.show(successMessage, 'success');
@@ -93,7 +98,7 @@ export class PaymentComponent {
       error: (err) => {
         const message = err?.error?.message || 'Please contact support.';
         console.error('Order creation failed:', err);
-        const errorMessage = isMock
+        const errorMessage = paymentDetails.provider === 'Mock'
           ? `Order creation failed: ${message}`
           : `Payment was successful, but creating your order failed: ${message}`;
         this.notificationService.show(errorMessage, 'error');
@@ -110,8 +115,12 @@ export class PaymentComponent {
     }
 
     const shippingAddr = this.cartService.shippingAddress();
-    if (!shippingAddr || !this.currentUser()) {
-      this._createOrder(); // Let the validation inside handle redirection/errors
+    const currentUser = this.currentUser();
+
+    if (!shippingAddr || !currentUser) {
+      this.notificationService.show('Please complete shipping details and log in.', 'error');
+      if (!shippingAddr) this.router.navigate(['/shipping']);
+      else this.router.navigate(['/login']);
       return;
     }
     
@@ -122,10 +131,14 @@ export class PaymentComponent {
       amount: this.cartService.total() * 100, // Amount is in currency subunits. for INR, it's paise.
       currency: "INR",
       name: paymentConfig.companyNameForPayment,
-      description: "Order Payment",
+      description: "Order Payment for " + this.cartService.cartItems().map(i => i.productName).join(', '),
       image: paymentConfig.companyLogoForPayment,
       handler: (response: any) => {
-        this._createOrder(false);
+        const paymentDetails: PaymentDetails = {
+          paymentId: response.razorpay_payment_id,
+          provider: 'Razorpay'
+        };
+        this._createOrder(paymentDetails);
       },
       modal: {
         ondismiss: () => {
@@ -134,11 +147,13 @@ export class PaymentComponent {
       },
       prefill: {
         name: shippingAddr.fullName,
-        email: this.currentUser()!.email,
+        email: currentUser.email,
         contact: shippingAddr.phone,
       },
       notes: {
-        address: `${shippingAddr.address}, ${shippingAddr.city}`,
+        address: `${shippingAddr.address}, ${shippingAddr.city}, ${shippingAddr.state} - ${shippingAddr.zip}`,
+        user_id: currentUser.id,
+        items_summary: this.cartService.cartItems().map(item => `${item.productName} (Qty: ${item.quantity})`).join('; ')
       },
       theme: {
         color: "#3b82f6", // Corresponds to primary-light
@@ -161,6 +176,57 @@ export class PaymentComponent {
   }
 
   placeMockOrder() {
-    this._createOrder(true);
+    const mockPaymentDetails: PaymentDetails = {
+      paymentId: `MOCK_${Date.now()}`,
+      provider: 'Mock'
+    };
+    this._createOrder(mockPaymentDetails);
+  }
+
+  private sendWhatsappNotifications(order: Order, customerPhone: string) {
+    const notificationSettings = this.settings().whatsappNotifications;
+  
+    if (!notificationSettings?.enableOrderNotifications) {
+      return;
+    }
+  
+    const placeholders: { [key: string]: string } = {
+      '[ORDER_ID]': order.id,
+      '[CUSTOMER_NAME]': order.customerName,
+      '[TOTAL_AMOUNT]': order.totalAmount.toString(),
+    };
+  
+    const replacePlaceholders = (template: string): string => {
+      return template.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[TOTAL_AMOUNT\]/g, (match) => placeholders[match]);
+    };
+
+    const customerMessage = replacePlaceholders(notificationSettings.customerOrderMessage);
+    const adminMessage = replacePlaceholders(notificationSettings.adminOrderMessage);
+  
+    if (notificationSettings.apiProvider === 'mock_server') {
+      // Simulate server-side API call
+      console.log('--- SIMULATING SERVER-SIDE WHATSAPP NOTIFICATION ---');
+      if (customerPhone && customerMessage) {
+        console.log(`To Customer (${customerPhone}): ${customerMessage}`);
+      }
+      if (notificationSettings.adminPhoneNumber && adminMessage) {
+        console.log(`To Admin (${notificationSettings.adminPhoneNumber}): ${adminMessage}`);
+      }
+      console.log('Using API Key:', notificationSettings.apiKey);
+      console.log('From Sender Number:', notificationSettings.senderNumber);
+      console.log('----------------------------------------------------');
+      this.notificationService.show('Order notifications sent (simulated).', 'success');
+    } else {
+      // Fallback to client-side wa.me links
+      if (customerPhone && customerMessage) {
+        const customerWhatsappUrl = `https://wa.me/${customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(customerMessage)}`;
+        window.open(customerWhatsappUrl, '_blank');
+      }
+    
+      if (notificationSettings.adminPhoneNumber && adminMessage) {
+        const adminWhatsappUrl = `https://wa.me/${notificationSettings.adminPhoneNumber.replace(/\D/g, '')}?text=${encodeURIComponent(adminMessage)}`;
+        window.open(adminWhatsappUrl, '_blank');
+      }
+    }
   }
 }

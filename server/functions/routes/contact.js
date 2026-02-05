@@ -1,4 +1,3 @@
-
 const router = require('express').Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
@@ -9,7 +8,7 @@ const queries = require('../queries').contact;
  * @desc    Create a new contact submission
  * @access  Public
  */
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
@@ -20,8 +19,7 @@ router.post('/', async (req, res) => {
     const { rows } = await db.query(queries.createSubmission, [name, email, message]);
     res.status(201).json(rows[0]);
   } catch (err) {
-    console.error('Contact submission error:', err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -30,7 +28,7 @@ router.post('/', async (req, res) => {
  * @desc    Get all contact submissions
  * @access  Private (Admin only)
  */
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') {
     return res.status(403).json({ message: 'Access Denied.' });
   }
@@ -39,8 +37,7 @@ router.get('/', verifyToken, async (req, res) => {
     const { rows } = await db.query(queries.getAllSubmissions);
     res.json(rows);
   } catch (err) {
-    console.error('Get submissions error:', err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 
@@ -49,7 +46,7 @@ router.get('/', verifyToken, async (req, res) => {
  * @desc    Update the status of a contact submission
  * @access  Private (Admin only)
  */
-router.put('/:id/status', verifyToken, async (req, res) => {
+router.put('/:id/status', verifyToken, async (req, res, next) => {
   if (req.user.role !== 'Admin') {
     return res.status(403).json({ message: 'Access Denied.' });
   }
@@ -68,8 +65,7 @@ router.put('/:id/status', verifyToken, async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error('Update submission status error:', err.message);
-    res.status(500).json({ message: `Server Error: ${err.message}` });
+    next(err);
   }
 });
 

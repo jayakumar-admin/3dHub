@@ -72,6 +72,7 @@ const queries = {
           o.status,
           o.user_id,
           o.shipping_info AS "shippingInfo",
+          o.payment_details AS "paymentDetails",
           COALESCE(json_agg(
               json_build_object(
                   'productId', oi.product_id,
@@ -105,6 +106,7 @@ const queries = {
           o.status,
           o.user_id,
           o.shipping_info AS "shippingInfo",
+          o.payment_details AS "paymentDetails",
           COALESCE(json_agg(
               json_build_object(
                   'productId', oi.product_id,
@@ -129,7 +131,21 @@ const queries = {
           o.order_date DESC
     `,
     getOrderById: `
-      SELECT * FROM orders WHERE id = $1`,
+      SELECT 
+        o.id, 
+        o.order_date as "orderDate",
+        o.customer_name as "customerName",
+        o.customer_email as "customerEmail",
+        u.avatar AS "customerAvatar",
+        o.total_amount as "totalAmount",
+        o.shipping_address as "shippingAddress",
+        o.status,
+        o.user_id,
+        o.shipping_info as "shippingInfo",
+        o.payment_details as "paymentDetails"
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.id
+      WHERE o.id = $1`,
     getOrderItemsByOrderId: `
       SELECT 
         id, order_id, product_id AS "productId", product_name AS "productName", quantity, price, 
@@ -137,8 +153,8 @@ const queries = {
       FROM order_items WHERE order_id = $1`,
     getReviewedProductIdsByOrderId: `SELECT DISTINCT product_id FROM reviews WHERE order_id = $1`,
     createOrder: `
-      INSERT INTO orders (id, customer_name, customer_email, total_amount, shipping_address, status, user_id)
-      VALUES ($1, $2, $3, $4, $5, 'Pending', $6)
+      INSERT INTO orders (id, customer_name, customer_email, total_amount, shipping_address, status, user_id, payment_details)
+      VALUES ($1, $2, $3, $4, $5, 'Pending', $6, $7)
       RETURNING id
     `,
     createOrderItem: `

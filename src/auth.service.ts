@@ -33,7 +33,8 @@ export class AuthService {
       const storedUser = sessionStorage.getItem('currentUser');
       const storedToken = sessionStorage.getItem('authToken');
       if (storedUser && storedToken) {
-        this.currentUser.set(JSON.parse(storedUser));
+        const user = JSON.parse(storedUser) as User;
+        this.currentUser.set(user);
         this.authToken.set(storedToken);
       }
     }
@@ -86,7 +87,7 @@ export class AuthService {
     } else {
       try {
         await firstValueFrom(this.http.post<User>(`${this.apiUrl}/user/signup`, userData));
-        // After successful signup, log the user in
+        // After successful signup, log the user in, which will trigger order loading
         return this.userLogin(userData.email!, userData.password!);
       } catch (error) {
         console.error('Signup failed', error);

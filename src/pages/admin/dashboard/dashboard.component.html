@@ -1,65 +1,145 @@
 
-<div class="text-gray-800 dark:text-gray-200">
-  <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+<div class="text-gray-900 dark:text-gray-100">
+  <h1 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200">Dashboard</h1>
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-   @for(stat of stats(); track stat.title) {
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex items-center">
-        <div class="p-3 rounded-full text-white" [class]="stat.color">
-          <!-- Placeholder for icon -->
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            @if(stat.icon === 'currency-dollar') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /> }
-            @if(stat.icon === 'shopping-cart') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /> }
-            @if(stat.icon === 'cube') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /> }
-            @if(stat.icon === 'users') { <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-6-6h6" /> }
+    <!-- Total Revenue -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex items-center space-x-4">
+      <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50">
+        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ stats().revenue | currency:'INR':'symbol':'1.0-0' }}</p>
+      </div>
+    </div>
+    <!-- Total Orders -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex items-center space-x-4">
+      <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ stats().orders }}</p>
+      </div>
+    </div>
+    <!-- Total Products -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex items-center space-x-4">
+      <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/50">
+         <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Products</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ stats().products }}</p>
+      </div>
+    </div>
+    <!-- New Customers -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex items-center space-x-4">
+      <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50">
+        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-6-6h6"></path></svg>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">New Customers <span class="text-xs">(This Month)</span></p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ stats().newCustomers }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <!-- Sales Overview -->
+    <div class="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+       <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Top Product Revenue</h2>
+       @if(productSalesData().length > 0) {
+        <div class="h-80 w-full">
+          <svg width="100%" height="100%" class="text-xs">
+            <!-- Y-axis Labels and Grid Lines -->
+            @for(label of yAxisLabels(); track label; let i = $index) {
+              <g class="text-gray-400 dark:text-gray-500">
+                <text x="6%" [attr.y]="(i * 25) + '%'" dy="0.3em" text-anchor="end" class="fill-current">{{ label/1000 }}k</text>
+                <line x1="8%" [attr.y1]="(i * 25) + '%'" x2="100%" [attr.y2]="(i * 25) + '%'" class="stroke-current stroke-1 stroke-dasharray-2 opacity-30"></line>
+              </g>
+            }
+
+            <!-- Bars -->
+            @for(bar of chartBars(); track bar.name) {
+              <g>
+                <rect 
+                  [attr.x]="bar.x" 
+                  [attr.y]="bar.y" 
+                  [attr.width]="bar.width"
+                  [attr.height]="bar.height" 
+                  rx="4"
+                  class="fill-blue-400 dark:fill-primary-dark hover:opacity-80 transition-opacity cursor-pointer"
+                  (mouseenter)="onBarHover($event, bar)"
+                  (mouseleave)="onBarLeave()">
+                </rect>
+                <text [attr.x]="bar.textX" y="100%" dy="-5" text-anchor="middle" class="fill-current text-gray-500 dark:text-gray-400">{{ bar.displayName }}</text>
+              </g>
+            }
           </svg>
         </div>
-        <div class="ml-4">
-          <p class="text-sm text-gray-500 dark:text-gray-400">{{ stat.title }}</p>
-          <p class="text-2xl font-semibold">{{ stat.value }}</p>
+       } @else {
+        <div class="h-80 flex items-center justify-center text-gray-500">
+            No sales data for delivered orders yet.
+        </div>
+       }
+    </div>
+
+    <!-- Top Selling & Recent -->
+    <div class="lg:col-span-2 flex flex-col gap-6">
+       <!-- Top Selling Products -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Top Selling Products (by Quantity)</h2>
+        <div class="space-y-4">
+       @for(product of topProducts(); track product.id) {
+            <a [routerLink]="['/product', product.id]" target="_blank" class="flex items-center space-x-4 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <img [src]="product.images[0]" [alt]="product.name" class="w-12 h-12 rounded-md object-cover">
+              <div class="flex-1">
+                <p class="font-semibold text-sm truncate text-gray-800 dark:text-gray-200">{{ product.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ product.sku }}</p>
+              </div>
+              <span class="font-bold text-sm text-gray-700 dark:text-gray-300">{{ product.price | currency:'INR':'symbol' }}</span>
+            </a>
+          } @empty {
+            <p class="text-sm text-gray-500">No sales data available.</p>
+          }
         </div>
       </div>
-    }
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Sales Overview -->
-    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-       <h2 class="text-xl font-semibold mb-4">Sales Overview</h2>
-       <div class="h-64 flex items-end justify-around space-x-2 pt-4">
-          @for(item of salesData; track item.month) {
-            <div class="flex flex-col items-center flex-1">
-              <div class="w-full h-full flex items-end">
-                <div 
-                  class="w-full bg-blue-400 dark:bg-primary-dark rounded-t-md hover:opacity-80 transition-opacity" 
-                  [style.height]="getBarHeight(item.sales)"
-                  [title]="'₹' + item.sales">
+      <!-- Recent Orders -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Orders</h2>
+        <div class="space-y-3">
+          @for(order of recentOrders(); track order.id) {
+            <a [routerLink]="['/admin/orders', order.id]" class="block p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                  <img [src]="order.customerAvatar" [alt]="order.customerName" class="w-8 h-8 rounded-full object-cover">
+                  <div>
+                    <p class="font-semibold text-sm text-gray-800 dark:text-gray-200">{{ order.customerName }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ order.id }}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-sm text-gray-700 dark:text-gray-300">{{ order.totalAmount | currency:'INR':'symbol' }}</p>
+                   <span class="px-2 py-0.5 text-xs font-medium rounded-full" [class]="getStatusClass(order.status)">{{ order.status }}</span>
                 </div>
               </div>
-              <span class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ item.month }}</span>
-            </div>
+            </a>
+          } @empty {
+            <p class="text-sm text-gray-500">No recent orders found.</p>
           }
-       </div>
-    </div>
-    <!-- Top Selling Products -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold mb-4">Top Selling Products</h2>
-      <div class="space-y-4">
-     @for(product of topProducts(); track product.id) {
-          <div class="flex items-center space-x-4">
-            <img [src]="product.images[0]" [alt]="product.name" class="w-12 h-12 rounded-md object-cover">
-            <div class="flex-1">
-              <p class="font-semibold text-sm truncate">{{ product.name }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">{{ product.sku }}</p>
-            </div>
-            <span class="font-bold text-sm">₹{{ product.price }}</span>
-          </div>
-        } @empty {
-          <p class="text-sm text-gray-500">No sales data available to determine top products.</p>
-        }
+        </div>
       </div>
     </div>
   </div>
-
 </div>
+
+<!-- Tooltip -->
+@if (hoveredBar(); as bar) {
+  <div 
+    class="fixed top-0 left-0 bg-gray-900 text-white text-xs rounded py-1 px-2 pointer-events-none transition-opacity duration-200"
+    [style.transform]="'translate(' + tooltipPosition().x + 'px, ' + tooltipPosition().y + 'px) translateX(-50%) translateY(-100%)'">
+    <span class="font-bold">{{ bar.total | currency:'INR':'symbol' }}</span>
+  </div>
+}

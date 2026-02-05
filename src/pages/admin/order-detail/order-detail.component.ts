@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-// FIX: `of` is imported from 'rxjs', not 'rxjs/operators', and `Observable` is imported for explicit typing.
-import { Observable, of } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { DataService } from '../../../data.service';
 import { Order } from '../../../models';
 import { CommonModule } from '@angular/common';
@@ -23,31 +22,15 @@ export class AdminOrderDetailComponent {
   notificationService = inject(NotificationService);
   router = inject(Router);
 
-  // FIX: Explicitly typing the observable helps TypeScript's inference for `toSignal`.
-  private order$: Observable<Order | undefined> = this.route.paramMap.pipe(
-    map((params: ParamMap) => params.get('id')),
-    switchMap(id => {
-      if (!id) {
-        return of(undefined);
-      }
-      
-      const existingOrder = this.dataService.getOrderById(id);
-      if (existingOrder && existingOrder.items && existingOrder.items.length > 0) {
-        return of(existingOrder);
-      }
-      
-      return this.dataService.fetchOrderDetails(id).pipe(
-        catchError(err => {
-            console.error('Failed to fetch order details', err);
-            this.notificationService.show('Order not found.', 'error');
-            this.router.navigate(['/admin/orders']);
-            return of(undefined);
-        })
-      );
-    })
+  private orderIdSignal = toSignal(
+    this.route.paramMap.pipe(map((params: ParamMap) => params.get('id')))
   );
 
-  order = toSignal(this.order$);
+  order = computed(() => {
+    const id = this.orderIdSignal();
+    if (!id) return undefined;
+    return this.dataService.getOrders()().find(o => o.id === id);
+  });
 
   isShipModalOpen = signal(false);
   statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -58,6 +41,25 @@ export class AdminOrderDetailComponent {
     estimatedDelivery: ['', Validators.required],
   });
 
+  constructor() {
+    effect(() => {
+      const id = this.orderIdSignal();
+      if (id) {
+        const existingOrder = this.order();
+        if (!existingOrder || !existingOrder.items || existingOrder.items.length === 0) {
+          this.dataService.fetchOrderDetails(id).pipe(
+            catchError(err => {
+                console.error('Failed to fetch order details', err);
+                this.notificationService.show('Order not found.', 'error');
+                this.router.navigate(['/admin/orders']);
+                return of(undefined);
+            })
+          ).subscribe();
+        }
+      }
+    });
+  }
+
   updateStatus(newStatus: Order['status']) {
     const order = this.order();
     if (!order) return;
@@ -65,7 +67,6 @@ export class AdminOrderDetailComponent {
     if (newStatus === 'Shipped') {
       this.isShipModalOpen.set(true);
     } else {
-      // FIX: The type of `order` is now correctly inferred as `Order`, making `id` accessible.
       this.dataService.updateOrderStatus(order.id, newStatus);
       this.notificationService.show(`Order status updated to ${newStatus}`);
     }
@@ -79,7 +80,6 @@ export class AdminOrderDetailComponent {
     const order = this.order();
     if (order) {
         const shippingInfo = this.shippingForm.value as Order['shippingInfo'];
-        // FIX: The type of `order` is now correctly inferred as `Order`, making `id` accessible.
         this.dataService.updateOrderStatus(order.id, 'Shipped', shippingInfo);
         this.notificationService.show('Order marked as shipped and details saved.');
         this.closeModal();
@@ -93,9 +93,16 @@ export class AdminOrderDetailComponent {
 
   // UI Helpers
   get aStatusIndex() {
-    // FIX: The type of `order` is now correctly inferred, so `status` is accessible.
     const status = this.order()?.status;
     if(!status) return -1;
-    return this.statuses.indexOf(status);
+    
+    // 'Cancelled' status should not show progress.
+    if (status === 'Cancelled') {
+      return -1;
+    }
+    
+    // The visual tracker has its own set of statuses.
+    const visualStatuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+    return visualStatuses.indexOf(status);
   }
 }

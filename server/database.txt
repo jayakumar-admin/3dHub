@@ -22,9 +22,7 @@ CREATE TABLE users (
     avatar VARCHAR(255),
     phone VARCHAR(20),
     role VARCHAR(50) NOT NULL CHECK (role IN ('Admin', 'Customer')),
-    joined_date DATE NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    joined_date TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Categories Table
@@ -64,16 +62,14 @@ CREATE INDEX idx_products_category_id ON products(category_id);
 -- Stores high-level information about each order.
 CREATE TABLE orders (
     id VARCHAR(255) PRIMARY KEY,
-    order_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    order_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     customer_name VARCHAR(255) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
     total_amount NUMERIC(10, 2) NOT NULL,
     shipping_address JSONB NOT NULL,
     status VARCHAR(50) NOT NULL CHECK (status IN ('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')),
     user_id VARCHAR(255) REFERENCES users(id) ON DELETE SET NULL, -- Link to a registered user, optional
-    shipping_info JSONB, -- e.g., {"carrier": "Express", "trackingNumber": "..."}
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    shipping_info JSONB -- e.g., {"carrier": "Express", "trackingNumber": "..."}
 );
 -- Add an index on user_id for faster lookups
 CREATE INDEX idx_orders_user_id ON orders(user_id);

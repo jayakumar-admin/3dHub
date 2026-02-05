@@ -27,6 +27,11 @@ export interface Product {
   };
 }
 
+export interface PaymentDetails {
+  paymentId: string;
+  provider: string; // e.g., 'Razorpay', 'Mock'
+}
+
 export interface Order {
   id: string;
   orderDate: string;
@@ -48,6 +53,7 @@ export interface Order {
     estimatedDelivery: string;
   };
   reviewedProductIds?: string[];
+  paymentDetails?: PaymentDetails;
 }
 
 export interface OrderItem {
@@ -172,6 +178,16 @@ export interface ReturnSettings {
   returnPolicy: string;
 }
 
+export interface WhatsappNotificationSettings {
+  enableOrderNotifications: boolean;
+  apiProvider: 'none' | 'mock_server';
+  apiKey: string;
+  senderNumber: string;
+  adminPhoneNumber: string;
+  customerOrderMessage: string;
+  adminOrderMessage: string;
+}
+
 
 export interface Settings {
   general: {
@@ -218,4 +234,5 @@ export interface Settings {
   payment: PaymentSettings;
   shipping: ShippingSettings;
   returns: ReturnSettings;
+  whatsappNotifications: WhatsappNotificationSettings;
 }

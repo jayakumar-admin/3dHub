@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const functions = require("firebase-functions");
 const express = require('express');
 const cors = require('cors');
 
@@ -8,18 +9,16 @@ const app = express();
 // --------------------
 // CORS FIRST
 // --------------------
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+app.use(cors());
+app.options("*", cors());
 
 // --------------------
-// 🚨 UPLOAD ROUTES FIRST (VERY IMPORTANT)
+// 🚨 UPLOAD ROUTES FIRST (NO BODY PARSER HERE)
 // --------------------
 app.use('/api/upload', require('./routes/upload'));
 
 // --------------------
-// BODY PARSERS AFTER
+// BODY PARSERS AFTER UPLOAD ROUTES
 // --------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -1,8 +1,8 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, catchError, of } from 'rxjs';
 import { DataService } from '../../data.service';
 import { Order, OrderItem } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -15,10 +15,11 @@ import { ReviewModalComponent } from '../../components/review-modal/review-modal
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink, ReviewModalComponent],
 })
-export class OrderDetailComponent {
+export class OrderDetailComponent implements OnInit {
   route = inject(ActivatedRoute);
   dataService = inject(DataService);
   notificationService = inject(NotificationService);
+  router = inject(Router);
 
   isReviewModalOpen = signal(false);
   itemToReview = signal<OrderItem | null>(null);
@@ -33,6 +34,23 @@ export class OrderDetailComponent {
   });
   
   statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+  ngOnInit() {
+    const id = this.orderIdSignal();
+    if (id) {
+      const existingOrder = this.dataService.getOrderById(id);
+      // Fetch if order not present, or if it's a summary without items.
+      if (!existingOrder || !existingOrder.items || existingOrder.items.length === 0) {
+        this.dataService.fetchOrderDetails(id).pipe(
+          catchError(err => {
+            this.notificationService.show('Order not found.', 'error');
+            this.router.navigate(['/orders']);
+            return of(null);
+          })
+        ).subscribe();
+      }
+    }
+  }
 
   isReturnable = computed(() => {
     const order = this.order();
