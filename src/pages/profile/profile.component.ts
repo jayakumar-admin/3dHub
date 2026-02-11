@@ -81,11 +81,13 @@ export class ProfileComponent implements OnInit {
   onFileChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-
+ const user = this.currentUser();
     this.isUploadingAvatar.set(true);
     this.dataService.uploadImage(file, 'avatars').subscribe({
       next: async (res) => {
-        await this.authService.updateProfile({ avatar: res.imageUrl });
+        await this.authService.updateProfile({   name: user.name,
+        email: user.email,
+        phone: user.phone || '', avatar: res.imageUrl });
         this.notificationService.show('Profile picture updated!', 'success');
       },
       error: (err) => {

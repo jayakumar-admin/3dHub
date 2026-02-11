@@ -104,7 +104,17 @@ export class AdminProductEditComponent {
   }
 
   removeImage(index: number) {
+    const imageUrl = this.images.at(index).value;
     this.images.removeAt(index);
+    this.notificationService.show('Image slot removed.');
+    if (imageUrl) {
+        this.dataService.deleteImage(imageUrl).subscribe({
+            error: (err) => {
+                console.error('Failed to delete image from storage:', err);
+                this.notificationService.show('Could not delete image file from server.', 'error');
+            }
+        });
+    }
   }
 
   onFileChange(event: Event, index: number) {

@@ -214,6 +214,18 @@ export class DataService {
     return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload`, formData, { headers });
   }
 
+  deleteImage(imageUrl: string): Observable<any> {
+    if (environment.useTestData) {
+      console.log(`(Mock) Deleting image: ${imageUrl}`);
+      return of({ success: true });
+    }
+    const options = {
+      headers: this.getAuthHeaders().headers,
+      body: { imageUrl },
+    };
+    return this.http.delete(`${this.apiUrl}/upload`, options);
+  }
+
   updateOrderStatus(orderId: string, status: Order['status'], shippingInfo?: Order['shippingInfo']) {
     if (environment.useTestData) {
       this.orders.update(orders =>

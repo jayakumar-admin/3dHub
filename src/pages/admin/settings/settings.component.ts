@@ -258,14 +258,38 @@ export class AdminSettingsComponent {
   }
   
   removeImage(formControlPath: string) {
-    this.settingsForm.get(formControlPath)?.setValue('');
+    const control = this.settingsForm.get(formControlPath);
+    const imageUrl = control?.value;
+    
+    control?.setValue('');
     this.notificationService.show('Image removed.');
+
+    if (imageUrl) {
+      this.dataService.deleteImage(imageUrl).subscribe({
+        error: (err) => {
+          console.error('Failed to delete image from storage:', err);
+          this.notificationService.show('Could not delete image file from server.', 'error');
+        }
+      });
+    }
   }
 
   removeArrayImage(formArrayPath: string, index: number, controlName: string) {
     const formArray = this.settingsForm.get(formArrayPath) as FormArray;
-    formArray.at(index).get(controlName)?.setValue('');
+    const control = formArray.at(index).get(controlName);
+    const imageUrl = control?.value;
+
+    control?.setValue('');
     this.notificationService.show('Image removed.');
+    
+    if (imageUrl) {
+      this.dataService.deleteImage(imageUrl).subscribe({
+        error: (err) => {
+          console.error('Failed to delete image from storage:', err);
+          this.notificationService.show('Could not delete image file from server.', 'error');
+        }
+      });
+    }
   }
 
   saveSettings() {
