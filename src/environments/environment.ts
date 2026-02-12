@@ -13,12 +13,12 @@ export const environment = {
    * that skips the payment gateway and directly creates an order.
    * Set to false for production to use the real payment gateway.
    */
-  skipPayment: true,
+  skipPayment: false,
 
   /**
    * The base URL for the API.
    * This is used only when `useTestData` is false.
    */
-    apiUrl: 'http://localhost:3000/api',
-  // apiUrl: 'https://api-wddjmdzuzq-uc.a.run.app/api'
+    // apiUrl: 'http://localhost:3000/api',
+  apiUrl: 'https://api-wddjmdzuzq-uc.a.run.app/api'
 };

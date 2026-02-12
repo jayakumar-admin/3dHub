@@ -708,7 +708,7 @@
               <h3 class="font-semibold text-blue-800 dark:text-blue-200">Graph API Configuration</h3>
               <div>
                 <label for="whatsappToken" class="block text-sm font-medium mb-1">WhatsApp Access Token</label>
-                <input type="text" id="whatsappToken" formControlName="whatsappToken" class="admin-input" placeholder="Your permanent access token">
+                <input type="password" id="whatsappToken" formControlName="whatsappToken" class="admin-input" placeholder="Your permanent access token">
               </div>
               <div>
                 <label for="whatsappPhoneId" class="block text-sm font-medium mb-1">Phone Number ID</label>
@@ -727,36 +727,89 @@
             <p class="text-xs text-gray-500 mt-1">Include country code without '+' or spaces (e.g., 919876543210).</p>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t dark:border-gray-700">
-              <div>
-                <label for="adminOrderMessage" class="block text-sm font-medium mb-1">Admin: New Order</label>
-                <textarea id="adminOrderMessage" formControlName="adminOrderMessage" rows="3" class="admin-input"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8 pt-4 border-t dark:border-gray-700">
+              <!-- Admin: New Order -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Admin: New Order Notification</h4>
+                <div>
+                    <label for="adminNewOrderTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="adminNewOrderTemplateName" formControlName="adminNewOrderTemplateName" class="admin-input" placeholder="e.g., admin_new_order">
+                </div>
+                <div>
+                    <label for="adminNewOrderTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="adminNewOrderTemplateParams" formControlName="adminNewOrderTemplateParams" class="admin-input" placeholder="e.g., [CUSTOMER_NAME],[ORDER_ID]">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+                </div>
               </div>
-              <div>
-                <label for="customerOrderMessage" class="block text-sm font-medium mb-1">Customer: Order Placed</label>
-                <textarea id="customerOrderMessage" formControlName="customerOrderMessage" rows="3" class="admin-input"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+
+              <!-- Customer: Order Placed -->
+               <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Order Placed</h4>
+                <div>
+                    <label for="customerNewOrderTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="customerNewOrderTemplateName" formControlName="customerNewOrderTemplateName" class="admin-input" placeholder="e.g., customer_order_confirmation">
+                </div>
+                <div>
+                    <label for="customerNewOrderTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="customerNewOrderTemplateParams" formControlName="customerNewOrderTemplateParams" class="admin-input">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+                </div>
               </div>
-              <div>
-                <label for="customerOrderProcessingMessage" class="block text-sm font-medium mb-1">Customer: Order Processing</label>
-                <textarea id="customerOrderProcessingMessage" formControlName="customerOrderProcessingMessage" rows="3" class="admin-input"></textarea>
-                 <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+
+              <!-- Customer: Order Processing -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Order Processing</h4>
+                <div>
+                    <label for="customerProcessingTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="customerProcessingTemplateName" formControlName="customerProcessingTemplateName" class="admin-input">
+                </div>
+                <div>
+                    <label for="customerProcessingTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="customerProcessingTemplateParams" formControlName="customerProcessingTemplateParams" class="admin-input">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                </div>
               </div>
-              <div>
-                <label for="customerOrderShippedMessage" class="block text-sm font-medium mb-1">Customer: Order Shipped</label>
-                <textarea id="customerOrderShippedMessage" formControlName="customerOrderShippedMessage" rows="3" class="admin-input"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Available: <code>[ORDER_ID]</code>, <code>[CARRIER]</code>, <code>[TRACKING_NUMBER]</code>.</p>
+
+              <!-- Customer: Order Shipped -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Order Shipped</h4>
+                <div>
+                    <label for="customerShippedTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="customerShippedTemplateName" formControlName="customerShippedTemplateName" class="admin-input">
+                </div>
+                <div>
+                    <label for="customerShippedTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="customerShippedTemplateParams" formControlName="customerShippedTemplateParams" class="admin-input">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[CARRIER]</code>, <code>[TRACKING_NUMBER]</code>.</p>
+                </div>
               </div>
-              <div>
-                <label for="customerOrderDeliveredMessage" class="block text-sm font-medium mb-1">Customer: Order Delivered</label>
-                <textarea id="customerOrderDeliveredMessage" formControlName="customerOrderDeliveredMessage" rows="3" class="admin-input"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+
+              <!-- Customer: Order Delivered -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Order Delivered</h4>
+                <div>
+                    <label for="customerDeliveredTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="customerDeliveredTemplateName" formControlName="customerDeliveredTemplateName" class="admin-input">
+                </div>
+                <div>
+                    <label for="customerDeliveredTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="customerDeliveredTemplateParams" formControlName="customerDeliveredTemplateParams" class="admin-input">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                </div>
               </div>
-              <div>
-                <label for="customerOrderCancelledMessage" class="block text-sm font-medium mb-1">Customer: Order Cancelled</label>
-                <textarea id="customerOrderCancelledMessage" formControlName="customerOrderCancelledMessage" rows="3" class="admin-input"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+              
+              <!-- Customer: Order Cancelled -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Order Cancelled</h4>
+                <div>
+                    <label for="customerCancelledTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="customerCancelledTemplateName" formControlName="customerCancelledTemplateName" class="admin-input">
+                </div>
+                <div>
+                    <label for="customerCancelledTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="customerCancelledTemplateParams" formControlName="customerCancelledTemplateParams" class="admin-input">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                </div>
               </div>
           </div>
         </div>

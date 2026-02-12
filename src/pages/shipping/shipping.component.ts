@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CartService, ShippingAddress } from '../../cart.service';
@@ -12,7 +12,7 @@ import { NotificationService } from '../../notification.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, CommonModule, RouterLink],
 })
-export class ShippingComponent {
+export class ShippingComponent implements OnInit {
   fb: FormBuilder = inject(FormBuilder);
   router = inject(Router);
   cartService = inject(CartService);
@@ -33,6 +33,16 @@ export class ShippingComponent {
     if (existingAddress) {
       this.shippingForm.patchValue(existingAddress);
     }
+  }
+
+  ngOnInit() {
+    // Subscribe to form value changes to provide live shipping cost updates
+    // as the user types their address.
+    this.shippingForm.valueChanges.subscribe(formValue => {
+      // The computed signal in the cart service is robust enough to handle
+      // a partial address object, as it only needs the 'zip' property for now.
+      this.cartService.saveShippingAddress(formValue as ShippingAddress);
+    });
   }
 
   proceedToPayment() {

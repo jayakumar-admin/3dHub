@@ -452,7 +452,7 @@ export class DataService {
         freeShippingPincodes: ''
       },
       returns: { returnsEnabled: false, returnWindowDays: 0, returnPolicy: '' },
-      // FIX: Corrected whatsappNotifications to match the WhatsappNotificationSettings interface
+      // FIX: Corrected the properties for whatsappNotifications to align with the WhatsappNotificationSettings interface.
       whatsappNotifications: {
         enableOrderNotifications: false,
         apiProvider: 'none',
@@ -460,12 +460,18 @@ export class DataService {
         whatsappPhoneId: '',
         whatsappVersion: 'v19.0',
         adminPhoneNumber: '',
-        adminOrderMessage: '',
-        customerOrderMessage: '',
-        customerOrderProcessingMessage: '',
-        customerOrderShippedMessage: '',
-        customerOrderDeliveredMessage: '',
-        customerOrderCancelledMessage: ''
+        adminNewOrderTemplateName: '',
+        adminNewOrderTemplateParams: '',
+        customerNewOrderTemplateName: '',
+        customerNewOrderTemplateParams: '',
+        customerProcessingTemplateName: '',
+        customerProcessingTemplateParams: '',
+        customerShippedTemplateName: '',
+        customerShippedTemplateParams: '',
+        customerDeliveredTemplateName: '',
+        customerDeliveredTemplateParams: '',
+        customerCancelledTemplateName: '',
+        customerCancelledTemplateParams: ''
       }
     };
   }

@@ -1,36 +1,37 @@
 
+
 const router = require('express').Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const queries = require('../queries').orders;
+const { sendNewOrderNotifications, sendOrderStatusUpdate } = require('../whatsapp-notifications');
+
 
 /**
  * @route   POST /api/orders
- * @desc    Create a new order
+ * @desc    Create a new order and trigger notifications
  * @access  Public
  */
 router.post('/', async (req, res, next) => {
-  const { items, customerDetails, totalAmount, shippingAddress, userId, paymentDetails } = req.body;
+  const { items, customerDetails, customerPhone, totalAmount, shippingAddress, userId, paymentDetails } = req.body;
   
   const client = await db.getClient();
   try {
-    // Begin a database transaction
     await client.query('BEGIN');
 
-    // 1. Insert into the main 'orders' table
     const orderId = `ORD-${Date.now()}`;
     const orderData = await client.query(queries.createOrder, [
       orderId,
       customerDetails.name,
       customerDetails.email,
+      customerPhone,
       totalAmount,
       shippingAddress,
-      userId, // Can be null for guest checkouts
+      userId,
       paymentDetails ? JSON.stringify(paymentDetails) : null,
     ]);
     const newOrder = orderData.rows[0];
 
-    // 2. Insert each item into the 'order_items' table
     for (const item of items) {
       await client.query(queries.createOrderItem, [
         newOrder.id,
@@ -41,22 +42,30 @@ router.post('/', async (req, res, next) => {
         item.oldPrice,
         item.image,
       ]);
-      // Optional: Decrement product stock here
     }
 
-    // Commit the transaction
     await client.query('COMMIT');
-    res.status(201).json({ success: true, order: newOrder });
+    
+    // Fetch full order details to return to frontend
+    const fullOrderResult = await client.query(queries.getOrderById, [newOrder.id]);
+    const fullOrder = fullOrderResult.rows[0];
+    fullOrder.items = items; // Add items since the query doesn't join them
+
+    // --- Server-Side Notification Logic ---
+    // Fire-and-forget: Don't await this, so the API response isn't delayed
+    sendNewOrderNotifications(fullOrder);
+    // --- End Notification Logic ---
+
+    res.status(201).json({ success: true, order: fullOrder });
 
   } catch (err) {
-    // If any error occurs, rollback the transaction
     await client.query('ROLLBACK');
     next(err);
   } finally {
-    // Release the client back to the pool
     client.release();
   }
 });
+
 
 /**
  * @route   GET /api/orders/my-orders
@@ -124,7 +133,7 @@ router.get('/:id', verifyToken, async (req, res, next) => {
 
 /**
  * @route   PUT /api/orders/:id/status
- * @desc    Update the status of an order
+ * @desc    Update the status of an order and trigger notifications
  * @access  Private (Admin only)
  */
 router.put('/:id/status', verifyToken, async (req, res, next) => {
@@ -144,6 +153,9 @@ router.put('/:id/status', verifyToken, async (req, res, next) => {
     if (result.rowCount === 0) {
       return res.status(404).json({ msg: 'Order not found' });
     }
+
+    // Fire-and-forget the notification. Don't await it.
+    sendOrderStatusUpdate(id, status, shippingInfo);
 
     res.json({ msg: 'Order status updated' });
   } catch (err) {

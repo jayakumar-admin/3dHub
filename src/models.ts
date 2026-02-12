@@ -187,13 +187,25 @@ export interface WhatsappNotificationSettings {
   whatsappPhoneId: string;
   whatsappVersion: string;
   adminPhoneNumber: string;
-  // Templates
-  adminOrderMessage: string;
-  customerOrderMessage: string;
-  customerOrderProcessingMessage: string;
-  customerOrderShippedMessage: string;
-  customerOrderDeliveredMessage: string;
-  customerOrderCancelledMessage: string;
+  
+  // New structure for templates
+  adminNewOrderTemplateName: string;
+  adminNewOrderTemplateParams: string;
+  
+  customerNewOrderTemplateName: string;
+  customerNewOrderTemplateParams: string;
+  
+  customerProcessingTemplateName: string;
+  customerProcessingTemplateParams: string;
+
+  customerShippedTemplateName: string;
+  customerShippedTemplateParams: string;
+
+  customerDeliveredTemplateName: string;
+  customerDeliveredTemplateParams: string;
+  
+  customerCancelledTemplateName: string;
+  customerCancelledTemplateParams: string;
 }
 
 

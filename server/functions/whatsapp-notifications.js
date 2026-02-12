@@ -9,16 +9,11 @@ const axios = require('axios');
  */
 async function logWhatsappMessage({ recipientNumber, messageContent, status, reason, orderId, userId, messageType }) {
   try {
-    console.log("*******",  recipientNumber,
-      messageContent,
-      status,
-      reason,
-      orderId,
-      userId,
-      messageType);
+    // For template messages, messageContent is an object. Stringify it for logging.
+    const contentToLog = typeof messageContent === 'object' ? JSON.stringify(messageContent) : messageContent;
     // await db.query(queries.whatsapp.logMessage, [
     //   recipientNumber,
-    //   messageContent,
+    //   contentToLog,
     //   status,
     //   reason,
     //   orderId,
@@ -53,12 +48,43 @@ const formatPhone = (number) => {
   return cleaned.startsWith('91') ? cleaned : `91${cleaned}`;
 };
 
+/**
+ * Builds an ordered array of parameter values based on a mapping string from settings.
+ * This is crucial for correctly populating WhatsApp template variables like {{1}}, {{2}}, etc.
+ * @param {string} paramMapping - A comma-separated string of placeholders, e.g., "[CUSTOMER_NAME],[ORDER_ID]".
+ * @param {object} availableValues - A dictionary of all possible placeholder values for the current context.
+ * @returns {string[]} An array of parameter values in the correct order specified by paramMapping.
+ */
+function buildTemplateParameters(paramMapping, availableValues) {
+  // FIX: Trim the mapping string first. If it's empty or just whitespace, it means there are no parameters.
+  // This prevents an array with an empty string [''] from being created.
+  if (!paramMapping || !paramMapping.trim()) {
+      return [];
+  }
+  
+  return paramMapping
+    .split(',')
+    .map(key => key.trim())
+    // Add a filter to remove any empty strings that might result from trailing commas (e.g., "val1,val2,").
+    .filter(key => key) 
+    .map(key => {
+        // Provide a default fallback if a placeholder is not found, to avoid sending 'undefined'.
+        const value = availableValues[key];
+        return value !== undefined && value !== null ? String(value) : ' '; // WhatsApp requires a non-empty string.
+    });
+}
+
 
 /**
- * Dispatches a WhatsApp message based on the configured API provider.
- * Can simulate messages or send real ones via the Facebook Graph API.
+ * Dispatches a WhatsApp message. It can simulate messages for testing or send real
+ * template-based messages via the Facebook Graph API.
+ * @param {string} recipientNumber - The destination phone number.
+ * @param {string} templateName - The name of the approved WhatsApp template.
+ * @param {string[]} parameters - An ordered array of values to fill template variables.
+ * @param {object} notificationSettings - The WhatsApp settings object from the database.
+ * @returns {Promise<object>} A result object with success status and a reason.
  */
-async function sendWhatsappMessage(recipientNumber, message, notificationSettings) {
+async function sendWhatsappMessage(recipientNumber, templateName, parameters, notificationSettings) {
   if (!notificationSettings?.enableOrderNotifications) {
     const reason = "WhatsApp notifications are disabled in settings.";
     console.log(`[SERVER] ⚠️ Skipping WhatsApp notification: ${reason}`);
@@ -67,23 +93,23 @@ async function sendWhatsappMessage(recipientNumber, message, notificationSetting
   
   const { apiProvider } = notificationSettings;
 
+  // --- MOCK SERVER LOGIC ---
   if (apiProvider === 'mock_server') {
-    if (!recipientNumber) {
-      const reason = "Recipient phone number is missing.";
-      return { success: false, reason };
-    }
-    console.log(`\n--- [SERVER] SIMULATING WHATSAPP MESSAGE ---`);
+    if (!recipientNumber) return { success: false, reason: "Recipient phone number is missing." };
+    console.log(`\n--- [SERVER] SIMULATING WHATSAPP TEMPLATE MESSAGE ---`);
     console.log(`[SERVER] To: ${recipientNumber}`);
-    console.log(`[SERVER] Message: ${message}`);
+    console.log(`[SERVER] Template Name: ${templateName}`);
+    console.log(`[SERVER] Parameters: ${JSON.stringify(parameters)}`);
     console.log('--- SIMULATION END ---\n');
     return { success: true, reason: 'Simulated successfully' };
   }
   
+  // --- FACEBOOK GRAPH API LOGIC ---
   if (apiProvider === 'graph_api') {
     const { whatsappToken, whatsappPhoneId, whatsappVersion } = notificationSettings;
 
-    if (!whatsappToken || !whatsappPhoneId || !whatsappVersion) {
-      const reason = "WhatsApp Graph API settings (Token, Phone ID, Version) are not configured in the admin panel.";
+    if (!whatsappToken || !whatsappPhoneId || !whatsappVersion || !templateName) {
+      const reason = "WhatsApp Graph API settings (Token, Phone ID, Version, or Template Name) are missing.";
       console.error(`[SERVER] ❌ WhatsApp error: ${reason}`);
       return { success: false, reason };
     }
@@ -95,34 +121,54 @@ async function sendWhatsappMessage(recipientNumber, message, notificationSetting
       return { success: false, reason };
     }
 
-    const url = `https://graph.facebook.com/v22.0/898671220007214/messages`;
+    const url = `https://graph.facebook.com/${whatsappVersion}/${whatsappPhoneId}/messages`;
+    
+    // Base payload for a template message.
     const payload = {
-  "messaging_product": "whatsapp",
-  "to": "919597935647",
-  "type": "template",
-  "template": {
-    "name": "hello_world",
-    "language": {
-      "code": "en_US"
-    }
-  }
-};
-    const headers = {
-      Authorization: `Bearer ${whatsappToken}`,
-      "Content-Type": "application/json"
+      messaging_product: "whatsapp",
+      to: formattedPhone,
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: "en_US" }, // Language code should match the template's language.
+      }
     };
+
+    // FIX: Conditionally add the `components` object ONLY if there are parameters.
+    // The WhatsApp API rejects requests that include a components object for templates with no variables.
+    if (parameters.length > 0) {
+      payload.template.components = [{
+        type: 'body',
+        parameters: parameters.map(p => ({ type: 'text', text: p })),
+        
+      }];
+  payload.template.components.push({
+      type: "button",
+      sub_type: "url",
+      index: "0",
+      parameters: [
+        {
+          type: "text",
+          text: String('www.google.com') // ⚠️ dynamic value (orderId etc)
+        }
+      ]
+    });
+    }
+
+    const headers = { Authorization: `Bearer ${whatsappToken}`, "Content-Type": "application/json" };
 
     try {
       await axios.post(url, payload, { headers });
-      console.log("✅ WhatsApp sent to:", formattedPhone);
+      console.log(`✅ WhatsApp template '${templateName}' sent to: ${formattedPhone}`);
       return { success: true, reason: 'Message sent via Graph API.' };
     } catch (err) {
       const errorMessage = err?.response?.data ? JSON.stringify(err.response.data) : err.message;
-      console.error("❌ WhatsApp send error:", errorMessage);
+      console.error(`❌ WhatsApp template send error for '${templateName}':`, errorMessage);
       return { success: false, reason: `Graph API Error: ${errorMessage}` };
     }
   }
 
+  // Fallback for 'none' or unsupported providers
   const reason = `Provider '${apiProvider}' is 'none' or not supported.`;
   console.log(`[SERVER] ⚠️ Skipping WhatsApp notification: ${reason}`);
   return { success: false, reason };
@@ -130,30 +176,29 @@ async function sendWhatsappMessage(recipientNumber, message, notificationSetting
 
 
 /**
- * Sends notifications for a newly created order to both the customer and admin.
+ * Sends notifications for a newly created order to both the customer and admin
+ * by building and dispatching the appropriate templates.
  */
 async function sendNewOrderNotifications(order) {
   const settings = await getSettings();
-  const { whatsappNotifications: notificationSettings } = settings;
+  const { whatsappNotifications: ns } = settings;
 
-  if (!notificationSettings?.enableOrderNotifications) return;
+  if (!ns?.enableOrderNotifications) return;
 
-  const placeholders = {
+  // A dictionary of all possible dynamic values for this event.
+  const availablePlaceholders = {
     '[ORDER_ID]': order.id,
     '[CUSTOMER_NAME]': order.customerName,
     '[TOTAL_AMOUNT]': order.totalAmount.toString(),
   };
 
-  const replacePlaceholders = (template) => 
-    template.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[TOTAL_AMOUNT\]/g, match => placeholders[match]);
-
   // 1. Send to Customer
-  if (order.customerPhone && notificationSettings.customerOrderMessage) {
-    const customerMessage = replacePlaceholders(notificationSettings.customerOrderMessage);
-    const result = await sendWhatsappMessage(order.customerPhone, customerMessage, notificationSettings);
+  if (order.customerPhone && ns.customerNewOrderTemplateName) {
+    const customerParams = buildTemplateParameters(ns.customerNewOrderTemplateParams, availablePlaceholders);
+    const result = await sendWhatsappMessage(order.customerPhone, ns.customerNewOrderTemplateName, customerParams, ns);
     await logWhatsappMessage({
       recipientNumber: order.customerPhone,
-      messageContent: customerMessage,
+      messageContent: { template: ns.customerNewOrderTemplateName, params: customerParams },
       status: result.success ? 'success' : 'failed',
       reason: result.reason,
       orderId: order.id,
@@ -163,12 +208,12 @@ async function sendNewOrderNotifications(order) {
   }
   
   // 2. Send to Admin
-  if (notificationSettings.adminPhoneNumber && notificationSettings.adminOrderMessage) {
-    const adminMessage = replacePlaceholders(notificationSettings.adminOrderMessage);
-    const result = await sendWhatsappMessage(notificationSettings.adminPhoneNumber, adminMessage, notificationSettings);
+  if (ns.adminPhoneNumber && ns.adminNewOrderTemplateName) {
+    const adminParams = buildTemplateParameters(ns.adminNewOrderTemplateParams, availablePlaceholders);
+    const result = await sendWhatsappMessage(ns.adminPhoneNumber, ns.adminNewOrderTemplateName, adminParams, ns);
     await logWhatsappMessage({
-      recipientNumber: notificationSettings.adminPhoneNumber,
-      messageContent: adminMessage,
+      recipientNumber: ns.adminPhoneNumber,
+      messageContent: { template: ns.adminNewOrderTemplateName, params: adminParams },
       status: result.success ? 'success' : 'failed',
       reason: result.reason,
       orderId: order.id,
@@ -179,13 +224,14 @@ async function sendNewOrderNotifications(order) {
 }
 
 /**
- * Sends a notification when an order's status is updated.
+ * Sends a notification when an order's status is updated by building and
+ * dispatching the appropriate template.
  */
 async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
   const settings = await getSettings();
-  const { whatsappNotifications: notificationSettings } = settings;
+  const { whatsappNotifications: ns } = settings;
 
-  if (!notificationSettings?.enableOrderNotifications) return;
+  if (!ns?.enableOrderNotifications) return;
 
   const orderResult = await db.query("SELECT id, customer_name AS \"customerName\", customer_phone AS \"customerPhone\", user_id FROM orders WHERE id = $1", [orderId]);
   if (orderResult.rows.length === 0) {
@@ -194,33 +240,49 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
   }
   const order = orderResult.rows[0];
 
-  let template = "";
+  let templateName = "";
+  let templateParamsStr = "";
+  
+  // Select the correct template name and parameter string based on the new status.
   switch (newStatus) {
-    case "Processing": template = notificationSettings.customerOrderProcessingMessage; break;
-    case "Shipped": template = notificationSettings.customerOrderShippedMessage; break;
-    case "Delivered": template = notificationSettings.customerOrderDeliveredMessage; break;
-    case "Cancelled": template = notificationSettings.customerOrderCancelledMessage; break;
-    default: return;
+    case "Processing":
+      templateName = ns.customerProcessingTemplateName;
+      templateParamsStr = ns.customerProcessingTemplateParams;
+      break;
+    case "Shipped":
+      templateName = ns.customerShippedTemplateName;
+      templateParamsStr = ns.customerShippedTemplateParams;
+      break;
+    case "Delivered":
+      templateName = ns.customerDeliveredTemplateName;
+      templateParamsStr = ns.customerDeliveredTemplateParams;
+      break;
+    case "Cancelled":
+      templateName = ns.customerCancelledTemplateName;
+      templateParamsStr = ns.customerCancelledTemplateParams;
+      break;
+    default: return; // No template for other statuses
   }
 
-  if (!template) {
-    console.log(`[SERVER] ⚠️ Template missing for status: ${newStatus}`);
+  if (!templateName) {
+    console.log(`[SERVER] ⚠️ Template name missing in settings for status: ${newStatus}`);
     return;
   }
 
-  const placeholders = {
+  // A dictionary of all possible dynamic values for this event.
+  const availablePlaceholders = {
     '[ORDER_ID]': order.id,
     '[CUSTOMER_NAME]': order.customerName,
     '[CARRIER]': shippingInfo?.carrier || 'our courier partner',
     '[TRACKING_NUMBER]': shippingInfo?.trackingNumber || 'N/A',
   };
   
-  const customerMessage = template.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[CARRIER\]|\[TRACKING_NUMBER\]/g, match => placeholders[match]);
+  const parameters = buildTemplateParameters(templateParamsStr, availablePlaceholders);
 
-  const result = await sendWhatsappMessage(order.customerPhone, customerMessage, notificationSettings);
+  const result = await sendWhatsappMessage(order.customerPhone, templateName, parameters, ns);
   await logWhatsappMessage({
     recipientNumber: order.customerPhone,
-    messageContent: customerMessage,
+    messageContent: { template: templateName, params: parameters },
     status: result.success ? 'success' : 'failed',
     reason: result.reason,
     orderId: order.id,

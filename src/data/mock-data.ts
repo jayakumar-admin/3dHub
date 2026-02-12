@@ -94,11 +94,17 @@ export const MOCK_SETTINGS: Settings = {
     whatsappPhoneId: 'YOUR_PHONE_NUMBER_ID',
     whatsappVersion: 'v19.0',
     adminPhoneNumber: '919876543210',
-    adminOrderMessage: 'New Order Received! ID: [ORDER_ID], Customer: [CUSTOMER_NAME], Amount: ₹[TOTAL_AMOUNT].',
-    customerOrderMessage: 'Hello [CUSTOMER_NAME]! Thank you for your order #[ORDER_ID] of amount ₹[TOTAL_AMOUNT] from 3D Hub. We will notify you once it is shipped.',
-    customerOrderProcessingMessage: "Hi [CUSTOMER_NAME], good news! Your order #[ORDER_ID] is now being processed. We'll let you know once it's on its way.",
-    customerOrderShippedMessage: "Your order #[ORDER_ID] has been shipped! It's on its way to you with [CARRIER]. You can track it using the number: [TRACKING_NUMBER].",
-    customerOrderDeliveredMessage: 'Great news, [CUSTOMER_NAME]! Your order #[ORDER_ID] has been delivered. We hope you love it!',
-    customerOrderCancelledMessage: 'Hi [CUSTOMER_NAME], your order #[ORDER_ID] has been cancelled as requested. If you have any questions, please contact our support.'
+    adminNewOrderTemplateName: 'admin_new_order',
+    adminNewOrderTemplateParams: '[CUSTOMER_NAME],[ORDER_ID],[TOTAL_AMOUNT]',
+    customerNewOrderTemplateName: 'customer_new_order',
+    customerNewOrderTemplateParams: '[CUSTOMER_NAME],[ORDER_ID],[TOTAL_AMOUNT]',
+    customerProcessingTemplateName: 'order_processing',
+    customerProcessingTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]',
+    customerShippedTemplateName: 'order_shipped',
+    customerShippedTemplateParams: '[ORDER_ID],[CARRIER],[TRACKING_NUMBER]',
+    customerDeliveredTemplateName: 'order_delivered',
+    customerDeliveredTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]',
+    customerCancelledTemplateName: 'order_cancelled',
+    customerCancelledTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]'
   }
 };
