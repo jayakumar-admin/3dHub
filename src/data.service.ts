@@ -1,4 +1,5 @@
 
+
 import { Injectable, signal, inject, effect } from '@angular/core';
 import { Product, Category, Order, User, Settings, OrderItem, ContactSubmission, Review } from './models';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -451,14 +452,16 @@ export class DataService {
         freeShippingPincodes: ''
       },
       returns: { returnsEnabled: false, returnWindowDays: 0, returnPolicy: '' },
+      // FIX: Corrected whatsappNotifications to match the WhatsappNotificationSettings interface
       whatsappNotifications: {
         enableOrderNotifications: false,
         apiProvider: 'none',
-        apiKey: '',
-        senderNumber: '',
+        whatsappToken: '',
+        whatsappPhoneId: '',
+        whatsappVersion: 'v19.0',
         adminPhoneNumber: '',
-        customerOrderMessage: '',
         adminOrderMessage: '',
+        customerOrderMessage: '',
         customerOrderProcessingMessage: '',
         customerOrderShippedMessage: '',
         customerOrderDeliveredMessage: '',

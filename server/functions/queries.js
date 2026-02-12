@@ -200,6 +200,12 @@ const queries = {
     createSubmission: 'INSERT INTO contact_submissions (name, email, message) VALUES ($1, $2, $3) RETURNING *',
     getAllSubmissions: 'SELECT * FROM contact_submissions ORDER BY submitted_at DESC',
     updateStatus: 'UPDATE contact_submissions SET status = $1 WHERE id = $2 RETURNING *',
+  },
+  whatsapp: {
+    logMessage: `
+      INSERT INTO whatsapp_logs (recipient_number, message_content, status, reason, order_id, user_id, message_type)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `
   }
 };
 

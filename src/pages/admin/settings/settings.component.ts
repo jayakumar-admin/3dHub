@@ -108,8 +108,9 @@ export class AdminSettingsComponent {
       whatsappNotifications: this.fb.group({
         enableOrderNotifications: [true],
         apiProvider: ['none', Validators.required],
-        apiKey: [''],
-        senderNumber: [''],
+        whatsappToken: [''],
+        whatsappPhoneId: [''],
+        whatsappVersion: ['v19.0'],
         adminPhoneNumber: ['', Validators.required],
         adminOrderMessage: ['', Validators.required],
         customerOrderMessage: ['', Validators.required],

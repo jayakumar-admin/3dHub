@@ -89,9 +89,10 @@ export const MOCK_SETTINGS: Settings = {
   },
   whatsappNotifications: {
     enableOrderNotifications: true,
-    apiProvider: 'mock_server',
-    apiKey: 'YOUR_MOCK_API_KEY',
-    senderNumber: '919999988888',
+    apiProvider: 'graph_api',
+    whatsappToken: 'YOUR_GRAPH_API_TOKEN_HERE',
+    whatsappPhoneId: 'YOUR_PHONE_NUMBER_ID',
+    whatsappVersion: 'v19.0',
     adminPhoneNumber: '919876543210',
     adminOrderMessage: 'New Order Received! ID: [ORDER_ID], Customer: [CUSTOMER_NAME], Amount: ₹[TOTAL_AMOUNT].',
     customerOrderMessage: 'Hello [CUSTOMER_NAME]! Thank you for your order #[ORDER_ID] of amount ₹[TOTAL_AMOUNT] from 3D Hub. We will notify you once it is shipped.',

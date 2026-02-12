@@ -182,9 +182,10 @@ export interface ReturnSettings {
 
 export interface WhatsappNotificationSettings {
   enableOrderNotifications: boolean;
-  apiProvider: 'none' | 'mock_server';
-  apiKey: string;
-  senderNumber: string;
+  apiProvider: 'none' | 'mock_server' | 'graph_api';
+  whatsappToken: string;
+  whatsappPhoneId: string;
+  whatsappVersion: string;
   adminPhoneNumber: string;
   // Templates
   adminOrderMessage: string;

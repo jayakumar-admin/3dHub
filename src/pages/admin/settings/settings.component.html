@@ -695,25 +695,28 @@
           </div>
 
           <div>
-            <label for="apiProvider" class="block text-sm font-medium mb-1">Notification Method</label>
+            <label for="apiProvider" class="block text-sm font-medium mb-1">Notification Provider</label>
             <select id="apiProvider" formControlName="apiProvider" class="admin-input">
-              <option value="none">Client-side Link (wa.me)</option>
+              <option value="none">Disabled</option>
               <option value="mock_server">Server-side API (Simulated)</option>
+              <option value="graph_api">Facebook Graph API (Real)</option>
             </select>
-            <p class="text-xs text-gray-500 mt-1">"Client-side" opens a WhatsApp link on the user's device. "Server-side" triggers the notification from your server (check server logs for simulation).</p>
           </div>
 
-          @if (settingsForm.get('whatsappNotifications.apiProvider')?.value === 'mock_server') {
+          @if (settingsForm.get('whatsappNotifications.apiProvider')?.value === 'graph_api') {
             <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 space-y-4">
-              <h3 class="font-semibold text-blue-800 dark:text-blue-200">API Configuration (Simulated)</h3>
+              <h3 class="font-semibold text-blue-800 dark:text-blue-200">Graph API Configuration</h3>
               <div>
-                <label for="apiKey" class="block text-sm font-medium mb-1">API Key</label>
-                <input type="text" id="apiKey" formControlName="apiKey" class="admin-input" placeholder="Enter your WhatsApp provider API Key">
+                <label for="whatsappToken" class="block text-sm font-medium mb-1">WhatsApp Access Token</label>
+                <input type="text" id="whatsappToken" formControlName="whatsappToken" class="admin-input" placeholder="Your permanent access token">
               </div>
               <div>
-                <label for="senderNumber" class="block text-sm font-medium mb-1">API Sender Number</label>
-                <input type="text" id="senderNumber" formControlName="senderNumber" class="admin-input" placeholder="e.g., 919999988888">
-                 <p class="text-xs text-gray-500 mt-1">The business number registered with your API provider.</p>
+                <label for="whatsappPhoneId" class="block text-sm font-medium mb-1">Phone Number ID</label>
+                <input type="text" id="whatsappPhoneId" formControlName="whatsappPhoneId" class="admin-input" placeholder="The ID of the phone number to send from">
+              </div>
+              <div>
+                <label for="whatsappVersion" class="block text-sm font-medium mb-1">Graph API Version</label>
+                <input type="text" id="whatsappVersion" formControlName="whatsappVersion" class="admin-input" placeholder="e.g., v19.0">
               </div>
             </div>
           }

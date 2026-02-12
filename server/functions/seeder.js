@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const db = require('./db');
 const { users, categories, products, orders, order_items, settings, contact_submissions } = require('./seed-data');
@@ -8,6 +9,7 @@ const destroyData = async () => {
   try {
     console.log('Destroying existing data...');
     // The order of deletion is important due to foreign key constraints
+    await client.query('DELETE FROM whatsapp_logs');
     await client.query('DELETE FROM contact_submissions');
     await client.query('DELETE FROM reviews');
     await client.query('DELETE FROM order_items');
