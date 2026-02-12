@@ -13,4 +13,11 @@ import { RouterLink } from '@angular/router';
 export class FooterComponent {
   dataService = inject(DataService);
   settings = this.dataService.getSettings();
+
+  getCleanLink(link: string): string {
+    if (link && link.startsWith('/#/')) {
+      return link.substring(2);
+    }
+    return link;
+  }
 }

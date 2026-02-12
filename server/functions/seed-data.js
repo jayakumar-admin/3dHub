@@ -1,3 +1,4 @@
+
 const bcrypt = require('bcryptjs');
 
 // Hash the admin password before seeding
@@ -94,33 +95,39 @@ const orders = [
       order_date: '2024-07-20',
       customer_name: 'Alice Johnson',
       customer_email: 'alice.j@example.com',
+      customer_phone: '9876543211',
       shipping_address: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' },
       total_amount: 3998,
       status: 'Delivered',
       user_id: 'user2',
-      shipping_info: { carrier: 'Express Courier', trackingNumber: 'EC123456789', estimatedDelivery: '2024-07-22' }
+      shipping_info: { carrier: 'Express Courier', trackingNumber: 'EC123456789', estimatedDelivery: '2024-07-22' },
+      payment_details: { paymentId: 'pay_mock_12345', provider: 'Mock' }
     },
     {
       id: 'ORD-2024-002',
       order_date: '2024-07-22',
       customer_name: 'Bob Williams',
       customer_email: 'bob.w@example.com',
+      customer_phone: '9876543212',
       shipping_address: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' },
       total_amount: 799,
       status: 'Shipped',
       user_id: 'user3',
-      shipping_info: { carrier: 'Standard Post', trackingNumber: 'SP987654321', estimatedDelivery: '2024-07-26' }
+      shipping_info: { carrier: 'Standard Post', trackingNumber: 'SP987654321', estimatedDelivery: '2024-07-26' },
+      payment_details: { paymentId: 'pay_mock_67890', provider: 'Mock' }
     },
     {
       id: 'ORD-2024-003',
       order_date: '2024-07-23',
       customer_name: 'Charlie Brown',
       customer_email: 'charlie.b@example.com',
+      customer_phone: '9876543213',
       shipping_address: { street: '789 Imagination Ln', city: 'Star City', state: 'CA', zip: '90210' },
       total_amount: 3499,
       status: 'Processing',
       user_id: 'user4',
-      shipping_info: null
+      shipping_info: null,
+      payment_details: { paymentId: 'pay_mock_11223', provider: 'Mock' }
     },
 ];
 
@@ -162,18 +169,18 @@ const settings = {
         { platform: 'twitter', url: '#' },
       ],
       quickLinks: [
-        { title: 'About Us', url: '/#/about' },
-        { title: 'Contact', url: '/#/contact' },
-        { title: 'All Products', url: '/#/products' },
+        { title: 'About Us', url: '/about' },
+        { title: 'Contact', url: '/contact' },
+        { title: 'All Products', url: '/products' },
       ],
     },
     homePage: {
       heroSection: {
         enabled: true,
         slides: [
-           { title: '3D Photo Frame Box - Customized Products', subtitle: 'Handcrafted with love, starting from just ₹1299.', ctaText: 'Shop Now', ctaLink: '/#/products', imageUrl: fbUrl('3dHub/settings/banner1.jpg') },
-           { title: 'Luxury Gift Hampers for Every Occasion', subtitle: 'Curated with the finest products to delight your loved ones.', ctaText: 'Explore Hampers', ctaLink: '/#/products', imageUrl: fbUrl('3dHub/settings/banner2.jpg') },
-           { title: 'Light Up Your World with Custom Neon', subtitle: 'Personalized signs that make a bold statement.', ctaText: 'Design Yours', ctaLink: '/#/products', imageUrl: fbUrl('3dHub/settings/banner3.jpg') }
+           { title: '3D Photo Frame Box - Customized Products', subtitle: 'Handcrafted with love, starting from just ₹1299.', ctaText: 'Shop Now', ctaLink: '/products', imageUrl: fbUrl('3dHub/settings/banner1.jpg') },
+           { title: 'Luxury Gift Hampers for Every Occasion', subtitle: 'Curated with the finest products to delight your loved ones.', ctaText: 'Explore Hampers', ctaLink: '/products', imageUrl: fbUrl('3dHub/settings/banner2.jpg') },
+           { title: 'Light Up Your World with Custom Neon', subtitle: 'Personalized signs that make a bold statement.', ctaText: 'Design Yours', ctaLink: '/products', imageUrl: fbUrl('3dHub/settings/banner3.jpg') }
         ]
       },
       featuresSection: {
@@ -190,7 +197,7 @@ const settings = {
         title: 'What Our Customers Say',
         testimonials: [
           { author: 'Priya S.', role: 'Happy Customer', quote: 'The resin clock I bought is absolutely stunning! It\'s the centerpiece of my living room now. Amazing quality!', avatarUrl: fbUrl('3dHub/testimonials/test1.png') },
-          { author: 'Rahul K.', role: 'Gift Recipient', quote: 'Received a luxury hamper for my birthday and it was packed with so many wonderful things. Highly recommended!', avatarUrl: fbUrl('3dHub/testimonials/test2.png') },
+          { author: 'Rahul K.', role: 'Gift Recipient', quote: 'Received a luxury hamper for my birthday and it was packed with so many wonderful things. Highly recommended!', avatarUrl: fbUrl('dHub/testimonials/test2.png') },
         ],
       },
     },

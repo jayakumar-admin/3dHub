@@ -97,6 +97,8 @@ export class AdminSettingsComponent {
         flatRateCost: [0, [Validators.required, Validators.min(0)]],
         freeShippingEnabled: [true],
         freeShippingThreshold: [0, [Validators.required, Validators.min(0)]],
+        pincodeFreeShippingEnabled: [false],
+        freeShippingPincodes: ['']
       }),
       returns: this.fb.group({
         returnsEnabled: [true],
@@ -109,8 +111,12 @@ export class AdminSettingsComponent {
         apiKey: [''],
         senderNumber: [''],
         adminPhoneNumber: ['', Validators.required],
-        customerOrderMessage: ['', Validators.required],
         adminOrderMessage: ['', Validators.required],
+        customerOrderMessage: ['', Validators.required],
+        customerOrderProcessingMessage: ['', Validators.required],
+        customerOrderShippedMessage: ['', Validators.required],
+        customerOrderDeliveredMessage: ['', Validators.required],
+        customerOrderCancelledMessage: ['', Validators.required],
       })
     });
 

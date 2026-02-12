@@ -53,15 +53,26 @@ export class CartService {
   shipping = computed(() => {
     const shippingSettings = this.settings().shipping;
     const subtotal = this.subtotal();
+    const address = this.shippingAddress();
 
     if (subtotal === 0) {
       return 0; // No items, no shipping cost.
     }
 
+    // 1. Check for Pincode-based free shipping
+    if (shippingSettings.pincodeFreeShippingEnabled && address && shippingSettings.freeShippingPincodes) {
+      const freePincodes = shippingSettings.freeShippingPincodes.split(',').map(p => p.trim()).filter(p => p);
+      if (freePincodes.includes(address.zip)) {
+        return 0; // Free shipping for this pincode.
+      }
+    }
+
+    // 2. Check for threshold-based free shipping
     if (shippingSettings.freeShippingEnabled && subtotal >= shippingSettings.freeShippingThreshold) {
       return 0; // Free shipping threshold met.
     }
 
+    // 3. Apply flat rate as a fallback
     if (shippingSettings.flatRateEnabled) {
       return shippingSettings.flatRateCost; // Apply flat rate.
     }

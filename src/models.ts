@@ -170,6 +170,8 @@ export interface ShippingSettings {
   flatRateCost: number;
   freeShippingEnabled: boolean;
   freeShippingThreshold: number;
+  pincodeFreeShippingEnabled: boolean;
+  freeShippingPincodes: string;
 }
 
 export interface ReturnSettings {
@@ -184,8 +186,13 @@ export interface WhatsappNotificationSettings {
   apiKey: string;
   senderNumber: string;
   adminPhoneNumber: string;
-  customerOrderMessage: string;
+  // Templates
   adminOrderMessage: string;
+  customerOrderMessage: string;
+  customerOrderProcessingMessage: string;
+  customerOrderShippedMessage: string;
+  customerOrderDeliveredMessage: string;
+  customerOrderCancelledMessage: string;
 }
 
 

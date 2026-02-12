@@ -3,34 +3,96 @@ const router = require('express').Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const queries = require('../queries').orders;
+const settingsQueries = require('../queries').settings;
+
+
+// Helper function for sending notifications to avoid code duplication.
+// This is a "fire-and-forget" function. It shouldn't block the API response.
+const sendWhatsappStatusUpdate = async (orderId, newStatus, shippingInfo) => {
+  try {
+    const settingsResult = await db.query(settingsQueries.getSettings);
+    if (settingsResult.rows.length === 0) return;
+    
+    const settings = settingsResult.rows[0].data;
+    const notificationSettings = settings.whatsappNotifications;
+
+    if (!notificationSettings?.enableOrderNotifications || notificationSettings.apiProvider !== 'mock_server') {
+      return;
+    }
+
+    const orderResult = await db.query(queries.getOrderById, [orderId]);
+    if (orderResult.rows.length === 0) return;
+    const order = orderResult.rows[0];
+
+    let customerMessageTemplate = '';
+    switch(newStatus) {
+      case 'Processing':
+        customerMessageTemplate = notificationSettings.customerOrderProcessingMessage;
+        break;
+      case 'Shipped':
+        customerMessageTemplate = notificationSettings.customerOrderShippedMessage;
+        break;
+      case 'Delivered':
+        customerMessageTemplate = notificationSettings.customerOrderDeliveredMessage;
+        break;
+      case 'Cancelled':
+        customerMessageTemplate = notificationSettings.customerOrderCancelledMessage;
+        break;
+      default:
+        return; // Don't send notifications for 'Pending' or other statuses
+    }
+
+    if (!customerMessageTemplate || !order.customerPhone) {
+        return;
+    }
+
+    const placeholders = {
+        '[ORDER_ID]': order.id,
+        '[CUSTOMER_NAME]': order.customerName,
+        '[TOTAL_AMOUNT]': order.totalAmount.toString(),
+        '[CARRIER]': shippingInfo?.carrier || 'our courier',
+        '[TRACKING_NUMBER]': shippingInfo?.trackingNumber || 'N/A',
+    };
+    
+    const customerMessage = customerMessageTemplate.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[TOTAL_AMOUNT\]|\[CARRIER\]|\[TRACKING_NUMBER\]/g, match => placeholders[match]);
+
+    console.log(`\n--- [SERVER] SIMULATING WHATSAPP STATUS UPDATE (${newStatus}) ---`);
+    console.log(`[SERVER] To Customer (${order.customerPhone}): ${customerMessage}`);
+    console.log(`[SERVER] Using API Key: ${notificationSettings.apiKey.substring(0, 5)}...`);
+    console.log(`[SERVER] From Sender Number: ${notificationSettings.senderNumber}`);
+    console.log('--- SIMULATION END ---\n');
+
+  } catch (error) {
+    console.error(`[SERVER] Failed to process status update notification for order ${orderId}:`, error);
+  }
+};
+
 
 /**
  * @route   POST /api/orders
- * @desc    Create a new order
+ * @desc    Create a new order and trigger notifications
  * @access  Public
  */
 router.post('/', async (req, res, next) => {
-  const { items, customerDetails, totalAmount, shippingAddress, userId, paymentDetails } = req.body;
+  const { items, customerDetails, customerPhone, totalAmount, shippingAddress, userId, paymentDetails } = req.body;
   
   const client = await db.getClient();
   try {
-    // Begin a database transaction
     await client.query('BEGIN');
 
-    // 1. Insert into the main 'orders' table
     const orderId = `ORD-${Date.now()}`;
     const orderData = await client.query(queries.createOrder, [
       orderId,
       customerDetails.name,
       customerDetails.email,
+      customerPhone,
       totalAmount,
       shippingAddress,
-      userId, // Can be null for guest checkouts
+      userId,
       paymentDetails ? JSON.stringify(paymentDetails) : null,
     ]);
     const newOrder = orderData.rows[0];
 
-    // 2. Insert each item into the 'order_items' table
     for (const item of items) {
       await client.query(queries.createOrderItem, [
         newOrder.id,
@@ -41,22 +103,65 @@ router.post('/', async (req, res, next) => {
         item.oldPrice,
         item.image,
       ]);
-      // Optional: Decrement product stock here
     }
 
-    // Commit the transaction
     await client.query('COMMIT');
-    res.status(201).json({ success: true, order: newOrder });
+    
+    // Fetch full order details to return to frontend
+    const fullOrderResult = await client.query(queries.getOrderById, [newOrder.id]);
+    const fullOrder = fullOrderResult.rows[0];
+    fullOrder.items = items; // Add items since the query doesn't join them
+
+    // --- Server-Side Notification Logic ---
+    try {
+      const settingsResult = await client.query(settingsQueries.getSettings);
+      if (settingsResult.rows.length > 0) {
+        const settings = settingsResult.rows[0].data;
+        const notificationSettings = settings.whatsappNotifications;
+
+        if (notificationSettings?.enableOrderNotifications && notificationSettings.apiProvider === 'mock_server') {
+          console.log('\n--- [SERVER] SIMULATING WHATSAPP NOTIFICATION (NEW ORDER) ---');
+          
+          const placeholders = {
+            '[ORDER_ID]': newOrder.id,
+            '[CUSTOMER_NAME]': customerDetails.name,
+            '[TOTAL_AMOUNT]': totalAmount.toString(),
+          };
+          const replacePlaceholders = (template) => template.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[TOTAL_AMOUNT\]/g, match => placeholders[match]);
+
+          // 1. Customer Notification (Order Placed)
+          if (customerPhone && notificationSettings.customerOrderMessage) {
+            const customerMessage = replacePlaceholders(notificationSettings.customerOrderMessage);
+            console.log(`[SERVER] To Customer (${customerPhone}): ${customerMessage}`);
+          }
+          
+          // 2. Admin Notification (New Order)
+          if (notificationSettings.adminPhoneNumber && notificationSettings.adminOrderMessage) {
+            const adminMessage = replacePlaceholders(notificationSettings.adminOrderMessage);
+            console.log(`[SERVER] To Admin (${notificationSettings.adminPhoneNumber}): ${adminMessage}`);
+          }
+
+          console.log(`[SERVER] Using API Key: ${notificationSettings.apiKey.substring(0, 5)}...`);
+          console.log(`[SERVER] From Sender Number: ${notificationSettings.senderNumber}`);
+          console.log('--- SIMULATION END ---\n');
+        }
+      }
+    } catch (notificationError) {
+      // Log notification error but don't fail the transaction
+      console.error('[SERVER] Failed to process notifications after order creation:', notificationError);
+    }
+    // --- End Notification Logic ---
+
+    res.status(201).json({ success: true, order: fullOrder });
 
   } catch (err) {
-    // If any error occurs, rollback the transaction
     await client.query('ROLLBACK');
     next(err);
   } finally {
-    // Release the client back to the pool
     client.release();
   }
 });
+
 
 /**
  * @route   GET /api/orders/my-orders
@@ -124,7 +229,7 @@ router.get('/:id', verifyToken, async (req, res, next) => {
 
 /**
  * @route   PUT /api/orders/:id/status
- * @desc    Update the status of an order
+ * @desc    Update the status of an order and trigger notifications
  * @access  Private (Admin only)
  */
 router.put('/:id/status', verifyToken, async (req, res, next) => {
@@ -144,6 +249,9 @@ router.put('/:id/status', verifyToken, async (req, res, next) => {
     if (result.rowCount === 0) {
       return res.status(404).json({ msg: 'Order not found' });
     }
+
+    // Fire-and-forget the notification. Don't await it.
+    sendWhatsappStatusUpdate(id, status, shippingInfo);
 
     res.json({ msg: 'Order status updated' });
   } catch (err) {

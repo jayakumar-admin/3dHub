@@ -78,7 +78,9 @@ export const MOCK_SETTINGS: Settings = {
     flatRateEnabled: true,
     flatRateCost: 50,
     freeShippingEnabled: true,
-    freeShippingThreshold: 2000
+    freeShippingThreshold: 2000,
+    pincodeFreeShippingEnabled: true,
+    freeShippingPincodes: '10001, 07001, 90210, 12345'
   },
   returns: {
     returnsEnabled: true,
@@ -87,11 +89,15 @@ export const MOCK_SETTINGS: Settings = {
   },
   whatsappNotifications: {
     enableOrderNotifications: true,
-    apiProvider: 'none',
+    apiProvider: 'mock_server',
     apiKey: 'YOUR_MOCK_API_KEY',
     senderNumber: '919999988888',
     adminPhoneNumber: '919876543210',
+    adminOrderMessage: 'New Order Received! ID: [ORDER_ID], Customer: [CUSTOMER_NAME], Amount: ₹[TOTAL_AMOUNT].',
     customerOrderMessage: 'Hello [CUSTOMER_NAME]! Thank you for your order #[ORDER_ID] of amount ₹[TOTAL_AMOUNT] from 3D Hub. We will notify you once it is shipped.',
-    adminOrderMessage: 'New Order Received! ID: [ORDER_ID], Customer: [CUSTOMER_NAME], Amount: ₹[TOTAL_AMOUNT].'
+    customerOrderProcessingMessage: "Hi [CUSTOMER_NAME], good news! Your order #[ORDER_ID] is now being processed. We'll let you know once it's on its way.",
+    customerOrderShippedMessage: "Your order #[ORDER_ID] has been shipped! It's on its way to you with [CARRIER]. You can track it using the number: [TRACKING_NUMBER].",
+    customerOrderDeliveredMessage: 'Great news, [CUSTOMER_NAME]! Your order #[ORDER_ID] has been delivered. We hope you love it!',
+    customerOrderCancelledMessage: 'Hi [CUSTOMER_NAME], your order #[ORDER_ID] has been cancelled as requested. If you have any questions, please contact our support.'
   }
 };

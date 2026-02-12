@@ -482,7 +482,7 @@
           <!-- Free Shipping -->
           <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
             <div class="flex items-center justify-between">
-              <h3 class="font-semibold">Enable Free Shipping</h3>
+              <h3 class="font-semibold">Enable Free Shipping (by Order Total)</h3>
               <label class="toggle-switch">
                 <input type="checkbox" formControlName="freeShippingEnabled">
                 <span class="slider"></span>
@@ -492,6 +492,22 @@
               <label for="freeShippingThreshold" class="block text-sm font-medium mb-1">Free Shipping Threshold (₹)</label>
               <input type="number" id="freeShippingThreshold" formControlName="freeShippingThreshold" class="admin-input">
               <p class="text-xs text-gray-500 mt-1">Orders with a subtotal greater than or equal to this amount will have free shipping.</p>
+            </div>
+          </div>
+
+          <!-- Pincode-based Free Shipping -->
+          <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enable Pincode-Based Free Shipping</h3>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="pincodeFreeShippingEnabled">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <label for="freeShippingPincodes" class="block text-sm font-medium mb-1">Eligible Pincodes</label>
+              <textarea id="freeShippingPincodes" formControlName="freeShippingPincodes" rows="3" class="admin-input" placeholder="e.g., 110011, 400001, 560001"></textarea>
+              <p class="text-xs text-gray-500 mt-1">Enter a comma-separated list of pincodes that qualify for free shipping.</p>
             </div>
           </div>
         </div>
@@ -684,7 +700,7 @@
               <option value="none">Client-side Link (wa.me)</option>
               <option value="mock_server">Server-side API (Simulated)</option>
             </select>
-            <p class="text-xs text-gray-500 mt-1">"Client-side" opens a WhatsApp link. "Server-side" simulates a backend API call (check browser console).</p>
+            <p class="text-xs text-gray-500 mt-1">"Client-side" opens a WhatsApp link on the user's device. "Server-side" triggers the notification from your server (check server logs for simulation).</p>
           </div>
 
           @if (settingsForm.get('whatsappNotifications.apiProvider')?.value === 'mock_server') {
@@ -707,17 +723,38 @@
             <input type="text" id="adminPhoneNumber" formControlName="adminPhoneNumber" class="admin-input">
             <p class="text-xs text-gray-500 mt-1">Include country code without '+' or spaces (e.g., 919876543210).</p>
           </div>
-
-          <div>
-            <label for="customerOrderMessage" class="block text-sm font-medium mb-1">Customer Message Template</label>
-            <textarea id="customerOrderMessage" formControlName="customerOrderMessage" rows="4" class="admin-input"></textarea>
-            <p class="text-xs text-gray-500 mt-1">Use placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
-          </div>
           
-          <div>
-            <label for="adminOrderMessage" class="block text-sm font-medium mb-1">Admin Message Template</label>
-            <textarea id="adminOrderMessage" formControlName="adminOrderMessage" rows="3" class="admin-input"></textarea>
-            <p class="text-xs text-gray-500 mt-1">Use placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t dark:border-gray-700">
+              <div>
+                <label for="adminOrderMessage" class="block text-sm font-medium mb-1">Admin: New Order</label>
+                <textarea id="adminOrderMessage" formControlName="adminOrderMessage" rows="3" class="admin-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+              </div>
+              <div>
+                <label for="customerOrderMessage" class="block text-sm font-medium mb-1">Customer: Order Placed</label>
+                <textarea id="customerOrderMessage" formControlName="customerOrderMessage" rows="3" class="admin-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+              </div>
+              <div>
+                <label for="customerOrderProcessingMessage" class="block text-sm font-medium mb-1">Customer: Order Processing</label>
+                <textarea id="customerOrderProcessingMessage" formControlName="customerOrderProcessingMessage" rows="3" class="admin-input"></textarea>
+                 <p class="text-xs text-gray-500 mt-1">Placeholders: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+              </div>
+              <div>
+                <label for="customerOrderShippedMessage" class="block text-sm font-medium mb-1">Customer: Order Shipped</label>
+                <textarea id="customerOrderShippedMessage" formControlName="customerOrderShippedMessage" rows="3" class="admin-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Available: <code>[ORDER_ID]</code>, <code>[CARRIER]</code>, <code>[TRACKING_NUMBER]</code>.</p>
+              </div>
+              <div>
+                <label for="customerOrderDeliveredMessage" class="block text-sm font-medium mb-1">Customer: Order Delivered</label>
+                <textarea id="customerOrderDeliveredMessage" formControlName="customerOrderDeliveredMessage" rows="3" class="admin-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+              </div>
+              <div>
+                <label for="customerOrderCancelledMessage" class="block text-sm font-medium mb-1">Customer: Order Cancelled</label>
+                <textarea id="customerOrderCancelledMessage" formControlName="customerOrderCancelledMessage" rows="3" class="admin-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+              </div>
           </div>
         </div>
       </div>

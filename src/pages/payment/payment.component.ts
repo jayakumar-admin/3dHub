@@ -65,27 +65,16 @@ export class PaymentComponent {
         email: currentUser.email,
         avatar: currentUser.avatar,
       },
+      customerPhone: shippingAddr.phone, // Pass phone for server-side notifications
       userId: currentUser.id,
       paymentDetails: paymentDetails,
     };
 
     this.dataService.createOrder(orderData).subscribe({
       next: (orderResponse) => {
-        const newOrder: Order = {
-          id: orderResponse.order.id,
-          orderDate: new Date().toISOString().split('T')[0],
-          customerName: orderData.customerDetails.name,
-          customerEmail: orderData.customerDetails.email,
-          customerAvatar: orderData.customerDetails.avatar,
-          shippingAddress: orderData.shippingAddress,
-          totalAmount: orderData.totalAmount,
-          status: 'Pending',
-          items: orderData.items,
-          paymentDetails: paymentDetails
-        };
-        this.dataService.addOrderToSignal(newOrder);
-
-        this.sendWhatsappNotifications(newOrder, shippingAddr.phone);
+        // The signal update is now just for immediate UI feedback.
+        // The source of truth comes from subsequent data fetches.
+        this.dataService.addOrderToSignal(orderResponse.order);
 
         const successMessage = paymentDetails.provider === 'Mock'
           ? `Order placed successfully (mock): ${orderResponse.order.id}`
@@ -181,52 +170,5 @@ export class PaymentComponent {
       provider: 'Mock'
     };
     this._createOrder(mockPaymentDetails);
-  }
-
-  private sendWhatsappNotifications(order: Order, customerPhone: string) {
-    const notificationSettings = this.settings().whatsappNotifications;
-  
-    if (!notificationSettings?.enableOrderNotifications) {
-      return;
-    }
-  
-    const placeholders: { [key: string]: string } = {
-      '[ORDER_ID]': order.id,
-      '[CUSTOMER_NAME]': order.customerName,
-      '[TOTAL_AMOUNT]': order.totalAmount.toString(),
-    };
-  
-    const replacePlaceholders = (template: string): string => {
-      return template.replace(/\[ORDER_ID\]|\[CUSTOMER_NAME\]|\[TOTAL_AMOUNT\]/g, (match) => placeholders[match]);
-    };
-
-    const customerMessage = replacePlaceholders(notificationSettings.customerOrderMessage);
-    const adminMessage = replacePlaceholders(notificationSettings.adminOrderMessage);
-  
-    if (notificationSettings.apiProvider === 'mock_server') {
-      // Simulate server-side API call
-      console.log('--- SIMULATING SERVER-SIDE WHATSAPP NOTIFICATION ---');
-      if (customerPhone && customerMessage) {
-        console.log(`To Customer (${customerPhone}): ${customerMessage}`);
-      }
-      if (notificationSettings.adminPhoneNumber && adminMessage) {
-        console.log(`To Admin (${notificationSettings.adminPhoneNumber}): ${adminMessage}`);
-      }
-      console.log('Using API Key:', notificationSettings.apiKey);
-      console.log('From Sender Number:', notificationSettings.senderNumber);
-      console.log('----------------------------------------------------');
-      this.notificationService.show('Order notifications sent (simulated).', 'success');
-    } else {
-      // Fallback to client-side wa.me links
-      if (customerPhone && customerMessage) {
-        const customerWhatsappUrl = `https://wa.me/${customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(customerMessage)}`;
-        window.open(customerWhatsappUrl, '_blank');
-      }
-    
-      if (notificationSettings.adminPhoneNumber && adminMessage) {
-        const adminWhatsappUrl = `https://wa.me/${notificationSettings.adminPhoneNumber.replace(/\D/g, '')}?text=${encodeURIComponent(adminMessage)}`;
-        window.open(adminWhatsappUrl, '_blank');
-      }
-    }
   }
 }

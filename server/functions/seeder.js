@@ -9,6 +9,7 @@ const destroyData = async () => {
     console.log('Destroying existing data...');
     // The order of deletion is important due to foreign key constraints
     await client.query('DELETE FROM contact_submissions');
+    await client.query('DELETE FROM reviews');
     await client.query('DELETE FROM order_items');
     await client.query('DELETE FROM orders');
     await client.query('DELETE FROM products');
@@ -61,8 +62,8 @@ const importData = async () => {
     // 4. Seed orders
     for (const order of orders) {
       await client.query(
-        'INSERT INTO orders (id, order_date, customer_name, customer_email, shipping_address, total_amount, status, user_id, shipping_info) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-        [order.id, order.order_date, order.customer_name, order.customer_email, JSON.stringify(order.shipping_address), order.total_amount, order.status, order.user_id, JSON.stringify(order.shipping_info)]
+        'INSERT INTO orders (id, order_date, customer_name, customer_email, customer_phone, shipping_address, total_amount, status, user_id, shipping_info, payment_details) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+        [order.id, order.order_date, order.customer_name, order.customer_email, order.customer_phone, JSON.stringify(order.shipping_address), order.total_amount, order.status, order.user_id, JSON.stringify(order.shipping_info), JSON.stringify(order.payment_details)]
       );
     }
     console.log('Orders seeded.');

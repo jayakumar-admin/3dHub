@@ -22,8 +22,8 @@ export class LoginComponent {
   showPassword = signal(false);
 
   loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
+    email: ['alice.j@example.com', [Validators.required, Validators.email]],
+    password: ['password123', [Validators.required]],
   });
 
   async login() {

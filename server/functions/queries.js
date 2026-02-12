@@ -15,7 +15,12 @@ const queries = {
   },
   products: {
     getAllProducts: `
-      SELECT p.*, COALESCE(rev.review_count, 0) AS reviews, COALESCE(rev.avg_rating, 0) AS rating
+      SELECT 
+        p.id, p.name, p.description, p.price, p.old_price AS "oldPrice", p.stock, 
+        p.category_id AS "category", p.images, p.sku, p.enabled, p.tags, 
+        p.weight_kg AS "weight", p.dimensions,
+        COALESCE(rev.review_count, 0) AS "reviews", 
+        COALESCE(rev.avg_rating, 0) AS "rating"
       FROM products p
       LEFT JOIN (
           SELECT product_id, COUNT(*) AS review_count, AVG(rating) AS avg_rating
@@ -24,7 +29,12 @@ const queries = {
       ) rev ON p.id = rev.product_id
       ORDER BY p.created_at DESC`,
     getProductById: `
-      SELECT p.*, COALESCE(rev.review_count, 0) AS reviews, COALESCE(rev.avg_rating, 0) AS rating
+      SELECT 
+        p.id, p.name, p.description, p.price, p.old_price AS "oldPrice", p.stock, 
+        p.category_id AS "category", p.images, p.sku, p.enabled, p.tags, 
+        p.weight_kg AS "weight", p.dimensions,
+        COALESCE(rev.review_count, 0) AS "reviews", 
+        COALESCE(rev.avg_rating, 0) AS "rating"
       FROM products p
       LEFT JOIN (
           SELECT product_id, COUNT(*) AS review_count, AVG(rating) AS avg_rating
@@ -35,13 +45,13 @@ const queries = {
     createProduct: `
       INSERT INTO products (id, name, description, price, old_price, stock, category_id, images, sku, enabled, tags, weight_kg, dimensions)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-      RETURNING *
+      RETURNING id, name, description, price, old_price AS "oldPrice", stock, category_id AS "category", images, sku, enabled, tags, weight_kg AS "weight", dimensions
     `,
     updateProduct: `
       UPDATE products
       SET name = $1, description = $2, price = $3, old_price = $4, stock = $5, category_id = $6, images = $7, sku = $8, enabled = $9, tags = $10, weight_kg = $11, dimensions = $12, updated_at = CURRENT_TIMESTAMP
       WHERE id = $13
-      RETURNING *
+      RETURNING id, name, description, price, old_price AS "oldPrice", stock, category_id AS "category", images, sku, enabled, tags, weight_kg AS "weight", dimensions
     `,
     deleteProduct: 'DELETE FROM products WHERE id = $1',
     getAllCategories: 'SELECT * FROM categories ORDER BY name ASC',
@@ -66,6 +76,7 @@ const queries = {
           o.order_date AS "orderDate",
           o.customer_name AS "customerName",
           o.customer_email AS "customerEmail",
+          o.customer_phone AS "customerPhone",
           u.avatar AS "customerAvatar",
           o.total_amount AS "totalAmount",
           o.shipping_address AS "shippingAddress",
@@ -100,6 +111,7 @@ const queries = {
           o.order_date AS "orderDate",
           o.customer_name AS "customerName",
           o.customer_email AS "customerEmail",
+          o.customer_phone AS "customerPhone",
           u.avatar AS "customerAvatar",
           o.total_amount AS "totalAmount",
           o.shipping_address AS "shippingAddress",
@@ -136,6 +148,7 @@ const queries = {
         o.order_date as "orderDate",
         o.customer_name as "customerName",
         o.customer_email as "customerEmail",
+        o.customer_phone as "customerPhone",
         u.avatar AS "customerAvatar",
         o.total_amount as "totalAmount",
         o.shipping_address as "shippingAddress",
@@ -153,8 +166,8 @@ const queries = {
       FROM order_items WHERE order_id = $1`,
     getReviewedProductIdsByOrderId: `SELECT DISTINCT product_id FROM reviews WHERE order_id = $1`,
     createOrder: `
-      INSERT INTO orders (id, customer_name, customer_email, total_amount, shipping_address, status, user_id, payment_details)
-      VALUES ($1, $2, $3, $4, $5, 'Pending', $6, $7)
+      INSERT INTO orders (id, customer_name, customer_email, customer_phone, total_amount, shipping_address, status, user_id, payment_details)
+      VALUES ($1, $2, $3, $4, $5, $6, 'Pending', $7, $8)
       RETURNING id
     `,
     createOrderItem: `
@@ -181,7 +194,7 @@ const queries = {
   },
   settings: {
     getSettings: 'SELECT data FROM settings WHERE id = 1',
-    updateSettings: 'UPDATE settings SET data = $1 WHERE id = 1',
+    updateSettings: 'UPDATE settings SET data = $1, updated_at = CURRENT_TIMESTAMP WHERE id = 1',
   },
   contact: {
     createSubmission: 'INSERT INTO contact_submissions (name, email, message) VALUES ($1, $2, $3) RETURNING *',
@@ -190,4 +203,4 @@ const queries = {
   }
 };
 
-module.exports = queries; 
+module.exports = queries;

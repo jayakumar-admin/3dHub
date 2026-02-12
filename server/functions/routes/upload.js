@@ -9,7 +9,7 @@ const { bucket } = require('../firebase');
 
 // Middleware to check for Admin role
 const adminOnly = (req, res, next) => {
-    if (req.user) {
+    if (req.user && req.user.role === 'Admin') {
         next();
     } else {
         return res.status(403).json({ message: 'Access Denied. Admin privileges required.' });

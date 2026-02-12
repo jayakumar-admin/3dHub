@@ -14,7 +14,7 @@ bootstrapApplication(AppComponent, {
     provideZonelessChangeDetection(),
     provideRouter(
       APP_ROUTES, 
-      withHashLocation(),
+     
       withInMemoryScrolling({ scrollPositionRestoration: 'top' })
     ),
     provideHttpClient(),

@@ -49,6 +49,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.stopAutoplay();
   }
 
+  getCleanLink(link: string): string {
+    if (link && link.startsWith('/#/')) {
+        return link.substring(2);
+    }
+    return link;
+  }
+
   startAutoplay() {
     this.stopAutoplay();
     if (this.heroSlides().length > 1) {

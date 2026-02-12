@@ -36,7 +36,7 @@
         <ul class="space-y-2">
           @for(link of settings().footer.quickLinks; track link.title) {
             <li>
-              <a [routerLink]="link.url" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">{{ link.title }}</a>
+              <a [routerLink]="getCleanLink(link.url)" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">{{ link.title }}</a>
             </li>
           }
         </ul>

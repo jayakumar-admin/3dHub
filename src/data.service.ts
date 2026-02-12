@@ -259,16 +259,30 @@ export class DataService {
     } else {
       const isEdit = !!this.getProductById(product.id);
       const url = isEdit ? `${this.apiUrl}/products/${product.id}` : `${this.apiUrl}/products`;
+      // The API returns an object that might not have rating/reviews, so we type it as Partial
       const request$ = isEdit 
-        ? this.http.put<Product>(url, product, this.getAuthHeaders()) 
-        : this.http.post<Product>(url, product, this.getAuthHeaders());
+        ? this.http.put<Partial<Product>>(url, product, this.getAuthHeaders()) 
+        : this.http.post<Partial<Product>>(url, product, this.getAuthHeaders());
 
       request$.subscribe({
         next: savedProduct => {
           if (isEdit) {
-            this.products.update(products => products.map(p => p.id === savedProduct.id ? savedProduct : p));
+            this.products.update(products => products.map(p => {
+              if (p.id === savedProduct.id) {
+                // Merge the returned product over the existing one to preserve fields 
+                // like 'rating' and 'reviews' which aren't returned by the update endpoint.
+                return { ...p, ...savedProduct };
+              }
+              return p;
+            }));
           } else {
-            this.products.update(products => [...products, savedProduct]);
+            // The create endpoint doesn't return rating/reviews, so we add defaults.
+            const newProduct: Product = {
+              rating: 0,
+              reviews: 0,
+              ...savedProduct
+            } as Product;
+            this.products.update(products => [...products, newProduct]);
           }
         },
         error: err => this.handleError('Failed to save product', err)
@@ -428,7 +442,14 @@ export class DataService {
         teamSection: { enabled: false, title: '', members: [] },
       },
       payment: { razorpayEnabled: false, razorpayKeyId: '', companyNameForPayment: '', companyLogoForPayment: '' },
-      shipping: { flatRateEnabled: false, flatRateCost: 0, freeShippingEnabled: false, freeShippingThreshold: 0 },
+      shipping: { 
+        flatRateEnabled: false, 
+        flatRateCost: 0, 
+        freeShippingEnabled: false, 
+        freeShippingThreshold: 0,
+        pincodeFreeShippingEnabled: false,
+        freeShippingPincodes: ''
+      },
       returns: { returnsEnabled: false, returnWindowDays: 0, returnPolicy: '' },
       whatsappNotifications: {
         enableOrderNotifications: false,
@@ -437,7 +458,11 @@ export class DataService {
         senderNumber: '',
         adminPhoneNumber: '',
         customerOrderMessage: '',
-        adminOrderMessage: ''
+        adminOrderMessage: '',
+        customerOrderProcessingMessage: '',
+        customerOrderShippedMessage: '',
+        customerOrderDeliveredMessage: '',
+        customerOrderCancelledMessage: ''
       }
     };
   }
