@@ -10,8 +10,8 @@
         "firebase-debug.*.log"
        
       ],
-      "source": "functions"
-     
+      "source": "functions",
+      "predeploy": [ ]
     }
   ]
 }
