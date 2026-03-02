@@ -37,7 +37,7 @@
                 {{ submission.message }}
               </td>
               <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                {{ submission.submitted_at | date:'dd MMM yyyy, h:mm:ss a':'Asia/Kolkata' }} IST
+                {{ submission.submitted_at | date:'dd MMM yyyy h:mm a' }}
               </td>
               <td class="py-3 px-4">
                 <span class="px-2 py-1 text-xs font-medium rounded-full" [class]="getStatusClass(submission.status)">
@@ -73,7 +73,7 @@
         
         <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 border-b dark:border-gray-700 pb-4">
             <p><strong>Email:</strong> <a [href]="'mailto:' + submission.email" class="text-blue-500 hover:underline">{{ submission.email }}</a></p>
-            <p><strong>Received:</strong> {{ submission.submitted_at | date:'dd MMM yyyy, h:mm:ss a':'Asia/Kolkata' }} IST</p>
+            <p><strong>Received:</strong> {{ submission.submitted_at | date:'dd MMM yyyy h:mm a' }}</p>
             <p><strong>Status:</strong> <span class="px-2 py-0.5 text-xs font-medium rounded-full" [class]="getStatusClass(submission.status)">{{ submission.status }}</span></p>
         </div>
         

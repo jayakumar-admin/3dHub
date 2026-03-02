@@ -5,6 +5,7 @@ import { AuthService } from '../../auth.service';
 import { DataService } from '../../data.service';
 import { NotificationService } from '../../notification.service';
 import { User } from '../../models';
+import { AvatarComponent } from '../../components/avatar/avatar.component';
 
 // Custom validator to check if two fields match
 export function passwordMatchValidator(controlName: string, matchingControlName: string) {
@@ -31,7 +32,7 @@ export function passwordMatchValidator(controlName: string, matchingControlName:
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AvatarComponent],
 })
 export class ProfileComponent implements OnInit {
   authService = inject(AuthService);

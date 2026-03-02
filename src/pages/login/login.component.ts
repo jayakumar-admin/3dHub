@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth.service';
+import { DataService } from '../../data.service';
 
 @Component({
   selector: 'app-login',
@@ -15,11 +16,14 @@ export class LoginComponent {
   fb: FormBuilder = inject(FormBuilder);
   router = inject(Router);
   authService = inject(AuthService);
+  dataService = inject(DataService);
   route = inject(ActivatedRoute);
 
   isLoading = signal(false);
   loginError = signal<string | null>(null);
   showPassword = signal(false);
+  
+  websiteName = this.dataService.getSettings()().general.websiteName;
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

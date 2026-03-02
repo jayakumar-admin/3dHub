@@ -10,7 +10,76 @@ import { DataService } from '../../data.service';
 
 @Component({
   selector: 'app-product-card',
-  templateUrl: './product-card.component.html',
+  template: `
+@if (product()) {
+  @let p = product();
+  <a [routerLink]="['/product', p.id]" class="bg-light-card dark:bg-dark-card rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full border border-gray-200 dark:border-gray-700">
+    <div class="relative overflow-hidden">
+      <!-- Image (no longer a link) -->
+      <img class="w-full h-64 object-cover" [src]="p.images[0]" [alt]="p.name">
+      
+      <!-- Discount Badge -->
+      @if(discountPercent() > 0) {
+        <div class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-full shadow-md">
+          -{{ discountPercent() }}%
+        </div>
+      }
+      
+      <!-- Stock Badge -->
+      @if (p.stock === 0) {
+         <div class="absolute top-3 right-3 bg-gray-800 text-white text-xs font-bold px-2.5 py-1.5 rounded-full shadow-md">
+            OUT OF STOCK
+        </div>
+      } @else if (p.stock > 0 && p.stock <= 5) {
+         <div class="absolute top-3 right-3 bg-yellow-500 text-yellow-900 text-xs font-bold px-2.5 py-1.5 rounded-full shadow-md">
+            LOW STOCK
+        </div>
+      }
+      
+      <!-- Wishlist Button -->
+      <button (click)="toggleWishlist($event, p.id)" class="absolute top-14 right-3 bg-white/80 dark:bg-black/50 p-1.5 rounded-full text-red-500 hover:text-red-600 transition-colors opacity-80 hover:opacity-100">
+        <svg class="w-6 h-6" [attr.fill]="isInWishlist() ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+      </button>
+    </div>
+    
+    <!-- Content Area -->
+    <div class="p-5 flex flex-col flex-grow">
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ dataService.getCategoryById(p.category)?.name }}</p>
+      
+      <!-- Title (no longer a link) -->
+      <h3 class="text-lg font-bold text-light-text dark:text-dark-text truncate">{{ p.name }}</h3>
+      
+      <!-- Rating -->
+      <div class="flex items-center mt-2 mb-4">
+        @for (i of [1,2,3,4,5]; track i) {
+          <svg class="w-5 h-5" [class]="i <= p.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500'" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        }
+        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">({{ p.reviews }} reviews)</span>
+      </div>
+      
+      <!-- Price -->
+      <div class="mt-auto flex items-baseline">
+        <span class="text-2xl font-extrabold text-primary-light dark:text-primary-dark">₹{{ p.price }}</span>
+        @if (p.oldPrice) {
+          <span class="ml-2 text-md text-gray-500 line-through">₹{{ p.oldPrice }}</span>
+        }
+      </div>
+
+       <!-- Add to Cart Button -->
+      @if (p.stock > 0) {
+        <button (click)="addToCart($event)" class="mt-4 w-full bg-primary-light text-white p-2.5 rounded-lg hover:bg-blue-700 dark:bg-primary-dark dark:text-gray-900 dark:hover:opacity-80 transition-colors font-semibold flex items-center justify-center gap-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          Add to Cart
+        </button>
+      } @else {
+        <button disabled class="mt-4 w-full bg-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400 p-2.5 rounded-lg cursor-not-allowed font-semibold">
+          Out of Stock
+        </button>
+      }
+    </div>
+  </a>
+}
+`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
 })

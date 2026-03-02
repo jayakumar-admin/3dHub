@@ -4,12 +4,13 @@ import { DataService } from '../../../data.service';
 import { Order } from '../../../models';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
 
 @Component({
   selector: 'app-admin-order-list',
   templateUrl: './order-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AvatarComponent],
 })
 export class AdminOrderListComponent {
   dataService = inject(DataService);

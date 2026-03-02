@@ -36,6 +36,7 @@ export interface Order {
   id: string;
   orderDate: string;
   customerName: string;
+  customerPhone:string;
   customerEmail: string;
   customerAvatar: string;
   shippingAddress: {
@@ -190,22 +191,16 @@ export interface WhatsappNotificationSettings {
   
   // New structure for templates
   adminNewOrderTemplateName: string;
-  adminNewOrderTemplateParams: string;
   
   customerNewOrderTemplateName: string;
-  customerNewOrderTemplateParams: string;
   
   customerProcessingTemplateName: string;
-  customerProcessingTemplateParams: string;
 
   customerShippedTemplateName: string;
-  customerShippedTemplateParams: string;
 
   customerDeliveredTemplateName: string;
-  customerDeliveredTemplateParams: string;
   
   customerCancelledTemplateName: string;
-  customerCancelledTemplateParams: string;
 }
 
 

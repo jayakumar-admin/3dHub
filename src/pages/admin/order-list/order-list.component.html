@@ -23,7 +23,7 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-3">
         <div class="flex justify-between items-start">
             <div class="flex items-center gap-3">
-              <img [src]="order.customerAvatar" [alt]="order.customerName" class="w-10 h-10 rounded-full object-cover">
+              <app-avatar [name]="order.customerName" [imageUrl]="order.customerAvatar" size="md"></app-avatar>
               <div>
                 <p class="font-bold text-light-text dark:text-dark-text">{{ order.customerName }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ order.id }}</p>
@@ -35,7 +35,7 @@
         </div>
         <div class="text-sm border-t dark:border-gray-700 pt-3 grid grid-cols-2 gap-x-4">
             <div class="font-semibold text-gray-500 dark:text-gray-400">Date</div>
-            <div>{{ order.orderDate | date:'dd MMM yyyy, h:mm a':'Asia/Kolkata' }} IST</div>
+            <div class="text-xs">{{ order.orderDate | date:'dd MMM yyyy h:mm a' }}</div>
 
             <div class="font-semibold text-gray-500 dark:text-gray-400">Total</div>
             <div class="font-medium">₹{{ order.totalAmount }}</div>
@@ -72,11 +72,11 @@
           @for(order of filteredOrders(); track order.id) {
             <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                <td class="py-3 px-4 font-semibold flex items-center gap-3">
-                <img [src]="order.customerAvatar" [alt]="order.customerName" class="w-10 h-10 rounded-full object-cover">
+                <app-avatar [name]="order.customerName" [imageUrl]="order.customerAvatar" size="md"></app-avatar>
                 <span class="font-medium text-light-text dark:text-dark-text">{{ order.customerName }}</span>
               </td>
               <td class="py-3 px-4 font-mono text-sm text-gray-600 dark:text-gray-400">{{ order.id }}</td>
-              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ order.orderDate | date:'dd MMM yyyy, h:mm:ss a':'Asia/Kolkata' }} IST</td>
+              <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ order.orderDate | date:'dd MMM yyyy h:mm a' }}</td>
               <td class="py-3 px-4 font-medium">₹{{ order.totalAmount }}</td>
               <td class="py-3 px-4">
                 <span class="px-2 py-1 text-xs font-medium rounded-full" [class]="getStatusClass(order.status)">

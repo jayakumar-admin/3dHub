@@ -59,6 +59,7 @@ export class PaymentComponent {
         city: shippingAddr.city,
         state: shippingAddr.state,
         zip: shippingAddr.zip,
+        pickupMethod: shippingAddr.pickupMethod,
       },
       customerDetails: {
         name: currentUser.name,
@@ -140,7 +141,7 @@ export class PaymentComponent {
         contact: shippingAddr.phone,
       },
       notes: {
-        address: `${shippingAddr.address}, ${shippingAddr.city}, ${shippingAddr.state} - ${shippingAddr.zip}`,
+        address: shippingAddr.pickupMethod === 'pickup' ? 'Self Pickup' : `${shippingAddr.address}, ${shippingAddr.city}, ${shippingAddr.state} - ${shippingAddr.zip}`,
         user_id: currentUser.id,
         items_summary: this.cartService.cartItems().map(item => `${item.productName} (Qty: ${item.quantity})`).join('; ')
       },

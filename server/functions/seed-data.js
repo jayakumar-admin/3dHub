@@ -229,6 +229,28 @@ const settings = {
           { name: 'Priya Patel', role: 'Customer Happiness Lead', bio: 'Priya is dedicated to providing the best experience for our customers, handling inquiries with a smile and ensuring satisfaction.', imageUrl: fbUrl('3dHub/team/team3.png') }
         ]
       }
+    },
+    whatsappNotifications: {
+      enableOrderNotifications: true,
+      apiProvider: 'mock_server',
+      whatsappToken: '',
+      whatsappPhoneId: '',
+      whatsappVersion: 'v19.0',
+      adminPhoneNumber: '911234567890',
+      adminNewOrderTemplateName: 'order_confirmation_admin',
+      adminNewOrderTemplateParams: '[CUSTOMER_NAME],[CUSTOMER_PHONE],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[ORDER_DATE],[SHIPPING_ADDRESS],[ORDER_LINK]',
+      customerNewOrderTemplateName: 'order_confirmation_client',
+      customerNewOrderTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[WEBSITE_NAME]',
+      customerProcessingTemplateName: 'order_status_update',
+      customerProcessingTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]',
+      customerShippedTemplateName: 'order_status_update',
+      customerShippedTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]',
+      customerDeliveredTemplateName: 'order_status_update',
+      customerDeliveredTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]',
+      customerCancelledTemplateName: 'order_status_update',
+      customerCancelledTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]',
+      orderStatusUpdateTemplateName: 'order_status_update',
+      orderStatusUpdateTemplateParams: '[CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]',
     }
 };
 

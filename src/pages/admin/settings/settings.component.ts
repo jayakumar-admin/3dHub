@@ -113,17 +113,12 @@ export class AdminSettingsComponent {
         whatsappVersion: ['v19.0'],
         adminPhoneNumber: ['', Validators.required],
         adminNewOrderTemplateName: ['', Validators.required],
-        adminNewOrderTemplateParams: ['', Validators.required],
         customerNewOrderTemplateName: ['', Validators.required],
-        customerNewOrderTemplateParams: ['', Validators.required],
         customerProcessingTemplateName: ['', Validators.required],
-        customerProcessingTemplateParams: ['', Validators.required],
         customerShippedTemplateName: ['', Validators.required],
-        customerShippedTemplateParams: ['', Validators.required],
         customerDeliveredTemplateName: ['', Validators.required],
-        customerDeliveredTemplateParams: ['', Validators.required],
         customerCancelledTemplateName: ['', Validators.required],
-        customerCancelledTemplateParams: ['', Validators.required],
+        orderStatusUpdateTemplateName: [''],
       })
     });
 

@@ -1,7 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth.service';
 
@@ -15,6 +15,7 @@ export class SignupComponent {
   fb: FormBuilder = inject(FormBuilder);
   router = inject(Router);
   authService = inject(AuthService);
+  route = inject(ActivatedRoute);
 
   isLoading = signal(false);
   signupError = signal<string | null>(null);
@@ -39,7 +40,8 @@ export class SignupComponent {
       const success = await this.authService.signUp({ name, email, phone, password });
       
       if (success) {
-        this.router.navigate(['/home']);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+        this.router.navigateByUrl(returnUrl);
       } else {
         this.signupError.set('Could not create account. The email might already be in use.');
       }

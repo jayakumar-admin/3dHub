@@ -19,6 +19,7 @@ export class ShippingComponent implements OnInit {
   notificationService = inject(NotificationService);
 
   shippingForm = this.fb.group({
+    pickupMethod: ['delivery', Validators.required],
     fullName: ['', Validators.required],
     address: ['', Validators.required],
     city: ['', Validators.required],
@@ -36,6 +37,14 @@ export class ShippingComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Subscribe to pickup method changes to update validators
+    this.shippingForm.get('pickupMethod')?.valueChanges.subscribe(method => {
+      this.updateValidators(method);
+    });
+
+    // Initial validator update based on current value
+    this.updateValidators(this.shippingForm.get('pickupMethod')?.value);
+
     // Subscribe to form value changes to provide live shipping cost updates
     // as the user types their address.
     this.shippingForm.valueChanges.subscribe(formValue => {
@@ -43,6 +52,26 @@ export class ShippingComponent implements OnInit {
       // a partial address object, as it only needs the 'zip' property for now.
       this.cartService.saveShippingAddress(formValue as ShippingAddress);
     });
+  }
+
+  updateValidators(method: string | null | undefined) {
+    const addressControls = ['address', 'city', 'state', 'zip'];
+    if (method === 'pickup') {
+      addressControls.forEach(controlName => {
+        const control = this.shippingForm.get(controlName);
+        control?.clearValidators();
+        control?.updateValueAndValidity({ emitEvent: false }); // Prevent infinite loop
+      });
+    } else {
+      addressControls.forEach(controlName => {
+        const control = this.shippingForm.get(controlName);
+        control?.setValidators(Validators.required);
+        if (controlName === 'zip') {
+             control?.addValidators(Validators.pattern('^[0-9]{6}(?:-[0-9]{4})?$'));
+        }
+        control?.updateValueAndValidity({ emitEvent: false }); // Prevent infinite loop
+      });
+    }
   }
 
   proceedToPayment() {

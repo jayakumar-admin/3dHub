@@ -7,7 +7,7 @@ const queries = {
     findUserByEmail: 'SELECT * FROM users WHERE email = $1',
     createUser: `
       INSERT INTO users (id, name, email, password, avatar, phone, role, joined_date) 
-      VALUES ($1, $2, $3, $4, $5, $6, 'Customer', CURRENT_DATE)
+      VALUES ($1, $2, $3, $4, $5, $6, 'Customer', CURRENT_TIMESTAMP)
       RETURNING id, name, email, avatar, phone, role, joined_date AS "joinedDate"
     `,
     getUserPasswordById: 'SELECT password FROM users WHERE id = $1',

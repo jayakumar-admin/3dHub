@@ -6,11 +6,13 @@ import { User } from '../../../models';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../notification.service';
 
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
+
 @Component({
   selector: 'app-admin-users',
   templateUrl: './users.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AvatarComponent],
 })
 export class AdminUsersComponent {
   dataService = inject(DataService);

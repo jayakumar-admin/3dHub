@@ -101,9 +101,11 @@ function buildTemplateParameters(paramMapping, availableValues) {
  * @param {string} templateName - The name of the approved WhatsApp template.
  * @param {string[]} parameters - An ordered array of values to fill template variables.
  * @param {object} notificationSettings - The WhatsApp settings object from the database.
+ * @param {string[]} [buttonParameters] - An ordered array of values to fill button variables (e.g. dynamic URLs).
+ * @param {string[]} [headerParameters] - An ordered array of values to fill header variables.
  * @returns {Promise<object>} A result object with success status and a reason.
  */
-async function sendWhatsappMessage(recipientNumber, templateName, parameters, notificationSettings) {
+async function sendWhatsappMessage(recipientNumber, templateName, parameters, notificationSettings, buttonParameters = [], headerParameters = []) {
   if (!notificationSettings?.enableOrderNotifications) {
     const reason = "WhatsApp notifications are disabled in settings.";
     console.log(`[SERVER] ⚠️ Skipping WhatsApp notification: ${reason}`);
@@ -118,7 +120,13 @@ async function sendWhatsappMessage(recipientNumber, templateName, parameters, no
     console.log(`\n--- [SERVER] SIMULATING WHATSAPP TEMPLATE MESSAGE ---`);
     console.log(`[SERVER] To: ${recipientNumber}`);
     console.log(`[SERVER] Template Name: ${templateName}`);
-    console.log(`[SERVER] Parameters: ${JSON.stringify(parameters)}`);
+    console.log(`[SERVER] Body Parameters: ${JSON.stringify(parameters)}`);
+    if (headerParameters && headerParameters.length > 0) {
+      console.log(`[SERVER] Header Parameters: ${JSON.stringify(headerParameters)}`);
+    }
+    if (buttonParameters && buttonParameters.length > 0) {
+      console.log(`[SERVER] Button Parameters: ${JSON.stringify(buttonParameters)}`);
+    }
     console.log('--- SIMULATION END ---\n');
     return { success: true, reason: 'Simulated successfully' };
   }
@@ -150,16 +158,47 @@ async function sendWhatsappMessage(recipientNumber, templateName, parameters, no
       template: {
         name: templateName,
         language: { code: "en" }, // Language code should match the template's language.
+        components: []
       }
     };
 
-    // FIX: Conditionally add the `components` object ONLY if there are parameters.
-    // The WhatsApp API rejects requests that include a components object for templates with no variables.
+    // Add header parameters if they exist
+    if (headerParameters && headerParameters.length > 0) {
+      payload.template.components.push({
+        type: 'header',
+        parameters: headerParameters.map(p => ({ type: 'text', text: p }))
+      });
+    }
+
+    // Add body parameters if they exist
     if (parameters.length > 0) {
-      payload.template.components = [{
+      payload.template.components.push({
         type: 'body',
         parameters: parameters.map(p => ({ type: 'text', text: p }))
-      }];
+      });
+    }
+
+    // Add button parameters if they exist
+    // Assuming button type is 'url' and index is 0 for the first button
+    if (buttonParameters && buttonParameters.length > 0) {
+      buttonParameters.forEach((param, index) => {
+         payload.template.components.push({
+          type: 'button',
+          sub_type: 'url',
+          index: index.toString(), // Index of the button in the template (0, 1, 2)
+          parameters: [
+            {
+              type: 'text',
+              text: param // The dynamic part of the URL
+            }
+          ]
+        });
+      });
+    }
+    
+    // Remove components array if empty to avoid API errors
+    if (payload.template.components.length === 0) {
+        delete payload.template.components;
     }
 
     const headers = { Authorization: `Bearer ${whatsappToken}`, "Content-Type": "application/json" };
@@ -198,17 +237,30 @@ async function sendNewOrderNotifications(order) {
     '[CUSTOMER_NAME]': order.customerName,
     '[CUSTOMER_PHONE]': order.customerPhone,
     '[TOTAL_AMOUNT]': `₹${order.totalAmount}`,
-    '[ORDER_LINK]': `${process.env.APP_URL}/orders/${order.id}`,
+    '[ORDER_LINK]': `${process.env.APP_URL}/admin/orders/${order.id}`, // Admin link
+    '[ORDER_LINK_SUFFIX]': `admin/orders/${order.id}`, // Suffix for button
     '[PRODUCT_LIST]': order.items?.map(item => `${item.quantity}x ${item.productName}`).join(', ') || 'Items',
-    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
-    '[PAYMENT_STATUS]': order.paymentDetails ? (typeof order.paymentDetails === 'string' ? JSON.parse(order.paymentDetails).status : order.paymentDetails.status) || 'Paid' : 'Pending',
+    '[WEBSITE_NAME]': settings.general?.websiteName || '3D Hub',
+    '[PAYMENT_STATUS]': order.paymentDetails ? 'Paid' : 'Pending',
     '[ORDER_DATE]': formatDate(order.orderDate || new Date()),
-    '[SHIPPING_ADDRESS]': typeof order.shippingAddress === 'object' ? `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zip}` : order.shippingAddress || 'N/A',
+    '[SHIPPING_ADDRESS]': typeof order.shippingAddress === 'object' ? 
+      (order.shippingAddress.pickupMethod === 'pickup' ? 'Self Pickup' : `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zip}`) 
+      : order.shippingAddress || 'N/A',
   };
 
   // 1. Send to Customer
   if (order.customerPhone && ns.customerNewOrderTemplateName) {
-    const customerParams = buildTemplateParameters(ns.customerNewOrderTemplateParams, availablePlaceholders);
+    // Hardcoded parameters for 'order_Placed' template
+    // [CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[WEBSITE_NAME]
+    const customerParams = [
+      String(availablePlaceholders['[CUSTOMER_NAME]'] || 'Customer'),
+      String(availablePlaceholders['[WEBSITE_NAME]'] || '3D Hub'),
+      String(availablePlaceholders['[ORDER_ID]'] || order.id),
+      String(availablePlaceholders['[TOTAL_AMOUNT]'] || '0'),
+      String(availablePlaceholders['[PAYMENT_STATUS]'] || 'Pending'),
+      String(availablePlaceholders['[WEBSITE_NAME]'] || '3D Hub')
+    ];
+
     const result = await sendWhatsappMessage(order.customerPhone, ns.customerNewOrderTemplateName, customerParams, ns);
     await logWhatsappMessage({
       recipientNumber: order.customerPhone,
@@ -223,11 +275,27 @@ async function sendNewOrderNotifications(order) {
   
   // 2. Send to Admin
   if (ns.adminPhoneNumber && ns.adminNewOrderTemplateName) {
-    const adminParams = buildTemplateParameters(ns.adminNewOrderTemplateParams, availablePlaceholders);
-    const result = await sendWhatsappMessage(ns.adminPhoneNumber, ns.adminNewOrderTemplateName, adminParams, ns);
+    // Hardcoded parameters for admin new order template
+    // [CUSTOMER_NAME],[CUSTOMER_PHONE],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[ORDER_DATE],[SHIPPING_ADDRESS]
+    const adminParams = [
+      String(availablePlaceholders['[CUSTOMER_NAME]'] || 'Customer'),
+      String(availablePlaceholders['[CUSTOMER_PHONE]'] || 'N/A'),
+      String(availablePlaceholders['[ORDER_ID]'] || order.id),
+      String(availablePlaceholders['[TOTAL_AMOUNT]'] || '0'),
+      String(availablePlaceholders['[PAYMENT_STATUS]'] || 'Pending'),
+      String(availablePlaceholders['[ORDER_DATE]'] || 'N/A'),
+      String(availablePlaceholders['[SHIPPING_ADDRESS]'] || 'N/A')
+    ];
+    
+    // Button parameter for admin to view order
+    const adminButtonParams = [
+        String(availablePlaceholders['[ORDER_LINK_SUFFIX]'])
+    ];
+
+    const result = await sendWhatsappMessage(ns.adminPhoneNumber, ns.adminNewOrderTemplateName, adminParams, ns, adminButtonParams);
     await logWhatsappMessage({
       recipientNumber: ns.adminPhoneNumber,
-      messageContent: { template: ns.adminNewOrderTemplateName, params: adminParams },
+      messageContent: { template: ns.adminNewOrderTemplateName, params: adminParams, buttonParams: adminButtonParams },
       status: result.success ? 'success' : 'failed',
       reason: result.reason,
       orderId: order.id,
@@ -255,25 +323,19 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
   const order = orderResult.rows[0];
 
   let templateName = "";
-  let templateParamsStr = "";
   
-  // Select the correct template name and parameter string based on the new status.
+  // Select the correct template name based on the new status.
   if (newStatus === "Processing") {
       templateName = ns.customerProcessingTemplateName;
-      templateParamsStr = ns.customerProcessingTemplateParams;
   } else if (newStatus === "Shipped") {
       templateName = ns.customerShippedTemplateName;
-      templateParamsStr = ns.customerShippedTemplateParams;
   } else if (newStatus === "Delivered") {
       templateName = ns.customerDeliveredTemplateName;
-      templateParamsStr = ns.customerDeliveredTemplateParams;
   } else if (newStatus === "Cancelled") {
       templateName = ns.customerCancelledTemplateName;
-      templateParamsStr = ns.customerCancelledTemplateParams;
   } else {
       // Fallback to a generic status update template if defined
       templateName = ns.orderStatusUpdateTemplateName || "";
-      templateParamsStr = ns.orderStatusUpdateTemplateParams || "";
   }
 
   if (!templateName) {
@@ -283,24 +345,48 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
 
   // A dictionary of all possible dynamic values for this event.
   const availablePlaceholders = {
-    '[CUSTOMER_NAME]': order.customerName,
-    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
     '[ORDER_ID]': order.id,
+    '[CUSTOMER_NAME]': order.customerName,
+    '[CARRIER]': shippingInfo?.carrier || 'our courier partner',
+    '[TRACKING_NUMBER]': shippingInfo?.trackingNumber || 'N/A',
+    '[ORDER_LINK]': `${process.env.APP_URL}/orders/${order.id}`,
+    '[ORDER_LINK_SUFFIX]': `orders/${order.id}`,
+    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
     '[ORDER_STATUS]': newStatus,
+    '[UPDATE_TIME]': formatDate(new Date()),
     '[TOTAL_AMOUNT]': `₹${order.totalAmount}`,
     '[PAYMENT_STATUS]': order.paymentDetails ? (typeof order.paymentDetails === 'string' ? JSON.parse(order.paymentDetails).status : order.paymentDetails.status) || 'Paid' : 'Pending',
     '[SHIPPING_DETAILS]': newStatus === 'Shipped' ? `Your order has been shipped via ${shippingInfo?.carrier || 'our partner'} with tracking ID: ${shippingInfo?.trackingNumber || 'N/A'}.` : `Your order status is now: ${newStatus}`,
-   
-    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
-    
   };
   
-  const parameters = buildTemplateParameters(templateParamsStr, availablePlaceholders);
+  // Hardcoded parameters for status updates
+  // [CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME]
+  const parameters = [
+    String(availablePlaceholders['[CUSTOMER_NAME]'] || 'Customer'),
+    String(availablePlaceholders['[WEBSITE_NAME]'] || '3D Hub'),
+    String(availablePlaceholders['[ORDER_ID]'] || order.id),
+    String(availablePlaceholders['[ORDER_STATUS]'] || newStatus),
+    String(availablePlaceholders['[TOTAL_AMOUNT]'] || '0'),
+    String(availablePlaceholders['[PAYMENT_STATUS]'] || 'Pending'),
+    String(availablePlaceholders['[SHIPPING_DETAILS]'] || 'N/A'),
+    String(availablePlaceholders['[WEBSITE_NAME]'] || '3D Hub')
+  ];
 
-  const result = await sendWhatsappMessage(order.customerPhone, templateName, parameters, ns);
+  // Button parameter for customer to view/track order
+  const buttonParameters = [
+    String(availablePlaceholders['[ORDER_LINK_SUFFIX]'])
+  ];
+
+  // Header parameter (e.g., Order Status or Order ID)
+  // Using Order Status as it's a "Status Update" notification
+  const headerParameters = [
+    String(availablePlaceholders['[ORDER_STATUS]'] || newStatus)
+  ];
+
+  const result = await sendWhatsappMessage(order.customerPhone, templateName, parameters, ns, buttonParameters, headerParameters);
   await logWhatsappMessage({
     recipientNumber: order.customerPhone,
-    messageContent: { template: templateName, params: parameters },
+    messageContent: { template: templateName, params: parameters, buttonParams: buttonParameters, headerParams: headerParameters },
     status: result.success ? 'success' : 'failed',
     reason: result.reason,
     orderId: order.id,

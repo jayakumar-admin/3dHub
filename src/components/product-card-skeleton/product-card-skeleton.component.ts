@@ -4,7 +4,30 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 @Component({
   selector: 'app-product-card-skeleton',
   standalone: true,
-  templateUrl: './product-card-skeleton.component.html',
+  template: `
+<div class="bg-light-card dark:bg-dark-card rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 flex flex-col h-full animate-pulse">
+  <!-- Image Skeleton -->
+  <div class="w-full h-64 bg-gray-200 dark:bg-gray-700"></div>
+  
+  <!-- Content Skeleton -->
+  <div class="p-5 flex flex-col flex-grow">
+    <!-- Category Skeleton -->
+    <div class="h-4 w-1/3 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+    
+    <!-- Title Skeleton -->
+    <div class="h-6 w-full bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+    
+    <!-- Rating Skeleton -->
+    <div class="h-5 w-1/2 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+    
+    <!-- Price Skeleton -->
+    <div class="mt-auto h-8 w-1/4 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+    
+    <!-- Button Skeleton -->
+    <div class="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+  </div>
+</div>
+`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCardSkeletonComponent {}

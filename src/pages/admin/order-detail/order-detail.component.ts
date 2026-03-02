@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { DataService } from '../../../data.service';
 import { Order } from '../../../models';
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../notification.service';
@@ -13,7 +14,7 @@ import { NotificationService } from '../../../notification.service';
   selector: 'app-admin-order-detail',
   templateUrl: './order-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, AvatarComponent],
 })
 export class AdminOrderDetailComponent {
   route = inject(ActivatedRoute);

@@ -42,12 +42,12 @@ export const MOCK_PRODUCTS: Product[] = [
 
 // --- MOCK ORDERS ---
 export const MOCK_ORDERS: Order[] = [
-    { id: 'ORD-2024-001', orderDate: '2024-07-20T10:30:00Z', customerName: 'Alice Johnson', customerEmail: 'alice.j@example.com', customerAvatar: fbUrl('3dHub/users/user1.png'), shippingAddress: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' }, totalAmount: 3998, status: 'Delivered', items: [{ productId: 'prod1', productName: 'Resin Wall Clock', quantity: 1, price: 1499, image: fbUrl('3dHub/products/prod1_thumb.jpg'), oldPrice: 2000 }, { productId: 'prod2', productName: 'Luxury Gift Hamper', quantity: 1, price: 2499, image: fbUrl('3dHub/products/prod2_thumb.jpg'), oldPrice: 3200 }], shippingInfo: { carrier: 'Express Courier', trackingNumber: 'EC123456789', estimatedDelivery: '2024-07-22' } },
-    { id: 'ORD-2024-002', orderDate: '2024-07-22T15:00:45Z', customerName: 'Bob Williams', customerEmail: 'bob.w@example.com', customerAvatar: fbUrl('3dHub/users/user2.png'), shippingAddress: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' }, totalAmount: 799, status: 'Shipped', items: [{ productId: 'prod3', productName: 'Memory Scrapbook', quantity: 1, price: 799, image: fbUrl('3dHub/products/prod3_thumb.jpg'), oldPrice: 999 }], shippingInfo: { carrier: 'Standard Post', trackingNumber: 'SP987654321', estimatedDelivery: '2024-07-26' } },
-    { id: 'ORD-2024-003', orderDate: '2024-07-23T09:15:10Z', customerName: 'Charlie Brown', customerEmail: 'charlie.b@example.com', customerAvatar: fbUrl('3dHub/users/user3.png'), shippingAddress: { street: '789 Imagination Ln', city: 'Star City', state: 'CA', zip: '90210' }, totalAmount: 3499, status: 'Processing', items: [{ productId: 'prod4', productName: 'Custom Neon Sign', quantity: 1, price: 3499, image: fbUrl('3dHub/products/prod4_thumb.jpg') }] },
-    { id: 'ORD-2024-004', orderDate: '2024-07-24T12:05:00Z', customerName: 'Diana Prince', customerEmail: 'diana.p@example.com', customerAvatar: fbUrl('3dHub/users/user4.png'), shippingAddress: { street: '1 Paradise Island', city: 'Themyscira', state: 'DC', zip: '12345' }, totalAmount: 2298, status: 'Pending', items: [{ productId: 'prod8', productName: 'Explosion Gift Box', quantity: 1, price: 1199, image: fbUrl('3dHub/products/prod8_thumb.jpg'), oldPrice: 1499 }, { productId: 'prod7', productName: 'Personalized Name Plate', quantity: 1, price: 999, image: fbUrl('3dHub/products/prod7_thumb.jpg') }] },
-    { id: 'ORD-2024-005', orderDate: '2024-07-25T17:40:25Z', customerName: 'Alice Johnson', customerEmail: 'alice.j@example.com', customerAvatar: fbUrl('3dHub/users/user1.png'), shippingAddress: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' }, totalAmount: 1899, status: 'Cancelled', items: [{ productId: 'prod6', productName: 'Enchanted Rose Lamp', quantity: 1, price: 1899, image: fbUrl('3dHub/products/prod6_thumb.jpg') }] },
-    { id: 'ORD-2024-006', orderDate: '2024-07-26T21:00:00Z', customerName: 'Bob Williams', customerEmail: 'bob.w@example.com', customerAvatar: fbUrl('3dHub/users/user2.png'), shippingAddress: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' }, totalAmount: 3398, status: 'Processing', items: [{ productId: 'prod9', productName: 'Galaxy Moon Lamp', quantity: 1, price: 1799, image: fbUrl('3dHub/products/prod9_thumb.jpg') }, { productId: 'prod10', productName: 'Couple Caricature Stand', quantity: 1, price: 1599, image: fbUrl('3dHub/products/prod10_thumb.jpg'), oldPrice: 1999 }] }
+    { id: 'ORD-2024-001', orderDate: '2024-07-20T10:30:00Z', customerName: 'Alice Johnson', customerEmail: 'alice.j@example.com', customerPhone: '9876543210', customerAvatar: fbUrl('3dHub/users/user1.png'), shippingAddress: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' }, totalAmount: 3998, status: 'Delivered', items: [{ productId: 'prod1', productName: 'Resin Wall Clock', quantity: 1, price: 1499, image: fbUrl('3dHub/products/prod1_thumb.jpg'), oldPrice: 2000 }, { productId: 'prod2', productName: 'Luxury Gift Hamper', quantity: 1, price: 2499, image: fbUrl('3dHub/products/prod2_thumb.jpg'), oldPrice: 3200 }], shippingInfo: { carrier: 'Express Courier', trackingNumber: 'EC123456789', estimatedDelivery: '2024-07-22' } },
+    { id: 'ORD-2024-002', orderDate: '2024-07-22T15:00:45Z', customerName: 'Bob Williams', customerEmail: 'bob.w@example.com', customerPhone: '9876543211', customerAvatar: fbUrl('3dHub/users/user2.png'), shippingAddress: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' }, totalAmount: 799, status: 'Shipped', items: [{ productId: 'prod3', productName: 'Memory Scrapbook', quantity: 1, price: 799, image: fbUrl('3dHub/products/prod3_thumb.jpg'), oldPrice: 999 }], shippingInfo: { carrier: 'Standard Post', trackingNumber: 'SP987654321', estimatedDelivery: '2024-07-26' } },
+    { id: 'ORD-2024-003', orderDate: '2024-07-23T09:15:10Z', customerName: 'Charlie Brown', customerEmail: 'charlie.b@example.com', customerPhone: '9876543212', customerAvatar: fbUrl('3dHub/users/user3.png'), shippingAddress: { street: '789 Imagination Ln', city: 'Star City', state: 'CA', zip: '90210' }, totalAmount: 3499, status: 'Processing', items: [{ productId: 'prod4', productName: 'Custom Neon Sign', quantity: 1, price: 3499, image: fbUrl('3dHub/products/prod4_thumb.jpg') }] },
+    { id: 'ORD-2024-004', orderDate: '2024-07-24T12:05:00Z', customerName: 'Diana Prince', customerEmail: 'diana.p@example.com', customerPhone: '9876543213', customerAvatar: fbUrl('3dHub/users/user4.png'), shippingAddress: { street: '1 Paradise Island', city: 'Themyscira', state: 'DC', zip: '12345' }, totalAmount: 2298, status: 'Pending', items: [{ productId: 'prod8', productName: 'Explosion Gift Box', quantity: 1, price: 1199, image: fbUrl('3dHub/products/prod8_thumb.jpg'), oldPrice: 1499 }, { productId: 'prod7', productName: 'Personalized Name Plate', quantity: 1, price: 999, image: fbUrl('3dHub/products/prod7_thumb.jpg') }] },
+    { id: 'ORD-2024-005', orderDate: '2024-07-25T17:40:25Z', customerName: 'Alice Johnson', customerEmail: 'alice.j@example.com', customerPhone: '9876543210', customerAvatar: fbUrl('3dHub/users/user1.png'), shippingAddress: { street: '123 Dream Ave', city: 'Metropolis', state: 'NY', zip: '10001' }, totalAmount: 1899, status: 'Cancelled', items: [{ productId: 'prod6', productName: 'Enchanted Rose Lamp', quantity: 1, price: 1899, image: fbUrl('3dHub/products/prod6_thumb.jpg') }] },
+    { id: 'ORD-2024-006', orderDate: '2024-07-26T21:00:00Z', customerName: 'Bob Williams', customerEmail: 'bob.w@example.com', customerPhone: '9876543211', customerAvatar: fbUrl('3dHub/users/user2.png'), shippingAddress: { street: '456 Wonder Rd', city: 'Gotham', state: 'NJ', zip: '07001' }, totalAmount: 3398, status: 'Processing', items: [{ productId: 'prod9', productName: 'Galaxy Moon Lamp', quantity: 1, price: 1799, image: fbUrl('3dHub/products/prod9_thumb.jpg') }, { productId: 'prod10', productName: 'Couple Caricature Stand', quantity: 1, price: 1599, image: fbUrl('3dHub/products/prod10_thumb.jpg'), oldPrice: 1999 }] }
 ];
 
 // --- MOCK CONTACT SUBMISSIONS ---
@@ -94,17 +94,12 @@ export const MOCK_SETTINGS: Settings = {
     whatsappPhoneId: 'YOUR_PHONE_NUMBER_ID',
     whatsappVersion: 'v19.0',
     adminPhoneNumber: '919876543210',
-    adminNewOrderTemplateName: 'admin_new_order',
-    adminNewOrderTemplateParams: '[CUSTOMER_NAME],[ORDER_ID],[TOTAL_AMOUNT]',
-    customerNewOrderTemplateName: 'customer_new_order',
-    customerNewOrderTemplateParams: '[CUSTOMER_NAME],[ORDER_ID],[TOTAL_AMOUNT]',
-    customerProcessingTemplateName: 'order_processing',
-    customerProcessingTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]',
-    customerShippedTemplateName: 'order_shipped',
-    customerShippedTemplateParams: '[ORDER_ID],[CARRIER],[TRACKING_NUMBER]',
-    customerDeliveredTemplateName: 'order_delivered',
-    customerDeliveredTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]',
-    customerCancelledTemplateName: 'order_cancelled',
-    customerCancelledTemplateParams: '[CUSTOMER_NAME],[ORDER_ID]'
+    adminNewOrderTemplateName: 'order_confirmation_admin',
+    customerNewOrderTemplateName: 'order_Placed',
+    customerProcessingTemplateName: 'order_status_update',
+    customerShippedTemplateName: 'order_status_update',
+    customerDeliveredTemplateName: 'order_status_update',
+    customerCancelledTemplateName: 'order_status_update',
+    
   }
 };

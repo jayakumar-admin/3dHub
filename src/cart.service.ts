@@ -6,6 +6,7 @@ import { DataService } from './data.service';
 
 // Define a type for the shipping address form
 export type ShippingAddress = {
+  pickupMethod:string,
   fullName: string;
   address: string;
   city: string;

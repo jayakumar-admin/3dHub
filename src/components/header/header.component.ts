@@ -10,11 +10,148 @@ import { DataService } from '../../data.service';
 import { AuthService } from '../../auth.service';
 import { WishlistService } from '../../wishlist.service';
 
+import { AvatarComponent } from '../avatar/avatar.component';
+
 @Component({
   selector: 'app-header',
-  templateUrl: './header.component.html',
+  template: `
+<header class="bg-light-card dark:bg-dark-card/80 backdrop-blur-sm shadow-md sticky top-0 z-40 transition-colors duration-300">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo and Mobile Menu Toggle -->
+      <div class="flex items-center">
+        <button (click)="toggleMenu()" class="md:hidden mr-4 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-light-text dark:hover:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+        <a routerLink="/home" class="flex-shrink-0 flex items-center">
+          @if (themeService.theme() === 'dark' && settings().general.logoUrlDark) {
+            <img [ngSrc]="settings().general.logoUrlDark" alt="Website Logo" class="h-10 w-auto" height="40" width="150">
+          } @else if (themeService.theme() === 'light' && settings().general.logoUrlLight) {
+            <img [ngSrc]="settings().general.logoUrlLight" alt="Website Logo" class="h-10 w-auto" height="40" width="150">
+          } @else {
+            <h1 class="text-2xl font-bold text-light-text dark:text-primary-dark">{{ settings().general.websiteName }}</h1>
+          }
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex flex-1 justify-center items-center space-x-8 text-sm font-medium text-gray-600 dark:text-gray-300">
+        <a routerLink="/home" routerLinkActive="text-primary-light dark:text-primary-dark" [routerLinkActiveOptions]="{exact: true}" class="hover:text-primary-light dark:hover:text-primary-dark transition-colors">Home</a>
+        <a routerLink="/products" routerLinkActive="text-primary-light dark:text-primary-dark" class="hover:text-primary-light dark:hover:text-primary-dark transition-colors">All Products</a>
+        <a routerLink="/about" routerLinkActive="text-primary-light dark:text-primary-dark" class="hover:text-primary-light dark:hover:text-primary-dark transition-colors">About Us</a>
+        <a routerLink="/contact" routerLinkActive="text-primary-light dark:text-primary-dark" class="hover:text-primary-light dark:hover:text-primary-dark transition-colors">Contact Us</a>
+      </nav>
+
+      <!-- Icons -->
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <button (click)="toggleTheme()" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+          @if (themeService.theme() === 'light') {
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          } @else {
+            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          }
+        </button>
+        <a routerLink="/wishlist" class="relative p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+          @if (wishlistService.wishlistCount() > 0) {
+            <span class="absolute top-0 right-0 block h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+              {{ wishlistService.wishlistCount() }}
+            </span>
+          }
+        </a>
+        <a routerLink="/cart" class="relative p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          @if (cartService.cartCount() > 0) {
+            <span class="absolute top-0 right-0 block h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+              {{ cartService.cartCount() }}
+            </span>
+          }
+        </a>
+        
+        <!-- Auth Links -->
+        @if (!currentUser()) {
+           <a routerLink="/login" class="hidden sm:inline-block text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark">Sign In</a>
+           <a routerLink="/signup" class="hidden sm:inline-block text-sm font-medium px-4 py-2 rounded-md bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900">Sign Up</a>
+        } @else {
+          <!-- Profile Dropdown -->
+          <div class="relative">
+            <button (click)="toggleProfileMenu()" class="p-1 rounded-full text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-primary-dark">
+              <app-avatar [name]="currentUser()?.name || ''" [imageUrl]="currentUser()?.avatar" size="sm"></app-avatar>
+            </button>
+            @if (isProfileMenuOpen()) {
+              <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-light-card dark:bg-dark-card ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b dark:border-gray-600">
+                  <p class="font-semibold truncate">{{ currentUser()?.name }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ currentUser()?.email }}</p>
+                </div>
+                <a routerLink="/profile" (click)="toggleProfileMenu()" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Profile</a>
+                <a routerLink="/orders" (click)="toggleProfileMenu()" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">My Orders</a>
+                @if(isAdmin()) {
+                    <a routerLink="/admin" (click)="toggleProfileMenu()" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Admin Panel</a>
+                }
+                <button (click)="logout()" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">Sign Out</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    @if (isMenuOpen()) {
+      <div class="md:hidden pb-4">
+        <nav class="mt-4 flex flex-col space-y-2 px-2">
+          <a routerLink="/home" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
+          <a routerLink="/products" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">All Products</a>
+          <a routerLink="/about" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">About Us</a>
+          <a routerLink="/contact" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">Contact Us</a>
+          <a routerLink="/wishlist" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">My Wishlist</a>
+          @if (currentUser()) {
+            <a routerLink="/orders" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">My Orders</a>
+          }
+        </nav>
+        
+        <!-- User account section for mobile -->
+        <div class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
+          @if (currentUser()) {
+            <div class="px-4">
+              <div class="flex items-center">
+                  <app-avatar [name]="currentUser()?.name || ''" [imageUrl]="currentUser()?.avatar" size="md"></app-avatar>
+                  <div class="ml-3">
+                      <p class="text-base font-medium text-light-text dark:text-dark-text truncate">{{currentUser()?.name}}</p>
+                      <p class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{{currentUser()?.email}}</p>
+                  </div>
+              </div>
+              <div class="mt-3 space-y-1">
+                <a routerLink="/profile" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">
+                    My Profile
+                </a>
+                @if(isAdmin()) {
+                    <a routerLink="/admin" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Admin Panel
+                    </a>
+                }
+                <button (click)="logout(); toggleMenu();" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700">
+                    Sign Out
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="space-y-2 px-2">
+              <a routerLink="/login" (click)="toggleMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-light-text dark:text-dark-text hover:bg-gray-100 dark:hover:bg-gray-700">Sign In</a>
+              <a routerLink="/signup" (click)="toggleMenu()" class="block w-full text-center px-3 py-2 rounded-md text-base font-medium bg-primary-light text-white dark:bg-primary-dark dark:text-gray-900">Sign Up</a>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</header>
+`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, NgOptimizedImage]
+  imports: [RouterLink, RouterLinkActive, CommonModule, FormsModule, NgOptimizedImage, AvatarComponent]
 })
 export class HeaderComponent {
   themeService = inject(ThemeService);

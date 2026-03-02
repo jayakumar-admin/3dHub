@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { DataService } from '../../../data.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AvatarComponent } from '../../../components/avatar/avatar.component';
 
 interface ProductSalesData {
   name: string;
@@ -22,7 +23,7 @@ interface ChartBar extends ProductSalesData {
   selector: 'app-admin-dashboard',
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink, AvatarComponent]
 })
 export class AdminDashboardComponent {
   dataService = inject(DataService);

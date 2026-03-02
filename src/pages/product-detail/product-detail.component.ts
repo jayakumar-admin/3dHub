@@ -8,13 +8,14 @@ import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CartService } from '../../cart.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { AvatarComponent } from '../../components/avatar/avatar.component';
 import { Review } from '../../models';
 
 @Component({
   selector: 'app-product-detail',
   templateUrl: './product-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, ProductCardComponent]
+  imports: [CommonModule, RouterLink, ProductCardComponent, AvatarComponent]
 })
 export class ProductDetailComponent {
   route = inject(ActivatedRoute);

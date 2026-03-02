@@ -1,6 +1,6 @@
 
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../auth.service';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ export class AdminLoginComponent {
   fb: FormBuilder = inject(FormBuilder);
   authService = inject(AuthService);
   dataService = inject(DataService);
+  route = inject(ActivatedRoute);
 
   loginError = signal<string | null>(null);
   showPassword = signal(false);
@@ -34,7 +35,10 @@ export class AdminLoginComponent {
       if (success) {
         // The data service will now show a global loader
         this.dataService.loadAdminData().subscribe({
-            next: () => this.router.navigate(['/admin/dashboard']),
+            next: () => {
+              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
+              this.router.navigateByUrl(returnUrl);
+            },
             error: (err) => {
                 this.loginError.set('Failed to load required admin data.');
             }

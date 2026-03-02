@@ -367,6 +367,7 @@ export class DataService {
         id: `ORD-MOCK-${Date.now()}`,
         orderDate: new Date().toISOString().split('T')[0],
         customerName: orderData.customerDetails.name,
+        customerPhone: orderData.customerPhone || 'N/A', // Use provided phone or default to 'N/A'
         customerEmail: orderData.customerDetails.email,
         customerAvatar: orderData.customerDetails.avatar || 'https://via.placeholder.com/100',
         shippingAddress: orderData.shippingAddress,
@@ -461,17 +462,11 @@ export class DataService {
         whatsappVersion: 'v19.0',
         adminPhoneNumber: '',
         adminNewOrderTemplateName: '',
-        adminNewOrderTemplateParams: '',
         customerNewOrderTemplateName: '',
-        customerNewOrderTemplateParams: '',
         customerProcessingTemplateName: '',
-        customerProcessingTemplateParams: '',
         customerShippedTemplateName: '',
-        customerShippedTemplateParams: '',
         customerDeliveredTemplateName: '',
-        customerDeliveredTemplateParams: '',
         customerCancelledTemplateName: '',
-        customerCancelledTemplateParams: ''
       }
     };
   }
