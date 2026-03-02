@@ -733,12 +733,12 @@
                 <h4 class="font-semibold">Admin: New Order Notification</h4>
                 <div>
                     <label for="adminNewOrderTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
-                    <input type="text" id="adminNewOrderTemplateName" formControlName="adminNewOrderTemplateName" class="admin-input" placeholder="e.g., admin_new_order">
+                    <input type="text" id="adminNewOrderTemplateName" formControlName="adminNewOrderTemplateName" class="admin-input" placeholder="e.g., order_confirmation_admin">
                 </div>
                 <div>
                     <label for="adminNewOrderTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
-                    <input type="text" id="adminNewOrderTemplateParams" formControlName="adminNewOrderTemplateParams" class="admin-input" placeholder="e.g., [CUSTOMER_NAME],[ORDER_ID]">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+                    <input type="text" id="adminNewOrderTemplateParams" formControlName="adminNewOrderTemplateParams" class="admin-input" placeholder="e.g., [CUSTOMER_NAME],[CUSTOMER_PHONE],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[ORDER_DATE],[SHIPPING_ADDRESS],[ORDER_LINK]">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[CUSTOMER_PHONE]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>, <code>[ORDER_DATE]</code>, <code>[SHIPPING_ADDRESS]</code>, <code>[ORDER_LINK]</code>, <code>[PRODUCT_LIST]</code>, <code>[WEBSITE_NAME]</code>.</p>
                 </div>
               </div>
 
@@ -747,12 +747,26 @@
                 <h4 class="font-semibold">Customer: Order Placed</h4>
                 <div>
                     <label for="customerNewOrderTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
-                    <input type="text" id="customerNewOrderTemplateName" formControlName="customerNewOrderTemplateName" class="admin-input" placeholder="e.g., customer_order_confirmation">
+                    <input type="text" id="customerNewOrderTemplateName" formControlName="customerNewOrderTemplateName" class="admin-input" placeholder="e.g., order_confirmation_client">
                 </div>
                 <div>
                     <label for="customerNewOrderTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
-                    <input type="text" id="customerNewOrderTemplateParams" formControlName="customerNewOrderTemplateParams" class="admin-input">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>.</p>
+                    <input type="text" id="customerNewOrderTemplateParams" formControlName="customerNewOrderTemplateParams" class="admin-input" placeholder="e.g., [CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[TOTAL_AMOUNT],[PAYMENT_STATUS],[WEBSITE_NAME]">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_DATE]</code>, <code>[ORDER_ID]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_LINK]</code>, <code>[PRODUCT_LIST]</code>.</p>
+                </div>
+              </div>
+
+              <!-- Customer: Order Status Update (Generic) -->
+              <div class="space-y-2">
+                <h4 class="font-semibold">Customer: Status Update (Generic)</h4>
+                <div>
+                    <label for="orderStatusUpdateTemplateName" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="orderStatusUpdateTemplateName" formControlName="orderStatusUpdateTemplateName" class="admin-input" placeholder="e.g., order_status_update">
+                </div>
+                <div>
+                    <label for="orderStatusUpdateTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
+                    <input type="text" id="orderStatusUpdateTemplateParams" formControlName="orderStatusUpdateTemplateParams" class="admin-input" placeholder="e.g., [CUSTOMER_NAME],[WEBSITE_NAME],[ORDER_ID],[ORDER_STATUS],[TOTAL_AMOUNT],[PAYMENT_STATUS],[SHIPPING_DETAILS],[WEBSITE_NAME],[ORDER_LINK]">
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[UPDATE_TIME]</code>, <code>[ORDER_ID]</code>, <code>[ORDER_STATUS]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>, <code>[SHIPPING_DETAILS]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_LINK]</code>.</p>
                 </div>
               </div>
 
@@ -766,7 +780,7 @@
                 <div>
                     <label for="customerProcessingTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
                     <input type="text" id="customerProcessingTemplateParams" formControlName="customerProcessingTemplateParams" class="admin-input">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[ORDER_LINK]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_STATUS]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>.</p>
                 </div>
               </div>
 
@@ -780,7 +794,7 @@
                 <div>
                     <label for="customerShippedTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
                     <input type="text" id="customerShippedTemplateParams" formControlName="customerShippedTemplateParams" class="admin-input">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[CARRIER]</code>, <code>[TRACKING_NUMBER]</code>.</p>
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[CARRIER]</code>, <code>[TRACKING_NUMBER]</code>, <code>[ORDER_LINK]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_STATUS]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>, <code>[SHIPPING_DETAILS]</code>.</p>
                 </div>
               </div>
 
@@ -794,7 +808,7 @@
                 <div>
                     <label for="customerDeliveredTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
                     <input type="text" id="customerDeliveredTemplateParams" formControlName="customerDeliveredTemplateParams" class="admin-input">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[ORDER_LINK]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_STATUS]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>.</p>
                 </div>
               </div>
               
@@ -808,7 +822,7 @@
                 <div>
                     <label for="customerCancelledTemplateParams" class="block text-sm font-medium mb-1">Template Parameters (in order)</label>
                     <input type="text" id="customerCancelledTemplateParams" formControlName="customerCancelledTemplateParams" class="admin-input">
-                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>.</p>
+                    <p class="text-xs text-gray-500 mt-1">Available: <code>[CUSTOMER_NAME]</code>, <code>[ORDER_ID]</code>, <code>[ORDER_LINK]</code>, <code>[WEBSITE_NAME]</code>, <code>[ORDER_STATUS]</code>, <code>[TOTAL_AMOUNT]</code>, <code>[PAYMENT_STATUS]</code>.</p>
                 </div>
               </div>
           </div>

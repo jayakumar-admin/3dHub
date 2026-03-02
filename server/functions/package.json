@@ -1,8 +1,7 @@
 {
-  "name": "3dhub-ecommerce-server",
-  "version": "1.0.0",
-  "description": "Backend API for the 3D Hub E-Commerce application.",
-  "main": "server.js",
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "main": "index.js",
 "scripts": {
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",

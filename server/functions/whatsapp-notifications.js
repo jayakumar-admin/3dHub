@@ -11,15 +11,15 @@ async function logWhatsappMessage({ recipientNumber, messageContent, status, rea
   try {
     // For template messages, messageContent is an object. Stringify it for logging.
     const contentToLog = typeof messageContent === 'object' ? JSON.stringify(messageContent) : messageContent;
-    // await db.query(queries.whatsapp.logMessage, [
-    //   recipientNumber,
-    //   contentToLog,
-    //   status,
-    //   reason,
-    //   orderId,
-    //   userId,
-    //   messageType
-    // ]);
+    await db.query(queries.whatsapp.logMessage, [
+      recipientNumber,
+      contentToLog,
+      status,
+      reason,
+      orderId,
+      userId,
+      messageType
+    ]);
   } catch (error) {
     console.error("❌ Failed to log WhatsApp message to DB:", error);
   }
@@ -46,6 +46,25 @@ const formatPhone = (number) => {
   if (!number) return null;
   const cleaned = number.replace(/\s/g, '').replace(/\+/g, '');
   return cleaned.startsWith('91') ? cleaned : `91${cleaned}`;
+};
+
+/**
+ * Formats a date to "dd MMM yyyy h:mm AM/PM" format.
+ */
+const formatDate = (date) => {
+  if (!date) return 'N/A';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'N/A';
+  
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = d.toLocaleString('en-IN', { month: 'short' });
+  const year = d.getFullYear();
+  let hours = d.getHours();
+  const minutes = d.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  return `${day} ${month} ${year} ${hours}:${minutes} ${ampm}`;
 };
 
 /**
@@ -130,7 +149,7 @@ async function sendWhatsappMessage(recipientNumber, templateName, parameters, no
       type: "template",
       template: {
         name: templateName,
-        language: { code: "en_US" }, // Language code should match the template's language.
+        language: { code: "en" }, // Language code should match the template's language.
       }
     };
 
@@ -139,20 +158,8 @@ async function sendWhatsappMessage(recipientNumber, templateName, parameters, no
     if (parameters.length > 0) {
       payload.template.components = [{
         type: 'body',
-        parameters: parameters.map(p => ({ type: 'text', text: p })),
-        
+        parameters: parameters.map(p => ({ type: 'text', text: p }))
       }];
-  payload.template.components.push({
-      type: "button",
-      sub_type: "url",
-      index: "0",
-      parameters: [
-        {
-          type: "text",
-          text: String('www.google.com') // ⚠️ dynamic value (orderId etc)
-        }
-      ]
-    });
     }
 
     const headers = { Authorization: `Bearer ${whatsappToken}`, "Content-Type": "application/json" };
@@ -189,7 +196,14 @@ async function sendNewOrderNotifications(order) {
   const availablePlaceholders = {
     '[ORDER_ID]': order.id,
     '[CUSTOMER_NAME]': order.customerName,
-    '[TOTAL_AMOUNT]': order.totalAmount.toString(),
+    '[CUSTOMER_PHONE]': order.customerPhone,
+    '[TOTAL_AMOUNT]': `₹${order.totalAmount}`,
+    '[ORDER_LINK]': `${process.env.APP_URL}/orders/${order.id}`,
+    '[PRODUCT_LIST]': order.items?.map(item => `${item.quantity}x ${item.productName}`).join(', ') || 'Items',
+    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
+    '[PAYMENT_STATUS]': order.paymentDetails ? (typeof order.paymentDetails === 'string' ? JSON.parse(order.paymentDetails).status : order.paymentDetails.status) || 'Paid' : 'Pending',
+    '[ORDER_DATE]': formatDate(order.orderDate || new Date()),
+    '[SHIPPING_ADDRESS]': typeof order.shippingAddress === 'object' ? `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zip}` : order.shippingAddress || 'N/A',
   };
 
   // 1. Send to Customer
@@ -233,7 +247,7 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
 
   if (!ns?.enableOrderNotifications) return;
 
-  const orderResult = await db.query("SELECT id, customer_name AS \"customerName\", customer_phone AS \"customerPhone\", user_id FROM orders WHERE id = $1", [orderId]);
+  const orderResult = await db.query("SELECT id, customer_name AS \"customerName\", customer_phone AS \"customerPhone\", total_amount AS \"totalAmount\", payment_details AS \"paymentDetails\", order_date AS \"orderDate\", user_id FROM orders WHERE id = $1", [orderId]);
   if (orderResult.rows.length === 0) {
     console.error(`[SERVER] Could not find order ${orderId} to send status update.`);
     return;
@@ -244,24 +258,22 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
   let templateParamsStr = "";
   
   // Select the correct template name and parameter string based on the new status.
-  switch (newStatus) {
-    case "Processing":
+  if (newStatus === "Processing") {
       templateName = ns.customerProcessingTemplateName;
       templateParamsStr = ns.customerProcessingTemplateParams;
-      break;
-    case "Shipped":
+  } else if (newStatus === "Shipped") {
       templateName = ns.customerShippedTemplateName;
       templateParamsStr = ns.customerShippedTemplateParams;
-      break;
-    case "Delivered":
+  } else if (newStatus === "Delivered") {
       templateName = ns.customerDeliveredTemplateName;
       templateParamsStr = ns.customerDeliveredTemplateParams;
-      break;
-    case "Cancelled":
+  } else if (newStatus === "Cancelled") {
       templateName = ns.customerCancelledTemplateName;
       templateParamsStr = ns.customerCancelledTemplateParams;
-      break;
-    default: return; // No template for other statuses
+  } else {
+      // Fallback to a generic status update template if defined
+      templateName = ns.orderStatusUpdateTemplateName || "";
+      templateParamsStr = ns.orderStatusUpdateTemplateParams || "";
   }
 
   if (!templateName) {
@@ -271,10 +283,16 @@ async function sendOrderStatusUpdate(orderId, newStatus, shippingInfo) {
 
   // A dictionary of all possible dynamic values for this event.
   const availablePlaceholders = {
-    '[ORDER_ID]': order.id,
     '[CUSTOMER_NAME]': order.customerName,
-    '[CARRIER]': shippingInfo?.carrier || 'our courier partner',
-    '[TRACKING_NUMBER]': shippingInfo?.trackingNumber || 'N/A',
+    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
+    '[ORDER_ID]': order.id,
+    '[ORDER_STATUS]': newStatus,
+    '[TOTAL_AMOUNT]': `₹${order.totalAmount}`,
+    '[PAYMENT_STATUS]': order.paymentDetails ? (typeof order.paymentDetails === 'string' ? JSON.parse(order.paymentDetails).status : order.paymentDetails.status) || 'Paid' : 'Pending',
+    '[SHIPPING_DETAILS]': newStatus === 'Shipped' ? `Your order has been shipped via ${shippingInfo?.carrier || 'our partner'} with tracking ID: ${shippingInfo?.trackingNumber || 'N/A'}.` : `Your order status is now: ${newStatus}`,
+   
+    '[WEBSITE_NAME]': settings.general?.websiteName || 'Our Store',
+    
   };
   
   const parameters = buildTemplateParameters(templateParamsStr, availablePlaceholders);
