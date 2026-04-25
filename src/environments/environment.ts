@@ -20,5 +20,5 @@ export const environment = {
    * This is used only when `useTestData` is false.
    */
     // apiUrl: 'http://localhost:3000/api',
-  apiUrl: 'https://api-wddjmdzuzq-uc.a.run.app/api'
+  apiUrl: 'https://api-zogwo6z5ha-uc.a.run.app/api'
 };

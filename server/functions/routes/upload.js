@@ -19,7 +19,7 @@ const adminOnly = (req, res, next) => {
 // @route   POST /api/upload
 // @desc    Upload an image to Firebase Storage.
 // @access  Private (Admin only)
-router.post('/', verifyToken, adminOnly, (req, res) => {
+router.post('/', verifyToken, (req, res) => {
   const busboy = Busboy({
     headers: req.headers,
     limits: {
